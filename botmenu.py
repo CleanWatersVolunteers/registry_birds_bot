@@ -9,10 +9,12 @@ template_yes = '✅ '
 template_no = '❌ '
 
 def add_hdr_item(label, value):
+    text = f'{label}: '
     if value:
-        return f'{label}: {value}\n'
+        text += f'{value}\n'
     else:
-        return '-\n'
+        text += '-\n'
+    return text
 
 
 def welcome_menu(username):
@@ -39,16 +41,16 @@ def welcome_menu(username):
         return text, tgm.make_inline_keyboard(keyboard_menu_select_base)
     
     text += add_hdr_item("Номер животного", user["code"])
-    text += add_hdr_item("Место отлова", user["capture_place"])
-    text += add_hdr_item("Время отлова", user["capture_date"])
-    text += add_hdr_item("Степень загрязнения", user["polution"])
-    if user["mass"]:
-        text += add_hdr_item("Масса животного", user["mass"] + "гр.")
+    text += add_hdr_item("Место отлова", bird["capture_place"])
+    text += add_hdr_item("Время отлова", bird["capture_date"])
+    text += add_hdr_item("Степень загрязнения", bird["polution"])
+    if bird["mass"]:
+        text += add_hdr_item("Масса животного", bird["mass"] + "гр.")
     else:
         text += add_hdr_item("Масса животного", None)
-    text += add_hdr_item("Вид", user["species"])
-    text += add_hdr_item("Пол", user["sex"])
-    text += add_hdr_item("Клиническое состояние", user["clinic_state"])
+    text += add_hdr_item("Вид", bird["species"])
+    text += add_hdr_item("Пол", bird["sex"])
+    text += add_hdr_item("Клиническое состояние", bird["clinic_state"])
 
 
     # Поступление
@@ -263,7 +265,7 @@ def keyboard_menu_apm_handler(query)->(str,[]):
     text = 'Ошибка!'
     keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
     if query.data in keyboard_menu_select_mode:
-        text = f'{keyboard_menu_select_mode["menu_mode_apm0"]}:\n'
+        text = f'{keyboard_menu_select_mode[query.data]}:\n'
     if query.data == 'menu_mode_add_bird' or query.data == 'menu_mode_select_bird':
         text = "Введите бар-код"
     if query.data == 'menu_mode_apm0':
