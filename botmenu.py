@@ -8,12 +8,19 @@ from logs import log
 template_yes = '✅ '
 template_no = '❌ '
 
+def add_hdr_item(label, value):
+    if value:
+        return f'{label}: {value}\n'
+    else:
+        return '-\n'
+
+
 def welcome_menu(username):
     user = storage.get_user(username)
 
     if not user:
         return "Пожалуйста войдите в систему!", None
-    text = f'Здравствуйте @{username}!\n'
+    text = ''
 
     bird = None
     if user["code"]:
@@ -31,19 +38,25 @@ def welcome_menu(username):
         text += 'ДОБАВЬТЕ/ВЫБЕРИТЕ ПТИЦУ'
         return text, tgm.make_inline_keyboard(keyboard_menu_select_base)
     
-    text += f'Номер животного: {user["code"]}\n'
+    text += add_hdr_item("Номер животного", user["code"])
+    text += add_hdr_item("Место отлова", user["capture_place"])
+    text += add_hdr_item("Время отлова", user["capture_date"])
+    text += add_hdr_item("Степень загрязнения", user["polution"])
+    if user["mass"]:
+        text += add_hdr_item("Масса животного", user["mass"] + "гр.")
+    else:
+        text += add_hdr_item("Масса животного", None)
+    text += add_hdr_item("Вид", user["species"])
+    text += add_hdr_item("Пол", user["sex"])
+    text += add_hdr_item("Клиническое состояние", user["clinic_state"])
+
 
     # Поступление
     if bird["stage0"]:
         text += template_yes
-        text += f'{keyboard_menu_select_mode["menu_mode_apm0"]}:\n'
-        if bird["capture_place"] and bird["capture_date"] and bird["polution"]:
-            text += f'\t\tМесто отлова: {bird["capture_place"]}\n'
-            text += f'\t\tВремя отлова: {bird["capture_date"]}\n'
-            text += f'\t\tСтепень загрязнения: {bird["polution"]}\n'
     else:
         text += template_no
-        text += f'{keyboard_menu_select_mode["menu_mode_apm0"]}\n'
+    text += f'{keyboard_menu_select_mode["menu_mode_apm0"]}:\n'
 
     # Мойка
     if bird["stage1"]:
@@ -62,35 +75,23 @@ def welcome_menu(username):
     # Стационар
     if bird["stage3"]:
         text += template_yes
-        if bird["mass"]:
-            text += f'{keyboard_menu_select_mode["menu_mode_apm3"]}:\n'
-            text += f'\t\tМасса животного: {bird["mass"]}\n'
     else:
         text += template_no
-        text += f'{keyboard_menu_select_mode["menu_mode_apm3"]}\n'
+    text += f'{keyboard_menu_select_mode["menu_mode_apm3"]}\n'
 
     # Врач
     if bird["stage4"]:
         text += template_yes
-        text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}:\n'
-        if bird["species"] and bird["sex"] and bird["clinic_state"]:
-            text += f'\t\tВид: {bird["species"]}\n'
-            text += f'\t\tПол: {bird["sex"]}\n'
-            text += f'\t\tКлиническое состояние: {bird["clinic_state"]}\n'
     else:
         text += template_no
-        text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}\n'
+    text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}\n'
 
     # Нянька
     if bird["stage5"]:
         text += template_yes
-        if bird["nanny"]:
-            text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}: {bird["nanny"]}\n'
-        else:
-            text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}:\n'
     else:
         text += template_no
-        text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}\n'
+    text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}\n'
 
     # Загон
     if bird["stage6"]:
@@ -99,9 +100,102 @@ def welcome_menu(username):
         text += template_no
     text += f'{keyboard_menu_select_mode["menu_mode_apm6"]}'
 
-        
-
     return text, tgm.make_inline_keyboard(keyboard_menu_select_mode)
+
+
+# def welcome_menu(username):
+#     user = storage.get_user(username)
+
+#     if not user:
+#         return "Пожалуйста войдите в систему!", None
+#     text = ''
+
+#     bird = None
+#     if user["code"]:
+#         bird = storage.get_bird(user["code"])
+
+#     # Check selected address
+#     if not user["location"]:
+#         text += 'Выберите локацию'
+#         keyboard = tgm.make_inline_keyboard(keyboard_addr_list)
+#         return text, keyboard
+#     text += f'Адрес: {user["location"]}\n'
+
+#     # Check bird in list
+#     if not bird:
+#         text += 'ДОБАВЬТЕ/ВЫБЕРИТЕ ПТИЦУ'
+#         return text, tgm.make_inline_keyboard(keyboard_menu_select_base)
+    
+#     text += f'Номер животного: {user["code"]}\n'
+
+#     # Поступление
+#     if bird["stage0"]:
+#         text += template_yes
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm0"]}:\n'
+#         if bird["capture_place"] and bird["capture_date"] and bird["polution"]:
+#             text += f'\t\tМесто отлова: {bird["capture_place"]}\n'
+#             text += f'\t\tВремя отлова: {bird["capture_date"]}\n'
+#             text += f'\t\tСтепень загрязнения: {bird["polution"]}\n'
+#     else:
+#         text += template_no
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm0"]}\n'
+
+#     # Мойка
+#     if bird["stage1"]:
+#         text += template_yes
+#     else:
+#         text += template_no
+#     text += f'{keyboard_menu_select_mode["menu_mode_apm1"]}\n'
+
+#     # Первичка
+#     if bird["stage2"]:
+#         text += template_yes
+#     else:
+#         text += template_no
+#     text += f'{keyboard_menu_select_mode["menu_mode_apm2"]}\n'
+
+#     # Стационар
+#     if bird["stage3"]:
+#         text += template_yes
+#         if bird["mass"]:
+#             text += f'{keyboard_menu_select_mode["menu_mode_apm3"]}:\n'
+#             text += f'\t\tМасса животного: {bird["mass"]}\n'
+#     else:
+#         text += template_no
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm3"]}\n'
+
+#     # Врач
+#     if bird["stage4"]:
+#         text += template_yes
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}:\n'
+#         if bird["species"] and bird["sex"] and bird["clinic_state"]:
+#             text += f'\t\tВид: {bird["species"]}\n'
+#             text += f'\t\tПол: {bird["sex"]}\n'
+#             text += f'\t\tКлиническое состояние: {bird["clinic_state"]}\n'
+#     else:
+#         text += template_no
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}\n'
+
+#     # Нянька
+#     if bird["stage5"]:
+#         text += template_yes
+#         if bird["nanny"]:
+#             text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}: {bird["nanny"]}\n'
+#         else:
+#             text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}:\n'
+#     else:
+#         text += template_no
+#         text += f'{keyboard_menu_select_mode["menu_mode_apm5"]}\n'
+
+#     # Загон
+#     if bird["stage6"]:
+#         text += template_yes
+#     else:
+#         text += template_no
+#     text += f'{keyboard_menu_select_mode["menu_mode_apm6"]}'
+
+#     return text, tgm.make_inline_keyboard(keyboard_menu_select_mode)
+
 
 keyboard_menu_select_mode = {
     "menu_mode_apm0":"Поступление (АРМ1)",
@@ -168,26 +262,27 @@ def keyboard_menu_apm_handler(query)->(str,[]):
 
     text = 'Ошибка!'
     keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
-
+    if query.data in keyboard_menu_select_mode:
+        text = f'{keyboard_menu_select_mode["menu_mode_apm0"]}:\n'
     if query.data == 'menu_mode_add_bird' or query.data == 'menu_mode_select_bird':
         text = "Введите бар-код"
     if query.data == 'menu_mode_apm0':
-        text = "Введите через запятую: \nместо отлова, \nдату и время отлова, \nстепень загрязнения(1-10)"
+        text += "Введите через запятую: \nместо отлова, \nдату и время отлова, \nстепень загрязнения(1-10)"
     if query.data == 'menu_mode_apm1':
-        text = "Выполните мойку животного и нажмите 'Готово'"
+        text += "Выполните мойку животного и нажмите 'Готово'"
         keyboard = tgm.make_inline_keyboard(keyboard_menu_apm1)
     if query.data == 'menu_mode_apm2':
-        text = "Выполните необходимые действия и нажмите 'Готово'"
+        text += "Выполните необходимые действия и нажмите 'Готово'"
         keyboard = tgm.make_inline_keyboard(keyboard_menu_apm2)
     if query.data == 'menu_mode_apm3':
-        text = "Введите массу животного"
+        text += "Введите массу животного в граммах"
     if query.data == 'menu_mode_apm4':
-        text = "Введите через запятую: \nвид животного, \nпол животного, \nклиническое состояние"
+        text += "Введите через запятую: \nвид животного, \nпол животного, \nклиническое состояние"
     if query.data == 'menu_mode_apm5':
-        text = "Выберите тип операции"
+        text += "Выберите тип операции"
         keyboard = tgm.make_inline_keyboard(keyboard_menu_nanny)
     if query.data == 'menu_mode_apm6':
-        text = "Выполните необходимые действия и нажмите 'Готово'"
+        text += "Выполните необходимые действия и нажмите 'Готово'"
         keyboard = tgm.make_inline_keyboard(keyboard_menu_apm6)
     return text, keyboard
 
@@ -283,7 +378,7 @@ async def cb_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         # Стационар
         if user["apm"] == keyboard_menu_select_mode["menu_mode_apm3"]:
             data = update.message.text
-            text = f'Некорректный ввод:{update.message.text}\nВведите массу животного'
+            text = f'{keyboard_menu_select_mode["menu_mode_apm3"]}:\nНекорректный ввод:{update.message.text}\nВведите массу животного в граммах'
             keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
             if len(data) > 0:
                 storage.upd_bird(user["code"], "mass", data)
@@ -293,7 +388,7 @@ async def cb_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         # Врач
         if user["apm"] == keyboard_menu_select_mode["menu_mode_apm4"]:
             data = update.message.text.split(',')
-            text = f'Некорректный ввод:{update.message.text}\nВведите через запятую: \nвид животного, \nпол животного, \nклиническое состояние'
+            text = f'{keyboard_menu_select_mode["menu_mode_apm3"]}:\nНекорректный ввод:{update.message.text}\nВведите через запятую: \nвид животного, \nпол животного, \nклиническое состояние'
             keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
             if len(data) == 3:
                 storage.upd_bird(user["code"], "species", data[0])
