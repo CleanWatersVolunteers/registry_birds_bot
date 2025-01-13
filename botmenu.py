@@ -76,7 +76,7 @@ def welcome_menu(username):
         if bird["species"] and bird["sex"] and bird["clinic_state"]:
             text += f'\t\tВид: {bird["species"]}\n'
             text += f'\t\tПол: {bird["sex"]}\n'
-            text += f'\t\tКлиническое остояние: {bird["clinic_state"]}\n'
+            text += f'\t\tКлиническое состояние: {bird["clinic_state"]}\n'
     else:
         text += template_no
         text += f'{keyboard_menu_select_mode["menu_mode_apm4"]}\n'
