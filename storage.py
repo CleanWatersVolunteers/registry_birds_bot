@@ -22,7 +22,7 @@ class storage:
 
     @classmethod
     def __create_user(cls):
-        user = {"location":None, "apm":None, "code":None}
+        user = {"addr":None, "mode":None, "code":None}
         return user
 
     @classmethod

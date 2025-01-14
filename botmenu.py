@@ -5,6 +5,23 @@ from storage import storage
 
 from logs import log
 
+
+user_mode = {
+    "mode_apm0":"Поступление (АРМ1)",
+    "mode_apm1":"Мойка (АРМ1)",
+    "mode_apm2":"Первичка (АРМ2)",
+    "mode_apm3":"Стационар (АРМ3)",
+    "mode_apm4":"Врач (АРМ4)",
+    "mode_apm5":"Нянька (АРМ5)",
+    "mode_apm6":"Загон (АРМ6)",
+    "mode_add_bird":"Добавить птицу",
+    "mode_select_bird":"Выбрать птицу",
+    "mode_select_addr":"Сменить локацию",  
+}
+
+
+
+
 template_yes = '✅ '
 template_no = '❌ '
 
@@ -258,9 +275,26 @@ keyboard_handlers = {
     "menu_nanny1":keyboard_menu_done_handler,
     "menu_nanny2":keyboard_menu_done_handler,
     "menu_nanny3":keyboard_menu_done_handler,
-
-
 }
+
+from barcode_reader import barCodeReader
+
+async def cb_message_barcode(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    file_id = update.message.photo[0].file_id
+    new_file = await update.message.effective_attachment[-1].get_file()
+    file_name = new_file.file_path.split('/')[-1]
+    await new_file.download_to_drive()
+    code = barCodeReader(file_name)
+ 
+    if len(code) == 1:
+        print(f'[..] barcode: {code[0]}')
+        keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
+        await update.message.reply_text(f'Получен баркод: {code[0]}', reply_markup=InlineKeyboardMarkup(keyboard))
+        # await query.edit_message_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+    else:
+        print(f'[!!] barcode error: {code}')
+        keyboard = tgm.make_inline_keyboard(keyboard_menu_cancel)
+        await update.message.reply_text(f'Неправильный ввод!', reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 async def cb_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

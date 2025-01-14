@@ -6,6 +6,8 @@ from datetime import datetime
 from storage import storage
 from logs import log
 
+from ui_welcome import *
+
 f = open('token', 'r')
 TELEGRAM_BOT_TOKEN = f.read()
 f.close()
@@ -17,10 +19,11 @@ storage.init("user.base","birds.base")
 async def main() -> None:
 	application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
-	application.add_handler(CommandHandler("start", botmenu.cb_message_entry))
-	application.add_handler(MessageHandler(filters.TEXT, botmenu.cb_message_entry))
+	application.add_handler(CommandHandler("start", ui_message_entry))
+	application.add_handler(MessageHandler(filters.TEXT, ui_message_entry))
+	application.add_handler(MessageHandler(filters.PHOTO, ui_photo_entry))
 
-	application.add_handler(CallbackQueryHandler(botmenu.cb_reaction_button))
+	application.add_handler(CallbackQueryHandler(ui_button_pressed))
 
 	await application.initialize()
 	await application.start()
