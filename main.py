@@ -1,7 +1,6 @@
 import asyncio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
-import botmenu
 from datetime import datetime
 from storage import storage
 from logs import log
