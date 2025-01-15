@@ -40,14 +40,14 @@ def apm0_done_hndl(user, key=None, msg=None)->(str,):
 # Global API
 ############################################
 # create new bird
-def apm0_add_bird(user, key=None, msg=None)->(str,):
+def ui_apm0_add_bird(user, key=None, msg=None)->(str,):
     user["mode"] = "kbd_mode_apm0"
     text = APM0_TEXT(apm0_text_entry_barode) 
     keyboard = tgm.make_inline_keyboard(apm0_cancel)
     return text, keyboard
 
 # find existing bird
-def apm0_sel_bird(user, key=None, msg=None)->(str,):
+def ui_apm0_sel_bird(user, key=None, msg=None)->(str,):
     print(msg)
     user["mode"] = "kbd_mode_apm0_sw"
     text = APM0_TEXT(apm0_text_entry_barode) 
@@ -55,7 +55,7 @@ def apm0_sel_bird(user, key=None, msg=None)->(str,):
     return text, keyboard
 
 # barcode parser
-def apm0_entry(user, key=None, msg=None)->(str,):
+def ui_apm0_entry(user, key=None, msg=None)->(str,):
     print(f'[..] Entered barcode {msg}')
     barcode = msg
 
@@ -85,12 +85,6 @@ def apm0_entry(user, key=None, msg=None)->(str,):
             text += f'{barcode}\n'
             text += apm0_text_entry_barode
     return text, keyboard
-
-
-welcome_handlers["kbd_mode_apm0"] = apm0_entry
-welcome_handlers["kbd_mode_apm0_sw"] = apm0_entry
-welcome_handlers["kbd_add_bird"] = apm0_add_bird
-welcome_handlers["kbd_sel_bird"] = apm0_sel_bird
 
 welcome_handlers["kbd_apm0_done"] = apm0_done_hndl
 welcome_handlers["kbd_apm0_sw_bird"] = apm0_done_hndl

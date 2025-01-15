@@ -167,7 +167,10 @@ welcome_handlers = {
 }
 
 from ui_apm0 import *
-
+welcome_handlers["kbd_mode_apm0"] = ui_apm0_entry
+welcome_handlers["kbd_mode_apm0_sw"] = ui_apm0_entry
+welcome_handlers["kbd_add_bird"] = ui_apm0_add_bird
+welcome_handlers["kbd_sel_bird"] = ui_apm0_sel_bird
 
 ##########################################
 # Main callback process
@@ -231,9 +234,9 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await new_file.download_to_drive()
         code = barCodeReader(file_name)
         if len(code) == 1:
-            text, keyboard = apm0_entry(user, msg=code[0])
+            text, keyboard = ui_apm0_entry(user, msg=code[0])
         else:
-            text, keyboard = apm0_entry(user, msg='')
+            text, keyboard = ui_apm0_entry(user, msg='')
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
     return None
 
