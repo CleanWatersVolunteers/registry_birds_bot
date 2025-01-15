@@ -1,28 +1,16 @@
 import cv2 as cv
 from pyzbar.pyzbar import decode 
 
-def barCodeReader(image, sim=False) -> None:
-    img = cv.imread(image)
-    barcodes = decode(img)
+# pip install pyzbar
+# sudo apt install libzbar0
 
-    if not barcodes:
-        print("barcodes not detected")
-    else:
+
+def barCodeReader(image, sim=False) -> []:
+    barcodes = decode(cv.imread(image))
+    codes = []
+
+    if barcodes:
         for barcode in barcodes:
-            (x, y, w, h) = barcode.rect
-            cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 5)
-        
             if barcode.data != "":
-                data = barcode.data
-                print(barcode.data)        
-
-        if sim:
-            cv.imshow("Image", img) 
-            cv.waitKey(0) 
-            cv.destroyAllWindows() 
-
-
-if __name__ == '__main__':
-    image = 'image3.png'
-    barCodeReader(image)
-
+                codes.append(barcode.data.decode("utf-8"))
+    return codes
