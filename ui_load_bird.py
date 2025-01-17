@@ -2,7 +2,7 @@ from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome_cancel,ui_wel
 import tgm
 from storage import storage
 
-lb_text_entry_barode = f'Введите баркод или загрузите фото'
+lb_text_entry_barode = f'Введите баркод или загрузите фото с одним баркодом'
 lb_text_incorrect_barode = f'Неверный ввод:'
 lb_text_check_barode = 'Получен баркод:'
 lb_text_bird_found = 'Птица найдена:'
