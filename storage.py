@@ -12,84 +12,103 @@ class storage:
     )
 
     @classmethod
-    def insert_history(cls):
-        #todo убрать после реальных вызовов
-        item = {}
-        item["animal_id"] = 11
-        item["manipulation_id"] = 1
-        item["arms_id"] = 2
-        item["tg_nickname"] = "Palmman"
-        #todo убрать после реальных вызовов
+    def execute_query(cls, query, data=None, fetch=False):
         connection = cls.connection_pool.get_connection()
         cursor = connection.cursor(dictionary=True)
         try:
-            query = """
-            INSERT INTO history (animal_id, datetime, manipulation_id, arm_id, tg_nickname)
-            VALUES (%s, NOW(), %s, %s, %s)
-            """
-            data = (item["animal_id"], item["manipulation_id"], item["arms_id"], item["tg_nickname"])
             cursor.execute(query, data)
-            connection.commit()  # Подтверждаем изменения
-            print("Запись успешно добавлена.")
+            if fetch:
+                results = cursor.fetchall()
+                return results
+            else:
+                connection.commit()  # Подтверждаем изменения
+                print("Запись успешно добавлена.")
         except mysql.connector.Error as err:
-            print(f"Ошибка при добавлении записи: {err}")
+            print(f"Ошибка при выполнении запроса: {err}")
+            return None
         finally:
             cursor.close()
             connection.close()  # Закрываем соединение, возвращая его в пул
+
+    @classmethod
+    def insert_numerical_history(cls):
+        #todo убрать после реальных вызовов
+        item = {
+            "animal_id": 11,
+            "type_id": 2,
+            "value": 700
+        }
+        #todo убрать после реальных вызовов
+        query = """
+        INSERT INTO numerical_history (animal_id, datetime, type_id, value)
+        VALUES (%s, NOW(), %s, %s)
+        """
+        data = (item["animal_id"], item["type_id"], item["value"])
+        cls.execute_query(query, data)
+
+    @classmethod
+    def get_numerical_history(cls):
+        print("get_numerical_history")
+        select_query = "SELECT animal_id, type_id, value, datetime FROM numerical_history"
+        results = cls.execute_query(select_query, fetch=True)
+        if results is not None:
+            items = [{"animal_id": row["animal_id"], "type_id": row["type_id"], "value": row["value"], "datetime": row["datetime"]} for row in results]
+            print(items)
+            return items
+        return []
+
+    @classmethod
+    def get_numerical_history_type(cls):
+        print("get_numerical_history_type")
+        select_query = "SELECT id, name, units FROM numerical_history_type"
+        results = cls.execute_query(select_query, fetch=True)
+        if results is not None:
+            items = [{"id": row["id"], "name": row["name"], "units": row["units"]} for row in results]
+            print(items)
+            return items
+        return []
+
+    @classmethod
+    def insert_history(cls):
+        item = {
+            "animal_id": 11,
+            "manipulation_id": 2,
+            "arms_id": 2,
+            "tg_nickname": "Nick"
+        }
+        query = """
+        INSERT INTO history (animal_id, datetime, manipulation_id, arm_id, tg_nickname)
+        VALUES (%s, NOW(), %s, %s, %s)
+        """
+        data = (item["animal_id"], item["manipulation_id"], item["arms_id"], item["tg_nickname"])
+        cls.execute_query(query, data)
 
     @classmethod
     def insert_animals(cls):
         print("insert_animals")
         #todo убрать после реальных вызовов
-        item = {}
-        item["bar_code"] = 1234 #barcode
-        item["place_capture"] = "Anapa" #Место отлова
-        #item["capture_datetime"] = #Дата/время отлова. Временно! подставляется текущее прямо в базу. См. второй NOW()
-        item["degree_pollution"] = 3 #Степень загрязнения
+        item = {
+            "bar_code": 1236,  # barcode
+            "place_capture": "Marina",  # Место отлова
+            #"capture_datetime": #Дата/время отлова. Временно! подставляется текущее прямо в базу. См. второй NOW()            
+            "degree_pollution": 3  # Степень загрязнения
+        }
         #todo убрать после реальных вызовов
-
-        connection = cls.connection_pool.get_connection()
-        cursor = connection.cursor(dictionary=True)
-        try:
-            query = """
-            INSERT INTO animals (bar_code, registration_datetime, place_capture, capture_datetime, degree_pollution)
-            VALUES (%s, NOW(), %s, NOW(), %s)
-            """
-            data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
-            cursor.execute(query, data)
-            connection.commit()  # Подтверждаем изменения
-            print("Запись успешно добавлена.")
-        except mysql.connector.Error as err:
-            print(f"Ошибка при добавлении записи: {err}")
-        finally:
-            cursor.close()
-            connection.close()  # Закрываем соединение, возвращая его в пул
+        query = """
+        INSERT INTO animals (bar_code, registration_datetime, place_capture, capture_datetime, degree_pollution)
+        VALUES (%s, NOW(), %s, NOW(), %s)
+        """
+        data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
+        cls.execute_query(query, data)
 
     @classmethod
     def get_manipulations(cls, place_number):
-        connection = cls.connection_pool.get_connection()
-        cursor = connection.cursor(dictionary=True)
-        try:
-            # SQL-запрос для поиска записей по числу в place_list
-            select_query = "SELECT id, name FROM manipulations WHERE FIND_IN_SET(%s, place_list)"
-            cursor.execute(select_query, (place_number,))
-            results = cursor.fetchall()
-
-            # Создаём список объектов place
-            places = []
-            for row in results:
-                place = {
-                    "id": row["id"],
-                    "name": row["name"]
-                }
-                places.append(place)
-            return places
-        except mysql.connector.Error as err:
-            print(f"Ошибка: {err}")
-            return None
-        finally:
-            cursor.close()
-            connection.close()  # Возвращаем соединение в пул
+        select_query = "SELECT id, name FROM manipulations WHERE FIND_IN_SET(%s, place_list)"
+        results = cls.execute_query(select_query, (place_number,), fetch=True)
+        if results is not None:
+            items = [{"id": row["id"], "name": row["name"]} for row in results]
+            return items
+        return []
 
     @classmethod
     def __create_bird(cls):
@@ -181,4 +200,3 @@ class storage:
         if username in cls.__users:
             return cls.__users[username]
         return None
-        
