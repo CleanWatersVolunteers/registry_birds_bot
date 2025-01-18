@@ -110,6 +110,22 @@ class storage:
             return items
         return []
 
+    #Запись веса в таблицу animals
+    @classmethod
+    def set_animal_weight(cls, bar_code, weight)->bool:
+        print(f'set_animal_weight bar_code: {bar_code}, weight: {weight}')
+        query = """
+        UPDATE animals SET weight = %s WHERE bar_code = %s
+        """
+        data = (weight, bar_code)
+        result = cls.execute_query(query, data)
+        if result is None:
+            print("Ошибка обновления данных.")
+            return False
+        else:
+            print(f"Вес для бар-кода {bar_code} успешно обновлён.")        
+            return True
+
     @classmethod
     def __create_bird(cls):
         bird = {}
