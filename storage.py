@@ -10,6 +10,32 @@ class storage:
         pool_size = 5,
         **dbconfig
     )
+
+    @classmethod
+    def insert_history(cls):
+        #todo убрать после реальных вызовов
+        item = {}
+        item["animal_id"] = 11
+        item["manipulation_id"] = 1
+        item["arms_id"] = 2
+        item["tg_nickname"] = "Palmman"
+        #todo убрать после реальных вызовов
+        connection = cls.connection_pool.get_connection()
+        cursor = connection.cursor(dictionary=True)
+        try:
+            query = """
+            INSERT INTO history (animal_id, datetime, manipulation_id, arm_id, tg_nickname)
+            VALUES (%s, NOW(), %s, %s, %s)
+            """
+            data = (item["animal_id"], item["manipulation_id"], item["arms_id"], item["tg_nickname"])
+            cursor.execute(query, data)
+            connection.commit()  # Подтверждаем изменения
+            print("Запись успешно добавлена.")
+        except mysql.connector.Error as err:
+            print(f"Ошибка при добавлении записи: {err}")
+        finally:
+            cursor.close()
+            connection.close()  # Закрываем соединение, возвращая его в пул
     
     @classmethod
     def get_manipulations(cls, place_number):
