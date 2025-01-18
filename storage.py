@@ -36,7 +36,35 @@ class storage:
         finally:
             cursor.close()
             connection.close()  # Закрываем соединение, возвращая его в пул
-    
+
+    @classmethod
+    def insert_animals(cls):
+        print("insert_animals")
+        #todo убрать после реальных вызовов
+        item = {}
+        item["bar_code"] = 1234 #barcode
+        item["place_capture"] = "Anapa" #Место отлова
+        #item["capture_datetime"] = #Дата/время отлова. Временно! подставляется текущее прямо в базу. См. второй NOW()
+        item["degree_pollution"] = 3 #Степень загрязнения
+        #todo убрать после реальных вызовов
+
+        connection = cls.connection_pool.get_connection()
+        cursor = connection.cursor(dictionary=True)
+        try:
+            query = """
+            INSERT INTO animals (bar_code, registration_datetime, place_capture, capture_datetime, degree_pollution)
+            VALUES (%s, NOW(), %s, NOW(), %s)
+            """
+            data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
+            cursor.execute(query, data)
+            connection.commit()  # Подтверждаем изменения
+            print("Запись успешно добавлена.")
+        except mysql.connector.Error as err:
+            print(f"Ошибка при добавлении записи: {err}")
+        finally:
+            cursor.close()
+            connection.close()  # Закрываем соединение, возвращая его в пул
+
     @classmethod
     def get_manipulations(cls, place_number):
         connection = cls.connection_pool.get_connection()
