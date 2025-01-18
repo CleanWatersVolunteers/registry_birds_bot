@@ -20,6 +20,8 @@ ui_welcome_mode = {
     "kbd_add_bird":"Добавить птицу",
     "kbd_sel_bird":"Выбрать птицу",
     "kbd_sel_addr":"Сменить локацию", 
+    "kbd_feeding":"Кормление", 
+    "kbd_history":"История", 
 }
 
 ui_welcome_cancel = {
@@ -134,6 +136,8 @@ from ui_apm3 import *
 from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
+from ui_feeding import *
+from ui_history import *
 
 welcome_handlers["kbd_add_bird"] = ui_load_bird_add
 welcome_handlers["kbd_sel_bird"] = ui_load_bird_sel
@@ -144,7 +148,8 @@ welcome_handlers["kbd_mode_apm3"] = ui_apm3_mode
 welcome_handlers["kbd_mode_apm4"] = ui_apm4_mode
 welcome_handlers["kbd_mode_apm5"] = ui_apm5_mode
 welcome_handlers["kbd_mode_apm6"] = ui_apm6_mode
-
+welcome_handlers["kbd_feeding"] = ui_feeding_mode
+welcome_handlers["kbd_history"] = ui_history_mode
 
 
 ##########################################
