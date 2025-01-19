@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
--- Хост:                         rc1b-fetgu2vabyc1d7z4.mdb.yandexcloud.net
--- Версия сервера:               8.0.35-27 - Percona Server (GPL), Revision 03dc548
--- Операционная система:         Linux
+-- Хост:                         127.0.0.1
+-- Версия сервера:               8.0.40 - MySQL Community Server - GPL
+-- Операционная система:         Win64
 -- HeidiSQL Версия:              12.8.0.6908
 -- --------------------------------------------------------
 
@@ -114,6 +114,16 @@ INSERT INTO `numerical_history_type` (`id`, `name`, `units`) VALUES
 	(2, 'Вес', 'гр.'),
 	(3, 'Температура', '°C');
 
+-- Дамп структуры для таблица registry_birds.place_history
+CREATE TABLE IF NOT EXISTS `place_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `animal_id` int NOT NULL,
+  `datetime` datetime NOT NULL,
+  `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `arm_id` int NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Дамп структуры для таблица registry_birds.plaсes
 CREATE TABLE IF NOT EXISTS `plaсes` (
   `id` int NOT NULL,
@@ -121,6 +131,7 @@ CREATE TABLE IF NOT EXISTS `plaсes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп данных таблицы registry_birds.plaсes: ~8 rows (приблизительно)
 INSERT INTO `plaсes` (`id`, `name`) VALUES
 	(0, 'Поступление'),
 	(1, 'Первичка на мойке'),
