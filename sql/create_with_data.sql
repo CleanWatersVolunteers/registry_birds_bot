@@ -33,7 +33,12 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `clinical_condition_admission` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Дамп данных таблицы registry_birds.animals: ~2 rows (приблизительно)
+INSERT INTO `animals` (`id`, `bar_code`, `registration_datetime`, `place_capture`, `capture_datetime`, `degree_pollution`, `weight`, `female`, `species`, `clinical_condition_admission`) VALUES
+	(1, 1234, '2025-01-18 16:48:46', 'Anapa', '2025-01-18 16:48:46', 3, 1200, NULL, NULL, NULL),
+	(2, 1236, '2025-01-18 22:13:23', 'Marina', '2025-01-18 22:13:23', 3, NULL, NULL, NULL, NULL);
 
 -- Дамп структуры для таблица registry_birds.arms
 CREATE TABLE IF NOT EXISTS `arms` (
@@ -43,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `arms` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп данных таблицы registry_birds.arms: ~8 rows (приблизительно)
 INSERT INTO `arms` (`id`, `plaсe_id`, `location_id`) VALUES
 	(1, 0, 0),
 	(2, 1, 0),
@@ -62,7 +68,14 @@ CREATE TABLE IF NOT EXISTS `history` (
   `arm_id` int NOT NULL,
   `tg_nickname` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Дамп данных таблицы registry_birds.history: ~4 rows (приблизительно)
+INSERT INTO `history` (`id`, `animal_id`, `datetime`, `manipulation_id`, `arm_id`, `tg_nickname`) VALUES
+	(1, 11, '2025-01-18 15:31:28', 1, 2, 'Palmman'),
+	(2, 11, '2025-01-18 15:42:30', 1, 2, 'Palmman'),
+	(3, 11, '2025-01-18 15:45:13', 1, 2, 'Palmman'),
+	(4, 11, '2025-01-18 22:13:23', 2, 2, 'Palmman');
 
 -- Дамп структуры для таблица registry_birds.locations
 CREATE TABLE IF NOT EXISTS `locations` (
@@ -72,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `locations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп данных таблицы registry_birds.locations: ~2 rows (приблизительно)
 INSERT INTO `locations` (`id`, `address`, `name`) VALUES
 	(0, 'Витязево, ул. Жемчужная, д9.', 'Жемчужная'),
 	(1, 'Анапа, Пионерский просп.д  68', 'Полярные Зори');
@@ -82,14 +96,17 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
   `name` varchar(45) NOT NULL,
   `place_list` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп данных таблицы registry_birds.manipulations: ~7 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(1, 'Кормление', '5'),
 	(2, 'Поение', '5'),
 	(3, 'Отказ от еды', '5'),
 	(4, 'Отказ от питья', '5'),
-	(5, 'Энтерофурил + физ.раствор 20мл в рот', '2,5');
+	(5, 'Энтерофурил + физ.раствор 20мл в рот', '2,5'),
+	(6, 'Рингер 50/50 + Глюкоза 10мл', '2'),
+	(7, 'Бриллиантовые глаза', '2,5');
 
 -- Дамп структуры для таблица registry_birds.numerical_history
 CREATE TABLE IF NOT EXISTS `numerical_history` (
@@ -99,7 +116,14 @@ CREATE TABLE IF NOT EXISTS `numerical_history` (
   `value` int NOT NULL,
   `datetime` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Дамп данных таблицы registry_birds.numerical_history: ~4 rows (приблизительно)
+INSERT INTO `numerical_history` (`id`, `animal_id`, `type_id`, `value`, `datetime`) VALUES
+	(1, 11, 1, 12, '2025-01-18 20:06:51'),
+	(2, 11, 2, 650, '2025-01-18 20:08:42'),
+	(3, 11, 2, 700, '2025-01-18 22:00:30'),
+	(4, 11, 2, 700, '2025-01-18 22:13:23');
 
 -- Дамп структуры для таблица registry_birds.numerical_history_type
 CREATE TABLE IF NOT EXISTS `numerical_history_type` (
@@ -109,6 +133,7 @@ CREATE TABLE IF NOT EXISTS `numerical_history_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп данных таблицы registry_birds.numerical_history_type: ~3 rows (приблизительно)
 INSERT INTO `numerical_history_type` (`id`, `name`, `units`) VALUES
 	(1, 'Съедено рыбы', 'шт.'),
 	(2, 'Вес', 'гр.'),
@@ -122,7 +147,12 @@ CREATE TABLE IF NOT EXISTS `place_history` (
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `arm_id` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Дамп данных таблицы registry_birds.place_history: ~2 rows (приблизительно)
+INSERT INTO `place_history` (`id`, `animal_id`, `datetime`, `tg_nickname`, `arm_id`) VALUES
+	(5, 1, '2025-01-19 14:01:35', 'Palmman', 3),
+	(6, 1, '2025-01-19 14:14:29', 'Palmman', 3);
 
 -- Дамп структуры для таблица registry_birds.plaсes
 CREATE TABLE IF NOT EXISTS `plaсes` (

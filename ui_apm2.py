@@ -20,7 +20,12 @@ def apm2_done_hndl(user, key=None, msg=None)->(str,):
 ############################################
 def ui_apm2_mode(user, key=None, msg=None)->(str,):
     user["mode"] = "kbd_mode_apm2"
-    text = f'{ui_welcome_mode["kbd_mode_apm2"]}:\n{apm2_text_action}'
+    arm_code = 2
+    manipulations = storage.get_manipulations(arm_code)
+    text = f'{ui_welcome_mode["kbd_mode_apm2"]}:\n'
+    for manipulation in manipulations:
+        text += manipulation['name'] + '\n'
+    text += apm2_text_action
     keyboard = tgm.make_inline_keyboard(apm2_done)
     return text, keyboard
 
