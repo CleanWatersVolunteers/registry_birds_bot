@@ -21,6 +21,7 @@ ui_welcome_mode = {
     "kbd_sel_bird":"Выбрать птицу",
     "kbd_sel_addr":"Сменить локацию", 
     "kbd_feeding":"Кормление", 
+    "kbd_mass":"Изменить вес",
     "kbd_history":"История", 
 }
 
@@ -56,6 +57,22 @@ def add_hdr_item(label, value):
         text += '-\n'
     return text
 
+
+def ui_welcome_get_card(user, bird):
+    text = add_hdr_item("Номер животного", user["code"])
+    text += add_hdr_item("Место отлова", bird["capture_place"])
+    text += add_hdr_item("Время отлова", bird["capture_date"])
+    text += add_hdr_item("Степень загрязнения", bird["polution"])
+    if bird["mass"]:
+        text += add_hdr_item("Масса животного", bird["mass"] + "гр.")
+    else:
+        text += add_hdr_item("Масса животного", None)
+    text += add_hdr_item("Вид", bird["species"])
+    text += add_hdr_item("Пол", bird["sex"])
+    text += add_hdr_item("Клиническое состояние", bird["clinic_state"])
+    text += '---------------\n'
+    return text 
+
 def ui_welcome(user, key = None, msg=None):
     text = ''
 
@@ -77,18 +94,7 @@ def ui_welcome(user, key = None, msg=None):
         text += welcome_text_sel_bird
         return text, tgm.make_inline_keyboard(kbd_menu_base)
     
-
-    text += add_hdr_item("Номер животного", user["code"])
-    text += add_hdr_item("Место отлова", bird["capture_place"])
-    text += add_hdr_item("Время отлова", bird["capture_date"])
-    text += add_hdr_item("Степень загрязнения", bird["polution"])
-    if bird["mass"]:
-        text += add_hdr_item("Масса животного", bird["mass"] + "гр.")
-    else:
-        text += add_hdr_item("Масса животного", None)
-    text += add_hdr_item("Вид", bird["species"])
-    text += add_hdr_item("Пол", bird["sex"])
-    text += add_hdr_item("Клиническое состояние", bird["clinic_state"])
+    text += ui_welcome_get_card(user, bird)
 
     template_yes = '✅ '
     template_no = '❌ '
@@ -137,6 +143,7 @@ from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
 from ui_feeding import *
+from ui_mass import *
 from ui_history import *
 
 welcome_handlers["kbd_add_bird"] = ui_load_bird_add
@@ -149,7 +156,10 @@ welcome_handlers["kbd_mode_apm4"] = ui_apm4_mode
 welcome_handlers["kbd_mode_apm5"] = ui_apm5_mode
 welcome_handlers["kbd_mode_apm6"] = ui_apm6_mode
 welcome_handlers["kbd_feeding"] = ui_feeding_mode
+welcome_handlers["kbd_mass"] = ui_mass_entry_mode
 welcome_handlers["kbd_history"] = ui_history_mode
+
+
 
 
 ##########################################
