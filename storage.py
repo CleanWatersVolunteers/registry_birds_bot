@@ -31,6 +31,38 @@ class storage:
             connection.close()  # Закрываем соединение, возвращая его в пул
 
     @classmethod
+    def insert_place_history(cls, bar_code, tg_nickname):
+        animal_id = cls.get_animal_id(bar_code)
+        print(f"animal_id: {animal_id}")
+        if animal_id is not None:
+            #todo убрать после реальных вызовов
+            item = {
+                "animal_id": animal_id,
+                "tg_nickname": tg_nickname,
+                "arm_id": 3
+            }
+            #todo убрать после реальных вызовов
+            query = """
+            INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
+            VALUES (NOW(), %s, %s, %s)
+            """
+            data = (item["animal_id"], item["tg_nickname"], item["arm_id"])
+            cls.execute_query(query, data)
+        else:
+            print(f"invalid animal_id: {animal_id}")
+
+    #Врменной!!! метод - пока внутри бота для используется бар-код без привязки к БД.
+    @classmethod
+    def get_animal_id(cls, bar_code):
+        print("get_animal_id")
+        select_query = "SELECT id FROM animals WHERE bar_code = %s"
+        result = cls.execute_query(select_query, (bar_code,), fetch=True)
+        if result is not None and len(result) > 0:  # Проверяем, что результат не пустой
+            print(result[0])  # Печатаем первый элемент результата
+            return result[0]['id']  # Возвращаем значение 'id' первого элемента
+        return None  # Возвращаем None, если ничего не найдено
+
+    @classmethod
     def insert_numerical_history(cls):
         #todo убрать после реальных вызовов
         item = {
@@ -40,8 +72,8 @@ class storage:
         }
         #todo убрать после реальных вызовов
         query = """
-        INSERT INTO numerical_history (animal_id, datetime, type_id, value)
-        VALUES (%s, NOW(), %s, %s)
+        INSERT INTO numerical_history (datetime, animal_id, type_id, value)
+        VALUES (NOW(), %s, %s, %s)
         """
         data = (item["animal_id"], item["type_id"], item["value"])
         cls.execute_query(query, data)
@@ -69,16 +101,16 @@ class storage:
         return []
 
     @classmethod
-    def insert_history(cls):
+    def insert_history(cls, tg_nickname):
         item = {
             "animal_id": 11,
             "manipulation_id": 2,
             "arms_id": 2,
-            "tg_nickname": "Nick"
+            "tg_nickname": tg_nickname
         }
         query = """
-        INSERT INTO history (animal_id, datetime, manipulation_id, arm_id, tg_nickname)
-        VALUES (%s, NOW(), %s, %s, %s)
+        INSERT INTO history (datetime, animal_id, manipulation_id, arm_id, tg_nickname)
+        VALUES (NOW(), %s, %s, %s, %s)
         """
         data = (item["animal_id"], item["manipulation_id"], item["arms_id"], item["tg_nickname"])
         cls.execute_query(query, data)
@@ -95,8 +127,8 @@ class storage:
         }
         #todo убрать после реальных вызовов
         query = """
-        INSERT INTO animals (bar_code, registration_datetime, place_capture, capture_datetime, degree_pollution)
-        VALUES (%s, NOW(), %s, NOW(), %s)
+        INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
+        VALUES (NOW(), %s, %s, NOW(), %s)
         """
         data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
         cls.execute_query(query, data)
