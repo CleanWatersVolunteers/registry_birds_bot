@@ -18,7 +18,7 @@ apm1_text_enter_polituon = "Введите степень загрязнения
 apm1_text_incorrect = "Неверный ввод:"
 
 apm1_date = {
-    "kbd_date_now":"Сегодня",
+    "kbd_mode_apm1_date_now":"Сегодня",
     "kbd_cancel":"Отмена",
 }
 apm1_cancel = {
@@ -38,6 +38,7 @@ def apm1_place_hndl(user, key=None, msg=None)->(str,):
 
     return text, keyboard
 
+# date from button entry
 def apm1_date_now_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
     if not bird:
@@ -49,6 +50,7 @@ def apm1_date_now_hndl(user, key=None, msg=None)->(str,):
     keyboard = tgm.make_inline_keyboard(apm1_cancel)
     return text, keyboard
 
+# time from manualy entry
 def apm1_time_now_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
     if not bird:
@@ -68,14 +70,13 @@ def apm1_time_now_hndl(user, key=None, msg=None)->(str,):
         keyboard = tgm.make_inline_keyboard(apm1_cancel)
         return text, keyboard
     
-    time = time[0]
-
     bird["capture_date"] += f' {time}'
     user["mode"] = "kbd_mode_apm1_polution"
     text = f'{ui_welcome_mode["kbd_mode_apm1"]}:\n{apm1_text_enter_polituon}'
     keyboard = tgm.make_inline_keyboard(apm1_cancel)
     return text, keyboard
 
+# Full manualy entry
 def apm1_date_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
     if not bird:
@@ -92,16 +93,13 @@ def apm1_date_hndl(user, key=None, msg=None)->(str,):
         if int(t[0]) > 23 or int(t[1]) > 59:
             time = None
 
-
     if date:
         date = date[0]
         d = date.split('.')     # ['16', '01', '2025']
         n = now.split('.')     # ['17', '01', '2025']
-        if n[2] != d[2] or n[1] != d[1]:  # compare month and year
+        if n[2] != d[2] or n[1] != d[1] or int(d[0]) < (int(n[0])-1) or int(d[0]) > int(n[0]): 
             date = None
-        else:
-            if (int(d[0]) < (int(n[0])-1)) or (int(d[0]) > int(n[0])):    # compare day
-                date = None
+            
     if not time or not date:
         text = f'{ui_welcome_mode["kbd_mode_apm1"]}:\n{apm1_text_incorrect} {msg}\n'
         text += apm1_text_enter_date
@@ -112,6 +110,7 @@ def apm1_date_hndl(user, key=None, msg=None)->(str,):
     text = f'{ui_welcome_mode["kbd_mode_apm1"]}:\n{apm1_text_enter_polituon}'
     keyboard = tgm.make_inline_keyboard(apm1_cancel)
     return text, keyboard
+
 
 def apm1_polution_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
@@ -148,6 +147,6 @@ def ui_apm1_mode(user, key=None, msg=None)->(str,):
 
 welcome_handlers["kbd_mode_apm1_place"] = apm1_place_hndl
 welcome_handlers["kbd_mode_apm1_date"] = apm1_date_hndl
+welcome_handlers["kbd_mode_apm1_date_now"] = apm1_date_now_hndl
 welcome_handlers["kbd_mode_apm1_time"] = apm1_time_now_hndl
-welcome_handlers["kbd_date_now"] = apm1_date_now_hndl
 welcome_handlers["kbd_mode_apm1_polution"] = apm1_polution_hndl
