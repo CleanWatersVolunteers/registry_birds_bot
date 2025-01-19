@@ -142,20 +142,41 @@ class storage:
             return items
         return []
 
-    #Запись веса в таблицу animals
+    #Обновление таблицы animals
     @classmethod
-    def set_animal_weight(cls, bar_code, weight)->bool:
-        print(f'set_animal_weight bar_code: {bar_code}, weight: {weight}')
-        query = """
-        UPDATE animals SET weight = %s WHERE bar_code = %s
-        """
-        data = (weight, bar_code)
+    def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
+        print(f'update_animal bar_code: {bar_code}, weight: {weight}, female: {female}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
+        query = "UPDATE animals SET "
+        updates = []
+        data = []
+
+        # Добавляем поля для обновления, если они указаны
+        if weight is not None:
+            updates.append("weight = %s")
+            data.append(weight)
+        if female is not None:
+            updates.append("female = %s")
+            data.append(female)
+        if species is not None:
+            updates.append("species = %s")
+            data.append(species)
+        if clinical_condition_admission is not None:
+            updates.append("clinical_condition_admission = %s")
+            data.append(clinical_condition_admission)
+
+        if not updates:
+            print("Нет данных для обновления.")
+            return False
+
+        query += ", ".join(updates) + " WHERE bar_code = %s"
+        data.append(bar_code)
+
         result = cls.execute_query(query, data)
         if result is None:
             print("Ошибка обновления данных.")
             return False
         else:
-            print(f"Вес для бар-кода {bar_code} успешно обновлён.")        
+            print(f"Данные для бар-кода {bar_code} успешно обновлены.")
             return True
 
     @classmethod

@@ -23,7 +23,7 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
     bird["mass"] = msg
     bird["stage4"] = 'OK'
     storage.insert_place_history(user["code"], user["id"])
-    storage.set_animal_weight(user["code"], msg)
+    storage.update_animal(user["code"], weight = msg)
     return ui_welcome(user)
 
 ############################################

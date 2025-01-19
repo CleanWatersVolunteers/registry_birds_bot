@@ -30,6 +30,7 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
     if not bird:
         return ui_welcome(user)
+    storage.update_animal(user["code"], species = msg)
     bird["species"] = msg
     user["mode"] = "mode_apm6_clinic"
 
@@ -40,6 +41,7 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
 def apm6_done_hndl(user, key=None, msg=None)->(str,):
     bird = storage.get_bird(user["code"])
     if bird:
+        storage.update_animal(user["code"], clinical_condition_admission = msg)
         bird["clinic_state"] = msg
         bird["stage6"] = 'OK'
     return ui_welcome(user)
