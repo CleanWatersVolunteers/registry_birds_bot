@@ -51,7 +51,6 @@ class storage:
         else:
             print(f"invalid animal_id: {animal_id}")
 
-    #Врменной!!! метод - пока внутри бота для используется бар-код без привязки к БД.
     @classmethod
     def get_animal_id(cls, bar_code):
         print("get_animal_id")
@@ -61,6 +60,18 @@ class storage:
             print(result[0])  # Печатаем первый элемент результата
             return result[0]['id']  # Возвращаем значение 'id' первого элемента
         return None  # Возвращаем None, если ничего не найдено
+
+    @classmethod
+    def get_animal_by_id(cls, animal_id) -> dict:
+        print(f'get_animal_by_id animal_id: {animal_id}')
+        query = "SELECT * FROM animals WHERE id = %s"
+        data = (animal_id,)
+        result = cls.execute_query(query, data, fetch=True)
+        if result:
+            return result[0]  # Возвращаем первый (и единственный) объект
+        else:
+            print("Животное не найдено.")
+            return None
 
     @classmethod
     def insert_numerical_history(cls):
@@ -182,7 +193,6 @@ class storage:
     @classmethod
     def __create_bird(cls):
         bird = {}
-        bird["capture_place"] = None
         bird["capture_date"] = None
         bird["polution"] = None
         bird["mass"] = None
