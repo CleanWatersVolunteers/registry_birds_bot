@@ -6,6 +6,7 @@
 - logs.py - модуль для сохранения логов в файл, если функционал не нужен,внутри модуля можно отключить сохранение
 
 ## База данных
+### Установка mysql-сервера и зависимостей
 Для разворачивания локальной базы данных необходимо сделать следующее:
 1. установить зависимости
 ```sh
@@ -14,24 +15,33 @@ sudo apt install mysql-server
 ```
 после установки mysql сервер запустится автоматически
 
-2. настроить доступ к SQL-базе
+### Создание базы
+1. Запуск mysql (требуется если сервис еще не запущен)
 ```sh
-sudo mysql 	# запуск консоли
+sudo mkdir /var/log/mysql && sudo chmod a+rw /var/log/mysql # команда для создания логов (обычно создаются автоматом при установке mysql)
+sudo systemctl restart mysql # перезапуск сервиса
+
+sudo mysql 	# запуск консоли mysql
 ```
-и в появившейся SQL-консоли добавить пользователя к базе 'registry_birds'
+2. Создание новой базы 'registry_birds' из скрипта
+Запустить скрипт sql/create_with_data.sql командой
+```sh
+cat sql/create_with_data.sql | mysql
+```
+3. Проверить наличие базы командой
+```sql
+SHOW DATABASES;     # список баз
+USE registry_birds; 
+SHOW TABLES;		# список таблиц в базе
+```
+### Создание пользователя
+1. Создать нового пользователя с доступом к базе 'registry_birds'
 ```sql
 CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON registry_birds.* TO 'newuser'@'localhost';
+SELECT user FROM mysql.user;  # вывод списка пользователей
 ```
-Проверка доступа к базе из консоли
+2. Авторизация пользователя в базе
 ```sh
-mysql -h you_sql_server -u user_name -p
-```
-h — хост c MySQL. Если подключаемся с локальной машины, параметр можно опустить
-u — имя пользователя MySQL (root или другой пользователь MySQL)
-p — пароль, который будет предложено ввести после нажатия enter
-
-3. Для работы с базой, ее необходимо создать. Для этого нужно запустить скрипт sql/create_with_data.sql командой
-```sh
-sudo mysql -u user -p < sql/create_with_data.sql
+mysql -h localhost -u newuser -p
 ```
