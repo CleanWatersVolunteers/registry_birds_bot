@@ -7,6 +7,8 @@ history_cancel = {
     "kbd_cancel":"Меню",
 }
 
+manipulations_not_found = "Манипуляции не найдены"
+
 ############################################
 # Global API
 ############################################
@@ -19,11 +21,13 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
     keyboard = tgm.make_inline_keyboard(history_cancel)
 
     animal_id = storage.get_animal_id(user["code"])
+    numerical_history = ""
+    history = ""
+
     if animal_id is not None:
         numerical_history = storage.get_animal_numerical_history(animal_id)
         history = storage.get_animal_history(animal_id)
 
-    result_string = ""
     combined_history = numerical_history + history
     sorted_history = sorted(combined_history, key=lambda item: item['datetime'])
     result_string = ""
@@ -39,5 +43,8 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
             result_string += f"{item['datetime'].strftime('%H:%M')} - {item['type_name']}: {item['value']} {item['type_units']}\n"
         else:  # Элемент из history
             result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']}\n"
-    text += result_string.strip()
+    if result_string == "":
+        text += manipulations_not_found
+    else:
+        text += result_string.strip()
     return text, keyboard
