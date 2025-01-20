@@ -24,13 +24,17 @@ def mass_entry_hndl(user, key=None, msg=None)->(str,):
         keyboard = tgm.make_inline_keyboard(mass_cancel)
         return text, keyboard
 
-    bird["mass"] = msg
-
-    # todo need saving to SQL
-    if not "history" in bird:
-        bird["history"] = []
-    text = f'Масса животного {msg} гр.'
-    bird["history"].append(GET_HISTORY(user, text))
+    animal_id = storage.get_animal_id(user["code"])
+    if animal_id is not None:
+        manipulation = {
+            "animal_id": animal_id,
+            "id" : 2, #todo Кормление - загружать идентификаторы и названия манипуляций из базы #50
+            "arms_id": 7,
+            "tg_nickname": user["id"]
+        }
+        print(manipulation)
+        #todo Сохранять ТГ-ник в таблицу numerical_history #51
+        storage.insert_numerical_history(manipulation["animal_id"], manipulation["id"], int(msg))
     return ui_welcome(user)
 
 
