@@ -1,7 +1,6 @@
 from ui_welcome import ui_welcome_get_card, welcome_handlers,ui_welcome
 import tgm
 from storage import storage
-from datetime import datetime
 
 history_cancel = {
     "kbd_cancel":"Меню",
@@ -20,7 +19,7 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
     text = ui_welcome_get_card(bird)
     keyboard = tgm.make_inline_keyboard(history_cancel)
 
-    animal_id = storage.get_animal_id(user["code"])
+    animal_id = storage.get_animal_id(bird["bar_code"])
     numerical_history = ""
     history = ""
 
