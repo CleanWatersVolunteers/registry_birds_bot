@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import pooling
 from config import Config
+from datetime import datetime
 
 class storage:
 
@@ -53,7 +54,6 @@ class storage:
 
     @classmethod
     def get_animal_id(cls, bar_code):
-        print("get_animal_id")
         select_query = "SELECT id FROM animals WHERE bar_code = %s"
         result = cls.execute_query(select_query, (bar_code,), fetch=True)
         if result is not None and len(result) > 0:  # Проверяем, что результат не пустой
@@ -62,6 +62,39 @@ class storage:
         return None  # Возвращаем None, если ничего не найдено
 
     @classmethod
+    def get_animal_by_id(cls, animal_id) -> dict:
+        query = "SELECT * FROM animals WHERE id = %s"
+        data = (animal_id,)
+        result = cls.execute_query(query, data, fetch=True)
+        if result:
+            return result[0]  # Возвращаем первый (и единственный) объект
+        else:
+            print("Животное не найдено.")
+            return None
+    
+    #todo Удалить после перехода на id
+    @classmethod
+    def get_animal_by_bar_code(cls, bar_code) -> dict:
+        query = "SELECT * FROM animals WHERE bar_code = %s"
+        data = (bar_code,)
+        result = cls.execute_query(query, data, fetch=True)
+        if result:
+            print(f"Result {result}")
+            return result[0]  # Возвращаем первый (и единственный) объект
+        else:
+            print("Животное не найдено.")
+            return None
+
+    @classmethod
+    def insert_numerical_history(cls, animal_id, type_id, value):
+        query = """
+        INSERT INTO numerical_history (datetime, animal_id, type_id, value)
+        VALUES (NOW(), %s, %s, %s)
+        """
+        data = (animal_id, type_id, value)
+        cls.execute_query(query, data)
+
+#    @classmethod
     def get_animal_by_id(cls, animal_id) -> dict:
         print(f'get_animal_by_id animal_id: {animal_id}')
         query = "SELECT * FROM animals WHERE id = %s"
@@ -74,29 +107,13 @@ class storage:
             return None
 
     @classmethod
-    def insert_numerical_history(cls):
-        #todo убрать после реальных вызовов
-        item = {
-            "animal_id": 11,
-            "type_id": 2,
-            "value": 700
-        }
-        #todo убрать после реальных вызовов
-        query = """
-        INSERT INTO numerical_history (datetime, animal_id, type_id, value)
-        VALUES (NOW(), %s, %s, %s)
-        """
-        data = (item["animal_id"], item["type_id"], item["value"])
-        cls.execute_query(query, data)
-
-    @classmethod
-    def get_numerical_history(cls):
+    def get_numerical_history(cls, animal_id):
         print("get_numerical_history")
-        select_query = "SELECT animal_id, type_id, value, datetime FROM numerical_history"
-        results = cls.execute_query(select_query, fetch=True)
+        select_query = "SELECT type_id, value, datetime FROM numerical_history WHERE animal_id = %s"
+        data = (animal_id,)
+        results = cls.execute_query(select_query, data, fetch=True)
         if results is not None:
-            items = [{"animal_id": row["animal_id"], "type_id": row["type_id"], "value": row["value"], "datetime": row["datetime"]} for row in results]
-            print(items)
+            items = [{"type_id": row["type_id"], "value": row["value"], "datetime": row["datetime"]} for row in results]
             return items
         return []
 
@@ -107,41 +124,99 @@ class storage:
         results = cls.execute_query(select_query, fetch=True)
         if results is not None:
             items = [{"id": row["id"], "name": row["name"], "units": row["units"]} for row in results]
-            print(items)
+            return items
+        return []
+    
+    @classmethod
+    def get_animal_numerical_history(cls, animal_id):
+        select_query = """
+        SELECT 
+            nht.name AS type_name,
+            nht.units AS type_units,
+            nh.value,
+            nh.datetime
+        FROM 
+            numerical_history nh
+        JOIN 
+            numerical_history_type nht ON nh.type_id = nht.id
+        WHERE 
+            nh.animal_id = %s;
+        """
+        data = (animal_id,)
+        results = cls.execute_query(select_query, data, fetch=True)
+        if results is not None:
+            # Формируем список записей
+            items = [{
+                "type_name": row["type_name"],
+                "type_units": row["type_units"],
+                "value": row["value"],
+                "datetime": row["datetime"]
+            } for row in results]
             return items
         return []
 
     @classmethod
-    def insert_history(cls, tg_nickname):
-        item = {
-            "animal_id": 11,
-            "manipulation_id": 2,
-            "arms_id": 2,
-            "tg_nickname": tg_nickname
-        }
+    def insert_history(cls, manipulation_id, animal_id, arms_id, tg_nickname):
         query = """
         INSERT INTO history (datetime, animal_id, manipulation_id, arm_id, tg_nickname)
         VALUES (NOW(), %s, %s, %s, %s)
         """
-        data = (item["animal_id"], item["manipulation_id"], item["arms_id"], item["tg_nickname"])
+        data = (animal_id, manipulation_id, arms_id, tg_nickname)
         cls.execute_query(query, data)
 
     @classmethod
-    def insert_animals(cls):
-        print("insert_animals")
-        #todo убрать после реальных вызовов
-        item = {
-            "bar_code": 1236,  # barcode
-            "place_capture": "Marina",  # Место отлова
-            #"capture_datetime": #Дата/время отлова. Временно! подставляется текущее прямо в базу. См. второй NOW()            
-            "degree_pollution": 3  # Степень загрязнения
-        }
-        #todo убрать после реальных вызовов
+    def get_animal_history(cls, animal_id):
+        select_query = """
+        SELECT 
+            h.datetime, 
+            h.arm_id, 
+            h.tg_nickname, 
+            m.name AS manipulation_name 
+        FROM 
+            history h 
+        JOIN 
+            manipulations m ON h.manipulation_id = m.id 
+        WHERE 
+            h.animal_id = %s;
+        """
+        data = (animal_id,)
+        results = cls.execute_query(select_query, data, fetch=True)
+        if results is not None:
+            # Формируем список записей
+            items = [{
+                "datetime": row["datetime"],
+                "arm_id": row["arm_id"],
+                "tg_nickname": row["tg_nickname"],
+                "manipulation_name": row["manipulation_name"]
+            } for row in results]
+            return items
+        return []
+    
+    @classmethod
+    def get_history(cls, animal_id):
+        print("get_history")
+        select_query = "SELECT * FROM history WHERE animal_id = %s"
+        data = (animal_id,)
+        results = cls.execute_query(select_query, data, fetch=True)
+        if results is not None:
+            # Формируем список записей
+            items = [{"id": row["id"], "animal_id": row["animal_id"], "datetime": row["datetime"],
+                    "manipulation_id": row["manipulation_id"], "arm_id": row["arm_id"],
+                    "tg_nickname": row["tg_nickname"]} for row in results]
+            return items
+        return []
+
+    @classmethod
+    def insert_animal(cls, animal):
+        #todo Вынести форматные строки в константы
+        capture_datetime = datetime.strptime(animal["capture_datetime"], "%d.%m.%Y %H:%M")
+        capture_datetime_formatted = capture_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
         query = """
         INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
-        VALUES (NOW(), %s, %s, NOW(), %s)
+        VALUES (NOW(), %s, %s, %s, %s)
         """
-        data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
+        data = (animal["bar_code"], animal["place_capture"], capture_datetime_formatted, animal["degree_pollution"])
         cls.execute_query(query, data)
 
     @classmethod
@@ -154,6 +229,7 @@ class storage:
         return []
 
     #Обновление таблицы animals
+    #todo Переделать на WHERE id = id
     @classmethod
     def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
         print(f'update_animal bar_code: {bar_code}, weight: {weight}, female: {female}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')

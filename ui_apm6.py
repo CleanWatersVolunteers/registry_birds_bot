@@ -20,6 +20,10 @@ def apm6_sex_hndl(user, key=None, msg=None)->(str,):
     if not bird:
         return ui_welcome(user)
     bird["sex"] = kbd_apm6_sex[key]
+    if kbd_apm6_sex[key] == kbd_apm6_sex["kbd_female"]:
+        storage.update_animal(user["code"], female=True)
+    else:
+        storage.update_animal(user["code"], female=False)
     user["mode"] = "mode_apm6_species"
 
     text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_species}'
