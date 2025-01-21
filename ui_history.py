@@ -40,9 +40,9 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
             result_string += f"{formatted_date}\n"
             current_date = formatted_date
         if 'type_name' in item:  # Элемент из numerical_history
-            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['type_name']}: {item['value']} {item['type_units']}\n"
+            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['type_name']}: {item['value']} {item['type_units']} - {item['tg_nickname']}\n"
         else:  # Элемент из history
-            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']}\n"
+            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']} - {item['tg_nickname']}\n"
     if result_string == "":
         text += manipulations_not_found
     else:
