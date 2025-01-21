@@ -5,6 +5,9 @@ from datetime import datetime
 
 class storage:
 
+    capture_datetime_string_format = "%d.%m.%Y %H:%M"
+    capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
+
     dbconfig = Config.load_config_from_json()
     connection_pool = pooling.MySQLConnectionPool(
         pool_name = "mypool",
@@ -79,7 +82,6 @@ class storage:
         data = (bar_code,)
         result = cls.execute_query(query, data, fetch=True)
         if result:
-            print(f"Result {result}")
             return result[0]  # Возвращаем первый (и единственный) объект
         else:
             print("Животное не найдено.")
@@ -94,7 +96,6 @@ class storage:
         data = (animal_id, type_id, value, tg_nickname)
         cls.execute_query(query, data)
 
-#    @classmethod
     def get_animal_by_id(cls, animal_id) -> dict:
         print(f'get_animal_by_id animal_id: {animal_id}')
         query = "SELECT * FROM animals WHERE id = %s"
@@ -108,7 +109,6 @@ class storage:
 
     @classmethod
     def get_numerical_history_type(cls):
-        print("get_numerical_history_type")
         select_query = "SELECT id, name, units FROM numerical_history_type"
         results = cls.execute_query(select_query, fetch=True)
         if results is not None:
@@ -185,7 +185,6 @@ class storage:
     
     @classmethod
     def get_history(cls, animal_id):
-        print("get_history")
         select_query = "SELECT * FROM history WHERE animal_id = %s"
         data = (animal_id,)
         results = cls.execute_query(select_query, data, fetch=True)
@@ -199,10 +198,8 @@ class storage:
 
     @classmethod
     def insert_animal(cls, animal):
-        #todo Вынести форматные строки в константы
-        capture_datetime = datetime.strptime(animal["capture_datetime"], "%d.%m.%Y %H:%M")
-        capture_datetime_formatted = capture_datetime.strftime("%Y-%m-%d %H:%M:%S")
-
+        capture_datetime = datetime.strptime(animal["capture_datetime"], cls.capture_datetime_string_format)
+        capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
         query = """
         INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
         VALUES (NOW(), %s, %s, %s, %s)

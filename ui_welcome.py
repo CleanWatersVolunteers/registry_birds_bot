@@ -8,6 +8,7 @@ welcome_text_sel_addr = 'Выберите локацию'
 welcome_text_sel_bird = 'Добавьте/Выберите птицу'
 sex_male = "муж"
 sex_female = "жен"
+capture_datetime_format = "%d.%m.%y %H:%M"
 
 ui_welcome_mode = {
     "kbd_mode_apm1":"Поступление (АРМ1)",
@@ -62,10 +63,8 @@ def ui_welcome_get_card(user, bird):
     text = add_hdr_item("Номер животного", user["code"])
     animal = storage.get_animal_by_bar_code(user["code"])
     if animal is not None:
-        print(f'animal: {animal}')
         text += add_hdr_item("Место отлова", animal["place_capture"])
-        #todo Вынести форматную строку в константы
-        text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime("%d.%m.%y %H:%M"))
+        text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime(capture_datetime_format))
         text += add_hdr_item("Степень загрязнения", animal["degree_pollution"])
         if animal["weight"] is not None:
             text += add_hdr_item("Вес", str(animal["weight"]) + " гр.")
