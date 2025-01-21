@@ -72,9 +72,7 @@ def feeding_entry_fish_hndl(user, key=None, msg=None)->(str,):
             "arms_id": 7,
             "tg_nickname": user["id"]
         }
-        print(manipulation)
-        #todo Сохранять ТГ-ник в таблицу numerical_history #51
-        storage.insert_numerical_history(manipulation["animal_id"], manipulation["id"], int(msg))
+        storage.insert_numerical_history(manipulation["animal_id"], manipulation["id"], int(msg), manipulation["tg_nickname"])
     return ui_welcome(user)
 
 ############################################

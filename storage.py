@@ -86,12 +86,12 @@ class storage:
             return None
 
     @classmethod
-    def insert_numerical_history(cls, animal_id, type_id, value):
+    def insert_numerical_history(cls, animal_id, type_id, value, tg_nickname):
         query = """
-        INSERT INTO numerical_history (datetime, animal_id, type_id, value)
-        VALUES (NOW(), %s, %s, %s)
+        INSERT INTO numerical_history (datetime, animal_id, type_id, value, tg_nickname)
+        VALUES (NOW(), %s, %s, %s, %s)
         """
-        data = (animal_id, type_id, value)
+        data = (animal_id, type_id, value, tg_nickname)
         cls.execute_query(query, data)
 
 #    @classmethod
@@ -105,17 +105,6 @@ class storage:
         else:
             print("Животное не найдено.")
             return None
-
-    @classmethod
-    def get_numerical_history(cls, animal_id):
-        print("get_numerical_history")
-        select_query = "SELECT type_id, value, datetime FROM numerical_history WHERE animal_id = %s"
-        data = (animal_id,)
-        results = cls.execute_query(select_query, data, fetch=True)
-        if results is not None:
-            items = [{"type_id": row["type_id"], "value": row["value"], "datetime": row["datetime"]} for row in results]
-            return items
-        return []
 
     @classmethod
     def get_numerical_history_type(cls):
@@ -134,6 +123,7 @@ class storage:
             nht.name AS type_name,
             nht.units AS type_units,
             nh.value,
+            nh.tg_nickname,
             nh.datetime
         FROM 
             numerical_history nh
@@ -150,6 +140,7 @@ class storage:
                 "type_name": row["type_name"],
                 "type_units": row["type_units"],
                 "value": row["value"],
+                "tg_nickname": row["tg_nickname"],
                 "datetime": row["datetime"]
             } for row in results]
             return items

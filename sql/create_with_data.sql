@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
 -- Дамп данных таблицы registry_birds.manipulations: ~7 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(1, 'Кормление', '5'),
-	(2, 'Поение', '5'),
+	(2, 'Пил сам', '5'),
 	(3, 'Отказ от еды', '5'),
 	(4, 'Отказ от питья', '5'),
 	(5, 'Энтерофурил + физ.раствор 20мл в рот', '2,5'),
@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `numerical_history` (
   `type_id` int NOT NULL,
   `value` int NOT NULL,
   `datetime` datetime NOT NULL,
+  `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
