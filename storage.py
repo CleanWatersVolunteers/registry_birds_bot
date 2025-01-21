@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import pooling
 from config import Config
+from datetime import datetime
 
 class storage:
 
@@ -62,11 +63,23 @@ class storage:
 
     @classmethod
     def get_animal_by_id(cls, animal_id) -> dict:
-        print(f'get_animal_by_id animal_id: {animal_id}')
         query = "SELECT * FROM animals WHERE id = %s"
         data = (animal_id,)
         result = cls.execute_query(query, data, fetch=True)
         if result:
+            return result[0]  # Возвращаем первый (и единственный) объект
+        else:
+            print("Животное не найдено.")
+            return None
+    
+    #todo Удалить после перехода на id
+    @classmethod
+    def get_animal_by_bar_code(cls, bar_code) -> dict:
+        query = "SELECT * FROM animals WHERE bar_code = %s"
+        data = (bar_code,)
+        result = cls.execute_query(query, data, fetch=True)
+        if result:
+            print(f"Result {result}")
             return result[0]  # Возвращаем первый (и единственный) объект
         else:
             print("Животное не найдено.")
@@ -139,7 +152,6 @@ class storage:
                 "value": row["value"],
                 "datetime": row["datetime"]
             } for row in results]
-            #print(items)
             return items
         return []
 
@@ -195,21 +207,16 @@ class storage:
         return []
 
     @classmethod
-    def insert_animals(cls):
-        print("insert_animals")
-        #todo убрать после реальных вызовов
-        item = {
-            "bar_code": 1236,  # barcode
-            "place_capture": "Marina",  # Место отлова
-            #"capture_datetime": #Дата/время отлова. Временно! подставляется текущее прямо в базу. См. второй NOW()            
-            "degree_pollution": 3  # Степень загрязнения
-        }
-        #todo убрать после реальных вызовов
+    def insert_animal(cls, animal):
+        #todo Вынести форматные строки в константы
+        capture_datetime = datetime.strptime(animal["capture_datetime"], "%d.%m.%Y %H:%M")
+        capture_datetime_formatted = capture_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
         query = """
         INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
-        VALUES (NOW(), %s, %s, NOW(), %s)
+        VALUES (NOW(), %s, %s, %s, %s)
         """
-        data = (item["bar_code"], item["place_capture"], item["degree_pollution"])
+        data = (animal["bar_code"], animal["place_capture"], capture_datetime_formatted, animal["degree_pollution"])
         cls.execute_query(query, data)
 
     @classmethod
@@ -222,6 +229,7 @@ class storage:
         return []
 
     #Обновление таблицы animals
+    #todo Переделать на WHERE id = id
     @classmethod
     def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
         print(f'update_animal bar_code: {bar_code}, weight: {weight}, female: {female}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')

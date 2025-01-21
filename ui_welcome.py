@@ -6,7 +6,8 @@ from barcode_reader import barCodeReader
 
 welcome_text_sel_addr = 'Выберите локацию'
 welcome_text_sel_bird = 'Добавьте/Выберите птицу'
-
+sex_male = "муж"
+sex_female = "жен"
 
 ui_welcome_mode = {
     "kbd_mode_apm1":"Поступление (АРМ1)",
@@ -57,20 +58,35 @@ def add_hdr_item(label, value):
         text += '-\n'
     return text
 
-
 def ui_welcome_get_card(user, bird):
     text = add_hdr_item("Номер животного", user["code"])
-    text += add_hdr_item("Место отлова", bird["capture_place"])
-    text += add_hdr_item("Время отлова", bird["capture_date"])
-    text += add_hdr_item("Степень загрязнения", bird["polution"])
-    if bird["mass"]:
-        text += add_hdr_item("Масса животного", bird["mass"] + "гр.")
-    else:
-        text += add_hdr_item("Масса животного", None)
-    text += add_hdr_item("Вид", bird["species"])
-    text += add_hdr_item("Пол", bird["sex"])
-    text += add_hdr_item("Клиническое состояние", bird["clinic_state"])
-    text += '---------------\n'
+    animal = storage.get_animal_by_bar_code(user["code"])
+    if animal is not None:
+        print(f'animal: {animal}')
+        text += add_hdr_item("Место отлова", animal["place_capture"])
+        #todo Вынести форматную строку в константы
+        text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime("%d.%m.%y %H:%M"))
+        text += add_hdr_item("Степень загрязнения", animal["degree_pollution"])
+        if animal["weight"] is not None:
+            text += add_hdr_item("Вес", str(animal["weight"]) + " гр.")
+        else:
+            text += add_hdr_item("Вес", "Не указан")
+        if animal["species"] is not None:
+            text += add_hdr_item("Вид", animal["species"])
+        else:
+            text += add_hdr_item("Вид", "Не указан")
+        if animal["female"] is not None:
+            if animal["female"] == b'1':
+                text += add_hdr_item("Пол", sex_female)
+            else:
+                text += add_hdr_item("Пол", sex_male)
+        else:
+            text += add_hdr_item("Пол", "Не указан")
+        if animal["clinical_condition_admission"] is not None:
+            text += add_hdr_item("Клиническое состояние", animal["clinical_condition_admission"])
+        else:
+            text += add_hdr_item("Клиническое состояние", "Не указано")
+        text += '---------------\n'            
     return text 
 
 def ui_welcome(user, key = None, msg=None):
