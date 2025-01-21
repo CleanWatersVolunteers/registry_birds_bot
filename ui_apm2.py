@@ -1,4 +1,4 @@
-from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome_cancel,ui_welcome_done,ui_welcome
+from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
 from storage import storage
 
@@ -10,9 +10,8 @@ apm2_done = {
 }
 
 def apm2_done_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if bird:
-        bird["stage2"] = 'OK'
+    if "bird" in user:
+        user["bird"]["stage2"] = "OK"
     return ui_welcome(user)
 
 ############################################

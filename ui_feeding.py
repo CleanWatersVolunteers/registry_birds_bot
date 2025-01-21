@@ -1,4 +1,4 @@
-from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome_cancel,ui_welcome_done,ui_welcome
+from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
 from datetime import datetime
 import pytz
@@ -23,8 +23,7 @@ feeding_cancel = {
     "kbd_cancel":"Отмена",
 }
 def feeding_action_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if not bird:
+    if not "bird" in user:
         return ui_welcome(user)
     if key == 'kbd_feeding_eat':
         user["mode"] = "kbd_feeding_entry_fish"
@@ -32,7 +31,7 @@ def feeding_action_hndl(user, key=None, msg=None)->(str,):
         keyboard = tgm.make_inline_keyboard(feeding_cancel)
         return text, keyboard
 
-    animal_id = storage.get_animal_id(user["code"])
+    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
     if animal_id is not None:
         manipulation = {
             "animal_id": animal_id,
@@ -53,8 +52,7 @@ def feeding_action_hndl(user, key=None, msg=None)->(str,):
     return ui_welcome(user)
 
 def feeding_entry_fish_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if not bird:
+    if not "bird" in user:
         return ui_welcome(user)
     if not msg.isdigit():
         text = f'{ui_welcome_mode["kbd_feeding"]}:\n{feeding_text_incorrect} {msg}\n'
@@ -62,7 +60,7 @@ def feeding_entry_fish_hndl(user, key=None, msg=None)->(str,):
         keyboard = tgm.make_inline_keyboard(feeding_cancel)
         return text, keyboard
 
-    animal_id = storage.get_animal_id(user["code"])
+    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
     if animal_id is not None:
         manipulation = {
             "animal_id": animal_id,
@@ -77,10 +75,7 @@ def feeding_entry_fish_hndl(user, key=None, msg=None)->(str,):
 # Global API
 ############################################
 def ui_feeding_mode(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if not bird:
-        return ui_welcome(user)
-    user["mode"] = "kbd_mode_feeding"
+    user["mode"] = "kbd_feeding"
     text = f'{ui_welcome_mode["kbd_feeding"]}:\n{feeding_text_sel_action}'
     keyboard = tgm.make_inline_keyboard(feeding_actions)
     return text, keyboard

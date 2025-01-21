@@ -1,4 +1,4 @@
-from ui_welcome import ui_welcome_get_card, welcome_handlers,ui_welcome_mode,ui_welcome_cancel,ui_welcome_done,ui_welcome
+from ui_welcome import ui_welcome_get_card, welcome_handlers,ui_welcome
 import tgm
 from storage import storage
 from datetime import datetime
@@ -13,11 +13,11 @@ manipulations_not_found = "Манипуляции не найдены"
 # Global API
 ############################################
 def ui_history_mode(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
+    bird = user["bird"]
     if not bird:
         return ui_welcome(user)
 
-    text = ui_welcome_get_card(user, bird)
+    text = ui_welcome_get_card(bird)
     keyboard = tgm.make_inline_keyboard(history_cancel)
 
     animal_id = storage.get_animal_id(user["code"])

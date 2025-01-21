@@ -5,48 +5,28 @@ from storage import storage
 from barcode_reader import barCodeReader
 
 welcome_text_sel_addr = 'Выберите локацию'
-welcome_text_sel_bird = 'Добавьте/Выберите птицу'
+welcome_text_sel_bird = 'Загрузите птицу'
 sex_male = "муж"
 sex_female = "жен"
 capture_datetime_format = "%d.%m.%y %H:%M"
 
 ui_welcome_mode = {
-    "kbd_mode_apm1":"Поступление (АРМ1)",
     "kbd_mode_apm2":"Первичка перед мойкой (АРМ2)",
     "kbd_mode_apm3":"Мойка (АРМ3)",
     "kbd_mode_apm4":"Прием в стационар (АРМ4)",
     "kbd_mode_apm5":"Первичка в стационаре (АРМ5)",
     "kbd_mode_apm6":"Мед.обслуживание - Врач (АРМ6)",
-    # "kbd_mode_apm7":"Нянька (АРМ7)",
-    # "kbd_mode_apm7":"Загон (АРМ8)",
-    "kbd_add_bird":"Добавить птицу",
-    "kbd_sel_bird":"Выбрать птицу",
-    "kbd_sel_addr":"Сменить локацию", 
     "kbd_feeding":"Кормление", 
     "kbd_mass":"Изменить вес",
     "kbd_history":"История", 
-}
-
-ui_welcome_cancel = {
-    "kbd_cancel":"Отмена", 
-}
-ui_welcome_done = {
-    "kbd_done":"Готово",
-    "kbd_cancel":"Отмена",
+    "kbd_load_bird":"Загрузить птицу",
+    "kbd_sel_addr":"Сменить локацию", 
 }
 
 kbd_addr_list = {
     "kbd_addr1" : "Жемчужная",
-    "kbd_addr2" : "Аристей",
     "kbd_addr3" : "Полярные зори",
-    # "kbd_cancel":"Отмена",
 }
-kbd_menu_base = {
-    "kbd_add_bird":"Добавить птицу",
-    "kbd_sel_bird":"Выбрать птицу",
-    "kbd_sel_addr":"Сменить локацию",  
-}
-
 
 ##########################################
 # UI menu 
@@ -59,9 +39,9 @@ def add_hdr_item(label, value):
         text += '-\n'
     return text
 
-def ui_welcome_get_card(user, bird):
-    text = add_hdr_item("Номер животного", user["code"])
-    animal = storage.get_animal_by_bar_code(user["code"])
+def ui_welcome_get_card(bird):
+    text = add_hdr_item("Номер животного", bird["bar_code"])
+    animal = storage.get_animal_by_bar_code(bird["bar_code"])
     if animal is not None:
         text += add_hdr_item("Место отлова", animal["place_capture"])
         text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime(capture_datetime_format))
@@ -89,39 +69,29 @@ def ui_welcome_get_card(user, bird):
     return text 
 
 def ui_welcome(user, key = None, msg=None):
-    text = ''
-
     if not user:
         print('[!!] User not found!')
         return "Ошибка!", None
-    
-    # Check selected address
     if not user["addr"]:
         return welcome_sel_addr(user, key)
 
-    text += f'Адрес: {user["addr"]}\n'
-
-    # Check bird in list
+    text = f'Адрес: {user["addr"]}\n'
     bird = None
-    if user["code"]:
-        bird = storage.get_bird(user["code"])
+    if "bird" in user:
+        bird = user["bird"]
     if not bird:
-        text += welcome_text_sel_bird
-        return text, tgm.make_inline_keyboard(kbd_menu_base)
+        return ui_load_bird(user, key, msg)
     
-    text += ui_welcome_get_card(user, bird)
-
-    template_yes = '✅ '
-    template_no = '❌ '
-
-    for num in range(1,7):
-        if bird[f'stage{num}']:
-            text += template_yes
-        else:
-            text += template_no
+    text += ui_welcome_get_card(bird)
+    for num in range(2,7):
         id = f'kbd_mode_apm{num}'
-        text += f'{ui_welcome_mode[id]}:\n'
-
+        if id in ui_welcome_mode:
+            stage_num = f'stage{num}'
+            if stage_num in bird:
+                text += '✅ '
+            else:
+                text += '❌ '
+            text += f'{ui_welcome_mode[id]}:\n'
     return text, tgm.make_inline_keyboard(ui_welcome_mode)
 
 
@@ -135,16 +105,14 @@ def welcome_addr_hndl(user, key=None, msg=None):
         user["addr"] = kbd_addr_list[key]
     else:
         user["addr"] = None
-    return ui_welcome(user, key)
+    if "bird" in user:
+        return ui_welcome(user)
+    return ui_load_bird(user, key, msg)
 
 ##########################################
 # Callback handlers
 ##########################################
 welcome_handlers = {
-    "kbd_addr1":welcome_addr_hndl,
-    "kbd_addr2":welcome_addr_hndl,
-    "kbd_addr3":welcome_addr_hndl,
-
     "kbd_sel_addr":welcome_sel_addr,
     "kbd_cancel":ui_welcome,
     "kbd_done":ui_welcome,
@@ -161,8 +129,9 @@ from ui_feeding import *
 from ui_mass import *
 from ui_history import *
 
-welcome_handlers["kbd_add_bird"] = ui_load_bird_add
-welcome_handlers["kbd_sel_bird"] = ui_load_bird_sel
+welcome_handlers["kbd_load_bird"] = ui_load_bird
+welcome_handlers["kbd_addr1"] = welcome_addr_hndl
+welcome_handlers["kbd_addr3"] = welcome_addr_hndl
 
 welcome_handlers["kbd_mode_apm1"] = ui_apm1_mode
 welcome_handlers["kbd_mode_apm2"] = ui_apm2_mode

@@ -1,4 +1,4 @@
-from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome_cancel,ui_welcome_done,ui_welcome
+from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
 from storage import storage
 
@@ -16,14 +16,13 @@ apm6_cancel = {
 }
 
 def apm6_sex_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if not bird:
+    if not "bird" in user:
         return ui_welcome(user)
-    bird["sex"] = kbd_apm6_sex[key]
+    user["bird"]["sex"] = kbd_apm6_sex[key]
     if kbd_apm6_sex[key] == kbd_apm6_sex["kbd_female"]:
-        storage.update_animal(user["code"], female=True)
+        storage.update_animal(user["bird"]["bar_code"], female=True)
     else:
-        storage.update_animal(user["code"], female=False)
+        storage.update_animal(user["bird"]["bar_code"], female=False)
     user["mode"] = "mode_apm6_species"
 
     text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_species}'
@@ -31,11 +30,10 @@ def apm6_sex_hndl(user, key=None, msg=None)->(str,):
     return text, keyboard
     
 def apm6_species_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if not bird:
+    if not "bird" in user:
         return ui_welcome(user)
-    storage.update_animal(user["code"], species = msg)
-    bird["species"] = msg
+    storage.update_animal(user["bird"]["bar_code"], species = msg)
+    user["bird"]["species"] = msg
     user["mode"] = "mode_apm6_clinic"
 
     text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_clinic_state}'
@@ -43,11 +41,10 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
     return text, keyboard
 
 def apm6_done_hndl(user, key=None, msg=None)->(str,):
-    bird = storage.get_bird(user["code"])
-    if bird:
-        storage.update_animal(user["code"], clinical_condition_admission = msg)
-        bird["clinic_state"] = msg
-        bird["stage6"] = 'OK'
+    if "bird" in user:
+        storage.update_animal(user["bird"]["bar_code"], clinical_condition_admission = msg)
+        user["bird"]["clinic_state"] = msg
+        user["bird"]["stage6"] = 'OK'
     return ui_welcome(user)
 
 ############################################
