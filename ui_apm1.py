@@ -138,7 +138,6 @@ def apm1_polution_hndl(user, key=None, msg=None)->(str,):
         "degree_pollution": bird["polution"]
     }
     storage.insert_animal(animal)
-    print("Registration complete!")
     return ui_welcome(user)
 
 

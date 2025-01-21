@@ -48,9 +48,7 @@ def feeding_action_hndl(user, key=None, msg=None)->(str,):
         elif key == 'kbd_feeding_not_drink': #4
             manipulation["id"] = 4
         else:
-            print("to ui_welcome")
             return ui_welcome(user)
-        print(manipulation)
         storage.insert_history(manipulation["id"], manipulation["animal_id"], manipulation["arms_id"], manipulation["tg_nickname"])
     return ui_welcome(user)
 
