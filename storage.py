@@ -26,7 +26,7 @@ class storage:
                 return results
             else:
                 connection.commit()  # Подтверждаем изменения
-                print("Запись успешно добавлена.")
+                return True
         except mysql.connector.Error as err:
             print(f"Ошибка при выполнении запроса: {err}")
             return None
