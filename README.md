@@ -14,6 +14,7 @@ pip install opencv-contrib-python
 pip install pyzbar
 pip install pytz
 pip install mysql-connector-python
+pip install numpy
 
 apt-get install libzbar0
 ```

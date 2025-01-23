@@ -17,7 +17,7 @@ ui_welcome_mode = {
     "kbd_mode_apm5":"Первичка в стационаре (АРМ5)",
     "kbd_mode_apm6":"Мед.обслуживание - Врач (АРМ6)",
     "kbd_feeding":"Кормление", 
-    "kbd_mass":"Изменить вес",
+    # "kbd_mass":"Изменить вес",
     "kbd_history":"История", 
     "kbd_load_bird":"Загрузить птицу",
     "kbd_sel_addr":"Сменить локацию", 
@@ -205,9 +205,11 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     else:
         file_id = update.message.photo[0].file_id
         new_file = await update.message.effective_attachment[-1].get_file()
-        file_name = new_file.file_path.split('/')[-1]
-        await new_file.download_to_drive()
-        code = barCodeReader(file_name)
+        # file_name = new_file.file_path.split('/')[-1]
+        # await new_file.download_to_drive()
+        # code = barCodeReader(file_name)
+        data = await new_file.download_as_bytearray() 
+        code = barCodeReader(data)
         if len(code) == 1:
             text, keyboard = ui_load_bird_barcode(user, msg=code[0])
         else:
