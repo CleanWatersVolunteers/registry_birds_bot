@@ -18,7 +18,6 @@ apm6_cancel = {
 def apm6_sex_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
-    user["bird"]["sex"] = kbd_apm6_sex[key]
     if kbd_apm6_sex[key] == kbd_apm6_sex["kbd_female"]:
         storage.update_animal(user["bird"]["bar_code"], female=True)
     else:
@@ -33,7 +32,6 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
     storage.update_animal(user["bird"]["bar_code"], species = msg)
-    user["bird"]["species"] = msg
     user["mode"] = "mode_apm6_clinic"
 
     text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_clinic_state}'
@@ -43,7 +41,6 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
 def apm6_done_hndl(user, key=None, msg=None)->(str,):
     if "bird" in user:
         storage.update_animal(user["bird"]["bar_code"], clinical_condition_admission = msg)
-        user["bird"]["clinic_state"] = msg
         user["bird"]["stage6"] = 'OK'
     return ui_welcome(user)
 

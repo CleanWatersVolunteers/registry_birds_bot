@@ -99,7 +99,7 @@ def apm1_polution_hndl(user, key=None, msg=None)->(str,):
         text += apm1_text_enter_polituon
         keyboard = tgm.make_inline_keyboard(apm1_cancel)
         return text, keyboard
-
+# todo убрать "degree_pollution"
     user["bird"]["degree_pollution"] = msg
     storage.insert_animal(user["bird"])
     return ui_welcome(user)

@@ -16,7 +16,7 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
     if not bird:
         return ui_welcome(user)
 
-    text = ui_welcome_get_card(bird)
+    text = ui_welcome_get_card(bird["bar_code"])
     keyboard = tgm.make_inline_keyboard(history_cancel)
 
     animal_id = storage.get_animal_id(bird["bar_code"])

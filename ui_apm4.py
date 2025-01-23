@@ -19,7 +19,6 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
         return text, keyboard
 
     user["mode"] = None
-    user["bird"]["mass"] = msg
     user["bird"]["stage4"] = 'OK'
     storage.insert_place_history(user["bird"]["bar_code"], user["id"])
     storage.update_animal(user["bird"]["bar_code"], weight = msg)

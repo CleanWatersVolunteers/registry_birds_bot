@@ -39,9 +39,9 @@ def add_hdr_item(label, value):
         text += '-\n'
     return text
 
-def ui_welcome_get_card(bird):
-    text = add_hdr_item("Номер животного", bird["bar_code"])
-    animal = storage.get_animal_by_bar_code(bird["bar_code"])
+def ui_welcome_get_card(bar_code):
+    text = add_hdr_item("Номер животного", bar_code)
+    animal = storage.get_animal_by_bar_code(bar_code)
     if animal is not None:
         text += add_hdr_item("Место отлова", animal["place_capture"])
         text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime(capture_datetime_format))
@@ -82,7 +82,7 @@ def ui_welcome(user, key = None, msg=None):
     if not bird:
         return ui_load_bird(user, key, msg)
     
-    text += ui_welcome_get_card(bird)
+    text += ui_welcome_get_card(bird["bar_code"])
     for num in range(2,7):
         id = f'kbd_mode_apm{num}'
         if id in ui_welcome_mode:
