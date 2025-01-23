@@ -1,4 +1,4 @@
-from ui_welcome import ui_welcome_get_card, welcome_handlers,ui_welcome
+from ui_welcome import ui_welcome_get_card, ui_welcome
 import tgm
 from storage import storage
 

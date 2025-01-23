@@ -220,7 +220,6 @@ class storage:
     #todo Переделать на WHERE id = id
     @classmethod
     def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
-        print(f'update_animal bar_code: {bar_code}, weight: {weight}, female: {female}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
         query = "UPDATE animals SET "
         updates = []
         data = []
