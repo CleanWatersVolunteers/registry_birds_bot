@@ -255,8 +255,21 @@ class storage:
             return True
 
     @classmethod
+    def get_location(cls):
+        query = """
+        SELECT DISTINCT 
+            l.id AS location_id, 
+            l.name AS location_name
+        FROM 
+            arms a
+        JOIN 
+            locations l ON a.location_id = l.id;
+        """
+        return cls.execute_query(query, fetch=True)
+
+    @classmethod
     def __create_user(cls):
-        user = {"addr":None, "mode":None, "code":None, "id":None}
+        user = {"location_id":None, "location_name":None, "mode":None, "code":None, "id":None}
         return user
 
     @classmethod

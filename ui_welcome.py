@@ -3,6 +3,7 @@ from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 from storage import storage
 from barcode_reader import barCodeReader
+import re
 
 welcome_text_sel_addr = 'Выберите локацию'
 welcome_text_sel_bird = 'Загрузите птицу'
@@ -23,10 +24,7 @@ ui_welcome_mode = {
     "kbd_sel_addr":"Сменить локацию", 
 }
 
-kbd_addr_list = {
-    "kbd_addr1" : "Жемчужная",
-    "kbd_addr3" : "Полярные зори",
-}
+kbd_addr_list = {}
 
 ##########################################
 # UI menu 
@@ -72,10 +70,10 @@ def ui_welcome(user, key = None, msg=None):
     if not user:
         print('[!!] User not found!')
         return "Ошибка!", None
-    if not user["addr"]:
+    if not user["location_id"] or not user["location_name"]:
         return welcome_sel_addr(user, key)
 
-    text = f'Адрес: {user["addr"]}\n'
+    text = f'Адрес: {user["location_name"]}\n'
     bird = None
     if "bird" in user:
         bird = user["bird"]
@@ -94,17 +92,30 @@ def ui_welcome(user, key = None, msg=None):
             text += f'{ui_welcome_mode[id]}:\n'
     return text, tgm.make_inline_keyboard(ui_welcome_mode)
 
-
 def welcome_sel_addr(user, key=None, msg=None):
+    locations = storage.get_location()
+    if locations is not None:
+        for location in locations:
+            # Прячем идентификатор адреса
+            key = f"kbd_addr_{location['location_id']}"
+            kbd_addr_list[key] = location['location_name']
+            welcome_handlers[key] = welcome_addr_hndl
     text = welcome_text_sel_addr
     keyboard = tgm.make_inline_keyboard(kbd_addr_list)
     return text, keyboard
 
 def welcome_addr_hndl(user, key=None, msg=None):
     if key in kbd_addr_list:
-        user["addr"] = kbd_addr_list[key]
+        # Извлекаем припрятанный идентификатор адреса
+        match = re.search(r'\d+$', key)
+        if match:
+            user["location_id"] = int(match.group())
+            user["location_name"] = kbd_addr_list[key]
+        else:
+            print("Число не найдено.")
     else:
-        user["addr"] = None
+        user["location_id"] = None
+        user["location_name"] = None
     if "bird" in user:
         return ui_welcome(user)
     return ui_load_bird(user, key, msg)
@@ -130,9 +141,6 @@ from ui_mass import *
 from ui_history import *
 
 welcome_handlers["kbd_load_bird"] = ui_load_bird
-welcome_handlers["kbd_addr1"] = welcome_addr_hndl
-welcome_handlers["kbd_addr3"] = welcome_addr_hndl
-
 welcome_handlers["kbd_mode_apm1"] = ui_apm1_mode
 welcome_handlers["kbd_mode_apm2"] = ui_apm2_mode
 welcome_handlers["kbd_mode_apm3"] = ui_apm3_mode
