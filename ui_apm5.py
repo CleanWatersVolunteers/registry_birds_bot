@@ -1,6 +1,5 @@
 from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
-from storage import storage
 
 apm5_text_action = "Выполните необходимые операции и нажмите 'Готово'"
 

@@ -1,6 +1,6 @@
 import tgm
 from telegram import InlineKeyboardMarkup, Update
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes
 from storage import storage
 from barcode_reader import barCodeReader
 

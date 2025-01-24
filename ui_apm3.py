@@ -1,6 +1,5 @@
 from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
-from storage import storage
 
 apm3_text_action = "Выполните мойку животного и нажмите 'Готово'"
 
