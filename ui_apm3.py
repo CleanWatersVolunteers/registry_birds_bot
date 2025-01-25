@@ -18,7 +18,7 @@ def apm3_done_hndl(user, key=None, msg=None)->(str,):
 ############################################
 def ui_apm3_mode(user, key=None, msg=None)->(str,):
     user["mode"] = "kbd_mode_apm3"
-    text = f'{ui_welcome_mode["kbd_mode_apm3"]}:\n{apm3_text_action}'
+    text = f'{ui_welcome_mode[key]}:\n{apm3_text_action}'
     keyboard = tgm.make_inline_keyboard(apm3_done)
     return text, keyboard
 
