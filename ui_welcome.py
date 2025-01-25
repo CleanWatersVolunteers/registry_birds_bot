@@ -11,18 +11,7 @@ sex_male = "муж"
 sex_female = "жен"
 capture_datetime_format = "%d.%m.%y %H:%M"
 
-ui_welcome_mode = {
-    "kbd_mode_apm2":"Первичка перед мойкой (АРМ2)",
-    "kbd_mode_apm3":"Мойка (АРМ3)",
-    "kbd_mode_apm4":"Прием в стационар (АРМ4)",
-    "kbd_mode_apm5":"Первичка в стационаре (АРМ5)",
-    "kbd_mode_apm6":"Мед.обслуживание - Врач (АРМ6)",
-    "kbd_feeding":"Кормление", 
-    "kbd_mass":"Изменить вес",
-    "kbd_history":"История", 
-    "kbd_load_bird":"Загрузить птицу",
-    "kbd_sel_addr":"Сменить локацию", 
-}
+ui_welcome_mode = {}
 
 kbd_addr_list = {}
 
@@ -63,33 +52,48 @@ def ui_welcome_get_card(bar_code):
             text += add_hdr_item("Клиническое состояние", animal["clinical_condition_admission"])
         else:
             text += add_hdr_item("Клиническое состояние", "Не указано")
-        text += '---------------\n'            
-    return text 
+        text += '---------------\n'
+    return text
 
-def ui_welcome(user, key = None, msg=None):
+def ui_welcome(user, key=None, msg=None):
     if not user:
         print('[!!] User not found!')
         return "Ошибка!", None
-    if not user["location_id"] or not user["location_name"]:
+
+    if user["location_id"] is None or user["location_name"] is None:
         return welcome_sel_addr(user, key)
 
-    text = f'Адрес: {user["location_name"]}\n'
     bird = None
     if "bird" in user:
         bird = user["bird"]
     if not bird:
         return ui_load_bird(user, key, msg)
-    
+
+    text = f'Адрес: {user["location_name"]}\n'
     text += ui_welcome_get_card(bird["bar_code"])
-    for num in range(2,7):
-        id = f'kbd_mode_apm{num}'
-        if id in ui_welcome_mode:
-            stage_num = f'stage{num}'
-            if stage_num in bird:
-                text += '✅ '
-            else:
-                text += '❌ '
-            text += f'{ui_welcome_mode[id]}:\n'
+    arm_list = storage.get_arms(user["location_id"])
+    # todo Очищать welcome_handlers при смене локации
+    if arm_list is not None:
+        for arm in arm_list:
+            key = f"kbd_mode_apm{arm['arm_id']}"
+            ui_welcome_mode[key] = arm['arm_name']
+            # todo Продумать как убрать хардкод
+            if arm['arm_id'] == 0:
+                welcome_handlers[key] = ui_apm1_mode
+            elif arm['arm_id'] == 1:
+                welcome_handlers[key] = ui_apm2_mode
+            elif arm['arm_id'] == 2:
+                welcome_handlers[key] = ui_apm4_mode
+            elif arm['arm_id'] == 3:
+                welcome_handlers[key] = ui_apm5_mode
+            elif arm['arm_id'] == 4:
+                welcome_handlers[key] = ui_apm6_mode
+
+    ui_welcome_mode["kbd_feeding"] = "Кормление"
+    ui_welcome_mode["kbd_mass"] = "Взвешивание"
+    ui_welcome_mode["kbd_history"] = "История"
+    ui_welcome_mode["kbd_load_bird"] = "Загрузить птицу"
+    ui_welcome_mode["kbd_sel_addr"] = "Сменить локацию"
     return text, tgm.make_inline_keyboard(ui_welcome_mode)
 
 def welcome_sel_addr(user, key=None, msg=None):
@@ -124,15 +128,16 @@ def welcome_addr_hndl(user, key=None, msg=None):
 # Callback handlers
 ##########################################
 welcome_handlers = {
-    "kbd_sel_addr":welcome_sel_addr,
-    "kbd_cancel":ui_welcome,
-    "kbd_done":ui_welcome,
+    "kbd_sel_addr": welcome_sel_addr,
+    "kbd_cancel": ui_welcome,
+    "kbd_done": ui_welcome,
 }
 
 from ui_load_bird import *
 from ui_apm1 import *
 from ui_apm2 import *
-from ui_apm3 import *
+# todo Больше не нужно?
+# from ui_apm3 import *
 from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
@@ -141,17 +146,9 @@ from ui_mass import *
 from ui_history import *
 
 welcome_handlers["kbd_load_bird"] = ui_load_bird
-welcome_handlers["kbd_mode_apm1"] = ui_apm1_mode
-welcome_handlers["kbd_mode_apm2"] = ui_apm2_mode
-welcome_handlers["kbd_mode_apm3"] = ui_apm3_mode
-welcome_handlers["kbd_mode_apm4"] = ui_apm4_mode
-welcome_handlers["kbd_mode_apm5"] = ui_apm5_mode
-welcome_handlers["kbd_mode_apm6"] = ui_apm6_mode
 welcome_handlers["kbd_feeding"] = ui_feeding_mode
 welcome_handlers["kbd_mass"] = ui_mass_entry_mode
 welcome_handlers["kbd_history"] = ui_history_mode
-
-
 
 
 ##########################################
@@ -192,7 +189,7 @@ async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         text, keyboard = ui_welcome(user)
     else:
         if query.data in welcome_handlers:
-            text, keyboard = welcome_handlers[query.data](user, query.data,msg=query.message.text)
+            text, keyboard = welcome_handlers[query.data](user, query.data, msg=query.message.text)
         else:
             print(f'[!!] Got unknown kbd entry {query.data}')
             text, keyboard = ui_welcome(user)

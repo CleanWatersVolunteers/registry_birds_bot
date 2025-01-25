@@ -1,6 +1,7 @@
 from ui_welcome import welcome_handlers,ui_welcome_mode,ui_welcome
 import tgm
 from storage import storage
+import re
 
 apm6_text_sex = "Выберите пол животного"
 apm6_text_species = "Введите вид животного"
@@ -15,6 +16,11 @@ apm6_cancel = {
     "kbd_cancel":"Отмена",
 }
 
+apm6_data = {
+    "arm_id": None,
+    "title": None
+}
+
 def apm6_sex_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
@@ -23,8 +29,7 @@ def apm6_sex_hndl(user, key=None, msg=None)->(str,):
     else:
         storage.update_animal(user["bird"]["bar_code"], female=False)
     user["mode"] = "mode_apm6_species"
-
-    text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_species}'
+    text = f'{apm6_data["title"]}:\n{apm6_text_species}'
     keyboard = tgm.make_inline_keyboard(apm6_cancel)
     return text, keyboard
     
@@ -33,8 +38,7 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
         return ui_welcome(user)
     storage.update_animal(user["bird"]["bar_code"], species = msg)
     user["mode"] = "mode_apm6_clinic"
-
-    text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_clinic_state}'
+    text = f'{apm6_data["title"]}:\n{apm6_text_clinic_state}'
     keyboard = tgm.make_inline_keyboard(apm6_cancel)
     return text, keyboard
 
@@ -48,8 +52,12 @@ def apm6_done_hndl(user, key=None, msg=None)->(str,):
 # Global API
 ############################################
 def ui_apm6_mode(user, key=None, msg=None)->(str,):
+    match = re.search(r'\d+$', key)
+    if match:
+        apm6_data["arm_id"] = int(match.group())
+    apm6_data["title"] = ui_welcome_mode[key]
     user["mode"] = "kbd_mode_apm6_sex"
-    text = f'{ui_welcome_mode["kbd_mode_apm6"]}:\n{apm6_text_sex}'
+    text = f'{apm6_data["title"]}:\n{apm6_text_sex}'
     keyboard = tgm.make_inline_keyboard(kbd_apm6_sex)
     return text, keyboard
 

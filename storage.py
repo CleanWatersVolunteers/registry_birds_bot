@@ -4,14 +4,13 @@ from config import Config
 from datetime import datetime
 
 class storage:
-
     capture_datetime_string_format = "%d.%m.%Y %H:%M"
     capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
 
     dbconfig = Config.load_config_from_json()
     connection_pool = pooling.MySQLConnectionPool(
-        pool_name = "mypool",
-        pool_size = 5,
+        pool_name="mypool",
+        pool_size=5,
         **dbconfig
     )
 
@@ -35,17 +34,16 @@ class storage:
             connection.close()  # Закрываем соединение, возвращая его в пул
 
     @classmethod
-    def insert_place_history(cls, bar_code, tg_nickname):
+    def insert_place_history(cls, arm_id, bar_code, tg_nickname):
         animal_id = cls.get_animal_id(bar_code)
-        print(f"animal_id: {animal_id}")
         if animal_id is not None:
-            #todo убрать после реальных вызовов
+            # todo убрать после реальных вызовов
             item = {
                 "animal_id": animal_id,
                 "tg_nickname": tg_nickname,
                 "arm_id": 3
             }
-            #todo убрать после реальных вызовов
+            # todo убрать после реальных вызовов
             query = """
             INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
             VALUES (NOW(), %s, %s, %s)
@@ -74,8 +72,8 @@ class storage:
         else:
             print("Животное не найдено.")
             return None
-    
-    #todo Удалить после перехода на id
+
+    # todo Удалить после перехода на id
     @classmethod
     def get_animal_by_bar_code(cls, bar_code) -> dict:
         query = "SELECT * FROM animals WHERE bar_code = %s"
@@ -97,7 +95,6 @@ class storage:
         cls.execute_query(query, data)
 
     def get_animal_by_id(cls, animal_id) -> dict:
-        print(f'get_animal_by_id animal_id: {animal_id}')
         query = "SELECT * FROM animals WHERE id = %s"
         data = (animal_id,)
         result = cls.execute_query(query, data, fetch=True)
@@ -115,7 +112,7 @@ class storage:
             items = [{"id": row["id"], "name": row["name"], "units": row["units"]} for row in results]
             return items
         return []
-    
+
     @classmethod
     def get_animal_numerical_history(cls, animal_id):
         select_query = """
@@ -182,7 +179,7 @@ class storage:
             } for row in results]
             return items
         return []
-    
+
     @classmethod
     def get_history(cls, animal_id):
         select_query = "SELECT * FROM history WHERE animal_id = %s"
@@ -191,8 +188,8 @@ class storage:
         if results is not None:
             # Формируем список записей
             items = [{"id": row["id"], "animal_id": row["animal_id"], "datetime": row["datetime"],
-                    "manipulation_id": row["manipulation_id"], "arm_id": row["arm_id"],
-                    "tg_nickname": row["tg_nickname"]} for row in results]
+                      "manipulation_id": row["manipulation_id"], "arm_id": row["arm_id"],
+                      "tg_nickname": row["tg_nickname"]} for row in results]
             return items
         return []
 
@@ -216,8 +213,8 @@ class storage:
             return items
         return []
 
-    #Обновление таблицы animals
-    #todo Переделать на WHERE id = id
+    # Обновление таблицы animals
+    # todo Переделать на WHERE id = id
     @classmethod
     def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
         query = "UPDATE animals SET "
@@ -267,8 +264,20 @@ class storage:
         return cls.execute_query(query, fetch=True)
 
     @classmethod
+    def get_arms(cls, location_id):
+        query = """
+        SELECT
+            p.id  AS arm_id, 
+            p.name AS arm_name
+        FROM plaсes p
+        INNER JOIN arms a ON a.plaсe_id = p.id
+        WHERE a.location_id = %s
+        """
+        return cls.execute_query(query, (location_id,), fetch=True)
+
+    @classmethod
     def __create_user(cls):
-        user = {"location_id":None, "location_name":None, "mode":None, "code":None, "id":None}
+        user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
         return user
 
     @classmethod
@@ -276,7 +285,7 @@ class storage:
         cls.__users = {}
 
     @classmethod
-    def add_user(cls, username)->bool:
+    def add_user(cls, username) -> bool:
         if username in cls.__users:
             return False
         cls.__users[username] = cls.__create_user()
