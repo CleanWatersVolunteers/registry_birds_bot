@@ -19,7 +19,7 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
     if not msg.isdigit():
-        text = f'{data["title"]}:\n{apm4_text_incorrect} {msg}\n'
+        text = f'{apm4_data["title"]}:\n{apm4_text_incorrect} {msg}\n'
         text += apm4_text_action
         keyboard = tgm.make_inline_keyboard(apm4_cancel)
         return text, keyboard
