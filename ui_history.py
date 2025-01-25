@@ -26,8 +26,9 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
     if animal_id is not None:
         numerical_history = storage.get_animal_numerical_history(animal_id)
         history = storage.get_animal_history(animal_id)
+        place_history = storage.get_place_history(animal_id)
 
-    combined_history = numerical_history + history
+    combined_history = numerical_history + history + place_history
     sorted_history = sorted(combined_history, key=lambda item: item['datetime'])
     result_string = ""
     current_date = None
@@ -40,8 +41,10 @@ def ui_history_mode(user, key=None, msg=None)->(str,):
             current_date = formatted_date
         if 'type_name' in item:  # Элемент из numerical_history
             result_string += f"{item['datetime'].strftime('%H:%M')} - {item['type_name']}: {item['value']} {item['type_units']} - {item['tg_nickname']}\n"
-        else:  # Элемент из history
+        elif 'manipulation_name' in item:  # Элемент из history
             result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']} - {item['tg_nickname']}\n"
+        else:
+            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['place_name']} - {item['location_name']}\n"
     if result_string == "":
         text += manipulations_not_found
     else:
