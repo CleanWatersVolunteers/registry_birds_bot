@@ -37,21 +37,35 @@ class storage:
     def insert_place_history(cls, arm_id, bar_code, tg_nickname):
         animal_id = cls.get_animal_id(bar_code)
         if animal_id is not None:
-            # todo убрать после реальных вызовов
-            item = {
-                "animal_id": animal_id,
-                "tg_nickname": tg_nickname,
-                "arm_id": 3
-            }
-            # todo убрать после реальных вызовов
             query = """
             INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
             VALUES (NOW(), %s, %s, %s)
             """
-            data = (item["animal_id"], item["tg_nickname"], item["arm_id"])
+            data = (animal_id, tg_nickname, arm_id)
             cls.execute_query(query, data)
         else:
             print(f"invalid animal_id: {animal_id}")
+
+    @classmethod
+    def get_place_history(cls, animal_id):
+        query = """
+                SELECT 
+                    ph.datetime, 
+                    p.name AS place_name, 
+                    l.name AS location_name
+                FROM 
+                    place_history ph
+                JOIN 
+                    arms a ON ph.arm_id = a.id
+                JOIN 
+                    plaсes p ON a.plaсe_id = p.id
+                JOIN 
+                    locations l ON a.location_id = l.id
+                WHERE 
+                    ph.animal_id = %s
+            """
+        data = (animal_id,)
+        return cls.execute_query(query, data, fetch=True)
 
     @classmethod
     def get_animal_id(cls, bar_code):
