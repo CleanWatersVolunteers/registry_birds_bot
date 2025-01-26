@@ -18,7 +18,7 @@ apm4_data = {
 def apm4_done_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
-    if not msg.isdigit():
+    if not msg.isdigit() or int(msg) < 100:
         text = f'{apm4_data["title"]}:\n{apm4_text_incorrect} {msg}\n'
         text += apm4_text_action
         keyboard = tgm.make_inline_keyboard(apm4_cancel)
@@ -32,11 +32,10 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
 ############################################
 # Global API
 ############################################
-def ui_apm4_mode(user, key=None, msg=None)->(str,):
+def ui_apm4_mode(user, key=None, id=None)->(str,):
     user["mode"] = "kbd_mode_apm4_mass"
-    match = re.search(r'\d+$', key)
-    if match:
-        apm4_data["arm_id"] = int(match.group())
+    if id:
+        apm4_data["arm_id"] = int(id)
     apm4_data["title"] = ui_welcome_mode[key]
     text = f'{apm4_data["title"]}:\n{apm4_text_action}'
     keyboard = tgm.make_inline_keyboard(apm4_cancel)

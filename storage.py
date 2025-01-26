@@ -58,7 +58,7 @@ class storage:
                 JOIN 
                     arms a ON ph.arm_id = a.id
                 JOIN 
-                    plaсes p ON a.plaсe_id = p.id
+                    places p ON a.plaсe_id = p.id
                 JOIN 
                     locations l ON a.location_id = l.id
                 WHERE 
@@ -282,8 +282,9 @@ class storage:
         query = """
         SELECT
             p.id  AS arm_id, 
-            p.name AS arm_name
-        FROM plaсes p
+            p.name AS arm_name,
+            a.id AS id
+        FROM places p
         INNER JOIN arms a ON a.plaсe_id = p.id
         WHERE a.location_id = %s
         """
