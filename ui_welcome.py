@@ -1,4 +1,3 @@
-
 import tgm
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes
@@ -211,7 +210,7 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     else:
         file_id = update.message.photo[0].file_id
         new_file = await update.message.effective_attachment[-1].get_file()
-        data = await new_file.download_as_bytearray() 
+        data = await new_file.download_as_bytearray()
         code = barCodeReader(data)
         if len(code) == 1:
             text, keyboard = ui_load_bird_barcode(user, msg=code[0])
