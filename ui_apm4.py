@@ -37,7 +37,6 @@ def ui_apm4_mode(user, key=None, msg=None)->(str,):
     match = re.search(r'\d+$', key)
     if match:
         place_id = match.group()
-    print(storage.get_arm_id(place_id, user["location_id"]))
     apm4_data["arm_id"] = storage.get_arm_id(place_id, user["location_id"])
     apm4_data["title"] = ui_welcome_mode[key]
     text = f'{apm4_data["title"]}:\n{apm4_text_action}'
