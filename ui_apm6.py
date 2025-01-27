@@ -3,15 +3,9 @@ import tgm
 from storage import storage
 import re
 
-apm6_text_sex = "Выберите пол животного"
 apm6_text_species = "Введите вид животного"
 apm6_text_clinic_state = "Введите клиническое состояние"
 
-kbd_apm6_sex = {
-    "kbd_male":"муж",
-    "kbd_female":"жен",
-    "kbd_cancel":"Отмена",
-}
 apm6_cancel = {
     "kbd_cancel":"Отмена",
 }
@@ -20,18 +14,6 @@ apm6_data = {
     "arm_id": None,
     "title": None
 }
-
-def apm6_sex_hndl(user, key=None, msg=None)->(str,):
-    if not "bird" in user:
-        return ui_welcome(user)
-    if kbd_apm6_sex[key] == kbd_apm6_sex["kbd_female"]:
-        storage.update_animal(user["bird"]["bar_code"], female=True)
-    else:
-        storage.update_animal(user["bird"]["bar_code"], female=False)
-    user["mode"] = "mode_apm6_species"
-    text = f'{apm6_data["title"]}:\n{apm6_text_species}'
-    keyboard = tgm.make_inline_keyboard(apm6_cancel)
-    return text, keyboard
     
 def apm6_species_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
@@ -56,14 +38,10 @@ def ui_apm6_mode(user, key=None, msg=None)->(str,):
     if match:
         apm6_data["arm_id"] = int(match.group())
     apm6_data["title"] = ui_welcome_mode[key]
-    user["mode"] = "kbd_mode_apm6_sex"
-    text = f'{apm6_data["title"]}:\n{apm6_text_sex}'
-    keyboard = tgm.make_inline_keyboard(kbd_apm6_sex)
+    user["mode"] = "mode_apm6_species"
+    text = f'{apm6_data["title"]}:\n{apm6_text_species}'
+    keyboard = tgm.make_inline_keyboard(apm6_cancel)
     return text, keyboard
 
-welcome_handlers["kbd_mode_apm6_sex"] = apm6_sex_hndl
 welcome_handlers["mode_apm6_species"] = apm6_species_hndl
 welcome_handlers["mode_apm6_clinic"] = apm6_done_hndl
-
-welcome_handlers["kbd_male"] = apm6_sex_hndl
-welcome_handlers["kbd_female"] = apm6_sex_hndl
