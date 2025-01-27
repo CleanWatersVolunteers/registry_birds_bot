@@ -58,7 +58,7 @@ class storage:
                 JOIN 
                     arms a ON ph.arm_id = a.id
                 JOIN 
-                    places p ON a.plaсe_id = p.id
+                    places p ON a.place_id = p.id
                 JOIN 
                     locations l ON a.location_id = l.id
                 WHERE 
@@ -285,7 +285,7 @@ class storage:
             p.name AS arm_name,
             a.id AS id
         FROM places p
-        INNER JOIN arms a ON a.plaсe_id = p.id
+        INNER JOIN arms a ON a.place_id = p.id
         WHERE a.location_id = %s
         """
         return cls.execute_query(query, (location_id,), fetch=True)

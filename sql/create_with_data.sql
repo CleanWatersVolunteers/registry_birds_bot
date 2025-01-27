@@ -43,13 +43,13 @@ INSERT INTO `animals` (`bar_code`, `registration_datetime`, `place_capture`, `ca
 -- Дамп структуры для таблица registry_birds.arms
 CREATE TABLE IF NOT EXISTS `arms` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `plaсe_id` int NOT NULL,
+  `place_id` int NOT NULL,
   `location_id` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп данных таблицы registry_birds.arms: ~8 rows (приблизительно)
-INSERT INTO `arms` (`plaсe_id`, `location_id`) VALUES
+INSERT INTO `arms` (`place_id`, `location_id`) VALUES
 	(0, 0),
 	(1, 0),
 	(2, 0),
@@ -155,15 +155,15 @@ INSERT INTO `place_history` (`animal_id`, `datetime`, `tg_nickname`, `arm_id`) V
 	(1, '2025-01-19 14:01:35', 'Palmman', 3),
 	(1, '2025-01-19 14:14:29', 'Palmman', 3);
 
--- Дамп структуры для таблица registry_birds.plaсes
-CREATE TABLE IF NOT EXISTS `plaсes` (
+-- Дамп структуры для таблица registry_birds.plaes
+CREATE TABLE IF NOT EXISTS `places` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.plaсes: ~8 rows (приблизительно)
-INSERT INTO `plaсes` (`name`) VALUES
+-- Дамп данных таблицы registry_birds.places: ~8 rows (приблизительно)
+INSERT INTO `places` (`name`) VALUES
 	('Поступление'),
 	('Первичка на мойке'),
 	('Прием в стационар'),
