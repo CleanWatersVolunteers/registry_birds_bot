@@ -1,3 +1,4 @@
+
 import tgm
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes
@@ -15,9 +16,8 @@ ui_welcome_mode = {}
 
 kbd_addr_list = {}
 
-
 ##########################################
-# UI menu 
+# UI menu
 ##########################################
 def add_hdr_item(label, value):
     text = f'{label}: '
@@ -84,7 +84,7 @@ def ui_welcome(user, key=None, msg=None):
             elif arm['arm_id'] == 1:
                 welcome_handlers[key] = ui_apm2_mode
             elif arm['arm_id'] == 2:
-                welcome_handlers[key, arm['id']] = ui_apm4_mode
+                welcome_handlers[key] = ui_apm4_mode
             elif arm['arm_id'] == 3:
                 welcome_handlers[key] = ui_apm5_mode
             elif arm['arm_id'] == 4:

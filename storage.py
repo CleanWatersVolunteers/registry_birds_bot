@@ -291,6 +291,21 @@ class storage:
         return cls.execute_query(query, (location_id,), fetch=True)
 
     @classmethod
+    def get_arm_id(cls, place_id, location):
+        query = """
+          SELECT DISTINCT
+              a.id AS id
+          FROM places p
+          INNER JOIN arms a ON a.place_id = p.id
+          WHERE p.id = %s AND a.location_id = %s 
+          """
+        result = cls.execute_query(query, (place_id, location,), fetch=True)
+        if result and len(result) == 1:
+            arm_id = result[0]["id"]
+            return arm_id
+        return None
+
+    @classmethod
     def __create_user(cls):
         user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
         return user
