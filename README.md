@@ -8,14 +8,7 @@
 ### Зависимости
 Необходимо установить следующие зависимости 
 ```sh
-pip install python-telegram-bot
-pip install opencv-python
-pip install opencv-contrib-python
-pip install pyzbar
-pip install pytz
-pip install mysql-connector-python
-pip install numpy
-
+pip install requirements.txt
 apt-get install libzbar0
 ```
 ## База данных
