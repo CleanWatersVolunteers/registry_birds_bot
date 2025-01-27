@@ -23,7 +23,7 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
         text += apm4_text_action
         keyboard = tgm.make_inline_keyboard(apm4_cancel)
         return text, keyboard
-    storage.insert_place_history(int(apm4_data["arm_id"]), user["bird"]["bar_code"], user["id"])
+    storage.insert_place_history(apm4_data["arm_id"], user["bird"]["bar_code"], user["id"])
     storage.update_animal(user["bird"]["bar_code"], weight = msg)
     user["mode"] = None
     user["bird"]["stage4"] = 'OK'
@@ -36,7 +36,8 @@ def ui_apm4_mode(user, key=None, msg=None)->(str,):
     user["mode"] = "kbd_mode_apm4_mass"
     match = re.search(r'\d+$', key)
     if match:
-        apm4_data["arm_id"] = int(match.group())
+        place_id = match.group()
+    apm4_data["arm_id"] = storage.get_arm_id(place_id, user["location_id"])
     apm4_data["title"] = ui_welcome_mode[key]
     text = f'{apm4_data["title"]}:\n{apm4_text_action}'
     keyboard = tgm.make_inline_keyboard(apm4_cancel)

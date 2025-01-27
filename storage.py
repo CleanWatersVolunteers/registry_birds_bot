@@ -58,7 +58,7 @@ class storage:
                 JOIN 
                     arms a ON ph.arm_id = a.id
                 JOIN 
-                    plaсes p ON a.plaсe_id = p.id
+                    places p ON a.place_id = p.id
                 JOIN 
                     locations l ON a.location_id = l.id
                 WHERE 
@@ -282,12 +282,28 @@ class storage:
         query = """
         SELECT
             p.id  AS arm_id, 
-            p.name AS arm_name
-        FROM plaсes p
-        INNER JOIN arms a ON a.plaсe_id = p.id
+            p.name AS arm_name,
+            a.id AS id
+        FROM places p
+        INNER JOIN arms a ON a.place_id = p.id
         WHERE a.location_id = %s
         """
         return cls.execute_query(query, (location_id,), fetch=True)
+
+    @classmethod
+    def get_arm_id(cls, place_id, location):
+        query = """
+          SELECT DISTINCT
+              a.id AS id
+          FROM places p
+          INNER JOIN arms a ON a.place_id = p.id
+          WHERE p.id = %s AND a.location_id = %s 
+          """
+        result = cls.execute_query(query, (place_id, location,), fetch=True)
+        if result and len(result) == 1:
+            arm_id = result[0]["id"]
+            return arm_id
+        return None
 
     @classmethod
     def __create_user(cls):
