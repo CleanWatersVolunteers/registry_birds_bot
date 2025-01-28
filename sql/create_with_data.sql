@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS `animals` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп данных таблицы registry_birds.animals: ~2 rows (приблизительно)
-INSERT INTO `animals` (`bar_code`, `registration_datetime`, `place_capture`, `capture_datetime`, `degree_pollution`, `weight`, `female`, `species`, `clinical_condition_admission`) VALUES
-	(1234, '2025-01-18 16:48:46', 'Anapa', '2025-01-18 16:48:46', 3, 1200, NULL, NULL, NULL),
-	(1236, '2025-01-18 22:13:23', 'Marina', '2025-01-18 22:13:23', 3, NULL, NULL, NULL, NULL);
+INSERT INTO `animals` (`bar_code`, `registration_datetime`, `place_capture`, `capture_datetime`, `degree_pollution`, `weight`, `species`, `clinical_condition_admission`) VALUES
+	(1234, '2025-01-18 16:48:46', 'Anapa', '2025-01-18 16:48:46', 3, 1200, NULL, NULL),
+	(1236, '2025-01-18 22:13:23', 'Marina', '2025-01-18 22:13:23', 3, NULL, NULL, NULL);
 
 -- Дамп структуры для таблица registry_birds.arms
 CREATE TABLE IF NOT EXISTS `arms` (
@@ -171,6 +171,9 @@ INSERT INTO `places` (`name`) VALUES
 	('Медицинский прием'),
 	('Нянька'),
 	('общий загон');
+
+ALTER TABLE `animals`
+DROP COLUMN `female`;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

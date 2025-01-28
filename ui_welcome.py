@@ -7,8 +7,6 @@ import re
 
 welcome_text_sel_addr = 'Выберите локацию'
 welcome_text_sel_bird = 'Загрузите птицу'
-sex_male = "муж"
-sex_female = "жен"
 capture_datetime_format = "%d.%m.%y %H:%M"
 
 ui_welcome_mode = {}
@@ -41,13 +39,6 @@ def ui_welcome_get_card(bar_code):
             text += add_hdr_item("Вид", animal["species"])
         else:
             text += add_hdr_item("Вид", "Не указан")
-        if animal["female"] is not None:
-            if animal["female"] == b'1':
-                text += add_hdr_item("Пол", sex_female)
-            else:
-                text += add_hdr_item("Пол", sex_male)
-        else:
-            text += add_hdr_item("Пол", "Не указан")
         if animal["clinical_condition_admission"] is not None:
             text += add_hdr_item("Клиническое состояние", animal["clinical_condition_admission"])
         else:
