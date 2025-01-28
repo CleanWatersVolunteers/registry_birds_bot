@@ -230,7 +230,7 @@ class storage:
     # Обновление таблицы animals
     # todo Переделать на WHERE id = id
     @classmethod
-    def update_animal(cls, bar_code, weight=None, female=None, species=None, clinical_condition_admission=None) -> bool:
+    def update_animal(cls, bar_code, weight=None, species=None, clinical_condition_admission=None) -> bool:
         query = "UPDATE animals SET "
         updates = []
         data = []
@@ -239,9 +239,6 @@ class storage:
         if weight is not None:
             updates.append("weight = %s")
             data.append(weight)
-        if female is not None:
-            updates.append("female = %s")
-            data.append(female)
         if species is not None:
             updates.append("species = %s")
             data.append(species)
