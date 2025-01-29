@@ -1,4 +1,5 @@
 from ui_welcome import welcome_handlers,ui_welcome
+from ui_load_bird import ui_load_bird_barcode
 from storage import storage
 from datetime import datetime
 import pytz
@@ -24,6 +25,10 @@ apm1_date = {
 }
 apm1_cancel = {
     "kbd_cancel":"Отмена",
+}
+
+apm1_cancel_barcode_input = {
+    "kbd_back_to_load_barcode":"Отмена",
 }
 
 def apm1_place_hndl(user, key=None, msg=None)->(str,):
@@ -111,8 +116,10 @@ def apm1_polution_hndl(user, key=None, msg=None)->(str,):
 def ui_apm1_mode(user, key=None, msg=None)->(str,):
     user["mode"] = "kbd_mode_apm1_place"
     text = f'{apm1_text_header} {user["bird"]["bar_code"]}\n{apm1_text_enter_place}'
-    keyboard = tgm.make_inline_keyboard(apm1_cancel)
+    keyboard = tgm.make_inline_keyboard(apm1_cancel_barcode_input)
     return text, keyboard
+
+welcome_handlers["kbd_back_to_load_barcode"] = ui_load_bird_barcode
 
 welcome_handlers["kbd_mode_apm1_place"] = apm1_place_hndl
 
