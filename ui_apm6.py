@@ -33,18 +33,6 @@ for mannum, manip in enumerate(manipulations):
     apm6_manipulations[button_code]=f'''{manip['name']}'''
 
 
-def apm6_sex_hndl(user, key=None, msg=None)->(str,):
-    if not "bird" in user:
-        return ui_welcome(user)
-    if kbd_apm6_sex[key] == kbd_apm6_sex["kbd_female"]:
-        storage.update_animal(user["bird"]["bar_code"], female=True)
-    else:
-        storage.update_animal(user["bird"]["bar_code"], female=False)
-    user["mode"] = "mode_apm6_species"
-    text = f'{apm6_data["title"]}:\n{apm6_text_species}'
-    keyboard = tgm.make_inline_keyboard(apm6_cancel)
-    return text, keyboard
-    
 def apm6_species_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
@@ -106,11 +94,6 @@ def ui_apm6_mode(user, key=None, msg=None)->(str,):
 welcome_handlers["mode_apm6_species"] = apm6_species_hndl
 welcome_handlers["mode_apm6_clinic"] = apm6_clinical_condition_hndl
 welcome_handlers["mode_apm6_manipulations"] = apm6_manipulations_hndl
-
-
-
-welcome_handlers["kbd_male"] = apm6_sex_hndl
-welcome_handlers["kbd_female"] = apm6_sex_hndl
 
 # Загружаем в глобальные идентификаторы кнопок манипуляций.
 for button in apm6_manipulations:
