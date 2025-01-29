@@ -22,7 +22,7 @@ apm6_text_manipulations = "Проведем манипуляции?"
 place_for_pervichka_stacionar = 4
 manipulations = storage.get_manipulations(place_for_pervichka_stacionar)
 
-# Заполняем кнопкоменюшку манипуляций https://github.com/CleanWatersVolunteers/registry_birds_bot/issues/78
+# Заполняем кнопкоменюшку манипуляций
 # глобальный префикс для кнопок доступных манипуляций
 kbd_manip_prefix = 'kbd_apm6_manip_'
 apm6_manipulations = {
