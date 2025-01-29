@@ -4,11 +4,9 @@ from storage import storage
 import re
 
 apm7_text_action = 'Выберите действие'
-apm7_text_feeding_fish = 'Введите количество съеденных рыб'
+apm7_text_entry_fish = 'Введите количество съеденных рыб'
 apm7_text_weighing_action = "Введите массу животного в граммах"
-apm7_text_incorrect_feeding = "Количество рыб должно быть больше 0"
-apm7_text_incorrect_weighting = "Масса не может быть меньше 50 г.:"
-apm7_text_incorrect = "Вы ввели:"
+apm7_text_incorrect = "Неверный ввод:"
 
 apm7_cancel = {
     "kbd_cancel":"Отмена",
@@ -45,7 +43,7 @@ def apm3_done_hndl(user, key=None, msg=None)->(str,):
     get_numerical_types()
     if global_bird_sitter_actions["bird_sitter_actions"][key] == 'Кормление':
         user["mode"] = "kbd_mode_apm7_feeding"
-        text = f'{apm7_text_feeding_fish}'
+        text = f'{apm7_text_entry_fish}'
         keyboard = tgm.make_inline_keyboard(apm7_cancel)
         return text, keyboard
     if global_bird_sitter_actions["bird_sitter_actions"][key] == 'Взвешивание':
@@ -58,7 +56,7 @@ def apm3_done_hndl(user, key=None, msg=None)->(str,):
 
 def apm7_weighting_hndl(user, key=None, msg=None)->(str,):
     if not msg.isdigit() or int(msg) < 50:
-        text = f'{apm7_data["title"]}:\n{apm7_text_incorrect_weighting}\n{apm7_text_incorrect} {msg}\n'
+        text = f'{apm7_data["title"]}:\n{apm7_text_incorrect} {msg}\n'
         text += apm7_text_weighing_action
         keyboard = tgm.make_inline_keyboard(apm7_cancel)
         return text, keyboard
@@ -70,8 +68,8 @@ def apm7_weighting_hndl(user, key=None, msg=None)->(str,):
 
 def apm7_feeding_hndl(user, key=None, msg=None)->(str,):
     if not msg.isdigit() or int(msg) < 1:
-        text = f'{apm7_data["title"]}:\n{apm7_text_incorrect_feeding}\n{apm7_text_incorrect} {msg}\n'
-        text += apm7_text_feeding_fish
+        text = f'{apm7_data["title"]}:\n{apm7_text_incorrect} {msg}\n'
+        text += apm7_text_entry_fish
         keyboard = tgm.make_inline_keyboard(apm7_cancel)
         return text, keyboard
 
