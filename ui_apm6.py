@@ -58,7 +58,6 @@ def apm6_species_hndl(user, key=None, msg=None)->(str,):
 def apm6_clinical_condition_hndl(user, key=None, msg=None)->(str,):
     if "bird" in user:
         storage.update_animal(user["bird"]["bar_code"], clinical_condition_admission = msg)
-        # Вопрос-бизнес логики — здесь ли считаем, что ОК, или после необязательных манипуляций? Для совместимости оставляем здесь.
         user["bird"]["stage6"] = 'OK'
     user["mode"] = "mode_apm6_manipulations"
 
