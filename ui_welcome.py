@@ -132,7 +132,7 @@ from ui_apm2 import *
 from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
-from ui_nanny_arm import *
+from ui_apm_nanny import *
 from ui_history import *
 
 welcome_handlers["kbd_load_bird"] = ui_load_bird
