@@ -43,8 +43,8 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
     apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
     kbd_manip_prefix = 'kbd_apm5_manip_'
-    mm = apm5_data['manipulations_menu'] = apm5_done.copy()
-    for button in mm:
+    manipulations_menu = apm5_data['manipulations_menu'] = apm5_done.copy()
+    for button in manipulations_menu:
         # Дефолтное меню манипуляций — все ведет на Done.
         welcome_handlers[button] = apm5_done_hndl
 
@@ -54,7 +54,7 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
         # Обновляем глобальные идентификаторы кнопок манипуляций.
         welcome_handlers[button_code] = apm5_manipulations_hndl
 
-    keyboard = tgm.make_inline_keyboard(mm)
+    keyboard = tgm.make_inline_keyboard(manipulations_menu)
     return text, keyboard
 
 
