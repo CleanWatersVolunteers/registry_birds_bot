@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `capture_datetime` datetime NOT NULL,
   `degree_pollution` int NOT NULL,
   `weight` int DEFAULT NULL,
-  `female` binary(1) DEFAULT NULL,
   `species` varchar(45) DEFAULT NULL,
   `clinical_condition_admission` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
