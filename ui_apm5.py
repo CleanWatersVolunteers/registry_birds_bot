@@ -1,7 +1,6 @@
 from ui_welcome import welcome_handlers, ui_welcome_mode, ui_welcome
 import tgm
 from storage import storage
-from datetime import datetime
 
 datetime_format = "%H:%M"
 date_format = "%d.%m.%y"
