@@ -3,7 +3,8 @@ import tgm
 from storage import storage
 import re
 
-apm2_text_action = "Выполните необходимые операции и нажмите 'Готово'"
+apm2_text_action = "Выполните необходимые манипуляции и нажмите 'Готово'"
+apm2_text_animal_header = "Животное №:"
 
 apm2_done = {
     "kbd_apm2_done": "Готово",
@@ -24,6 +25,7 @@ def ui_apm2_mode(user, key=None, msg=None) -> (str,):
     if match:
         storage.insert_place_history(int(match.group()), user["bird"]["bar_code"], user["id"])
     text = f'{ui_welcome_mode[key]}\n'
+    text += f'{apm2_text_animal_header}{user["bird"]["bar_code"]}\n'
     text += apm2_text_action
     keyboard = tgm.make_inline_keyboard(apm2_done)
     return text, keyboard
