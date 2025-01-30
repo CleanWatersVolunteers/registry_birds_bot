@@ -3,7 +3,7 @@ import tgm
 from storage import storage
 from datetime import datetime
 
-datetime_format = "%d.%m.%y %H:%M:%S"
+datetime_format = "%H:%M"
 date_format = "%d.%m.%y"
 
 apm5_text_action = "Выполните необходимые операции и нажмите 'Готово'"
@@ -42,7 +42,7 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
 
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
     apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
-    kbd_manip_prefix = 'kbd_apm5_manip_'
+    kbd_manip_prefix = "kbd_apm5_manip_"
     manipulations_menu = apm5_data['manipulations_menu'] = apm5_done.copy()
     for button in manipulations_menu:
         # Дефолтное меню манипуляций — все ведет на Done.
