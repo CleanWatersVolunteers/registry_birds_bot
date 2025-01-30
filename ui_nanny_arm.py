@@ -57,34 +57,24 @@ def nunny_done_hndl(user, key=None, msg=None)->(str,):
     return ui_welcome(user)
 
 def nunny_weighting_hndl(user, key=None, msg=None)->(str,):
-    if not msg.isdigit():
-        text = f'{nunny_data["title"]}:\n{nunny_text_incorrect_digit}\n'
+    if not msg.isdigit() or int(msg) < 50:
+        error_text = nunny_text_incorrect_digit if not msg.isdigit() else nunny_text_incorrect_weight
+        text = f'{nunny_data["title"]}:\n{error_text}\n'
         text += nunny_text_weighing_action
         keyboard = tgm.make_inline_keyboard(nunny_cancel)
         return text, keyboard
-    elif int(msg) < 50:
-        text = f'{nunny_data["title"]}:\n{nunny_text_incorrect_weight}\n'
-        text += nunny_text_weighing_action
-        keyboard = tgm.make_inline_keyboard(nunny_cancel)
-        return text, keyboard
-
     else:
         storage.insert_numerical_history(animal_id=user["bird"]["bar_code"], type_id=nunny_data["num_weight_type_id"],
                                      value=int(msg), tg_nickname=user["id"])
     return ui_welcome(user)
 
 def nunny_feeding_hndl(user, key=None, msg=None)->(str,):
-    if not msg.isdigit():
-        text = f'{nunny_data["title"]}:\n{nunny_text_incorrect_digit}\n'
+    if not msg.isdigit() or int(msg) < 1:
+        error_text = nunny_text_incorrect_digit if not msg.isdigit() else nunny_text_incorrect_fish_number
+        text = f'{nunny_data["title"]}:\n{error_text}\n'
         text += nunny_text_entry_fish
         keyboard = tgm.make_inline_keyboard(nunny_cancel)
         return text, keyboard
-    elif int(msg) < 1:
-        text = f'{nunny_data["title"]}:\n{nunny_text_incorrect_fish_number}\n'
-        text += nunny_text_weighing_action
-        keyboard = tgm.make_inline_keyboard(nunny_cancel)
-        return text, keyboard
-
     else:
         storage.insert_numerical_history(animal_id=user["bird"]["bar_code"], type_id=nunny_data["num_feeding_type_id"],
                                      value=int(msg), tg_nickname=user["id"])
