@@ -23,6 +23,8 @@ def apm5_done_hndl(user, key=None, msg=None) -> (str,):
         
     return ui_welcome(user)
 
+capture_datetime_format = "%d.%m.%y %H:%M:%S"
+
 ############################################
 # Global API
 ############################################
@@ -33,7 +35,8 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     apm5_data["arm_id"] = storage.get_arm_id(apm5_data["place_id"], user["location_id"])
     apm5_data["title"] = ui_welcome_mode[key]
 
-    text = f'{apm5_data["title"]}:\n{apm5_text_action}'
+    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
+    text = f'{apm5_data["title"]}:\n\n{manipulation_history_text(animal_id)}\n\n{apm5_text_action}'
 
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
     apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
@@ -53,6 +56,20 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     return text, keyboard
 
 
+def manipulation_history_text(animal_id) -> (str,):
+    history = sorted(storage.get_animal_history(animal_id), key=lambda item: item['datetime'])
+    result_string = ""
+    current_date = None
+    for item in history:
+        formatted_date = item['datetime'].strftime("%d.%m.%y")
+        if current_date != formatted_date:
+            if current_date is not None:
+                result_string += "\n"
+            result_string += f"{formatted_date}\n"
+        current_date = formatted_date
+        result_string += f"{item['datetime'].strftime(capture_datetime_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
+    return result_string.strip()            
+
 def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     if 'done' in key:
         # Завершаем, запомним, где и кто работал с птицей.
@@ -65,23 +82,7 @@ def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     animal_id = storage.get_animal_id(user["bird"]["bar_code"])
     storage.insert_history(manipulation["id"], animal_id, apm5_data["arm_id"], user["id"])
 
-    hhmmss = datetime.now().strftime("%H:%M:%S")
-
-    history = sorted(storage.get_animal_history(animal_id), key=lambda item: item['datetime'])
-    result_string = ""
-    current_date = None
-    for item in history:
-        formatted_date = item['datetime'].strftime("%d.%m.%y")
-        if current_date != formatted_date:
-            if current_date is not None:
-                result_string += "\n"
-            result_string += f"{formatted_date}\n"
-            current_date = formatted_date
-            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']} - {item['tg_nickname']}\n"
-
-    manip_feedback = result_string.strip()
-
-    text = f'{apm5_data["title"]} → {manip_feedback}. \n{apm5_text_action}'
+    text = f'{apm5_data["title"]}\n\n{manipulation_history_text(animal_id)}\n\n{apm5_text_action}'
     keyboard = tgm.make_inline_keyboard(apm5_data['manipulations_menu'])
     return text, keyboard
 
