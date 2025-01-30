@@ -1,16 +1,26 @@
 from ui_welcome import welcome_handlers, ui_welcome_mode, ui_welcome
 import tgm
+from storage import storage
+from datetime import datetime
 
 apm5_text_action = "Выполните необходимые операции и нажмите 'Готово'"
 
 apm5_done = {
     "kbd_apm5_done": "Готово",
-    "kbd_cancel": "Отмена",
+}
+
+apm5_data = {
+    "arm_id": None,
+    "title": None,
+    "place_id": 3,
+    "manipulations": [],
+    "manipulations_menu": {},
 }
 
 def apm5_done_hndl(user, key=None, msg=None) -> (str,):
     if "bird" in user:
         user["bird"]["stage5"] = "OK"
+        
     return ui_welcome(user)
 
 ############################################
@@ -18,8 +28,49 @@ def apm5_done_hndl(user, key=None, msg=None) -> (str,):
 ############################################
 def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     user["mode"] = "kbd_mode_apm5"
-    text = f'{ui_welcome_mode[key]}:\n{apm5_text_action}'
-    keyboard = tgm.make_inline_keyboard(apm5_done)
+
+    # Инициализируем arm    
+    apm5_data["arm_id"] = storage.get_arm_id(apm5_data["place_id"], user["location_id"])
+    apm5_data["title"] = ui_welcome_mode[key]
+
+    text = f'{apm5_data["title"]}:\n{apm5_text_action}'
+
+    # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
+    apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
+    kbd_manip_prefix = 'kbd_apm5_manip_'
+    mm = apm5_data['manipulations_menu'] = apm5_done.copy()
+    for button in mm:
+        # Дефолтное меню манипуляций — все ведет на Done.
+        welcome_handlers[button] = apm5_done_hndl
+
+    for mannum, manip in enumerate(apm5_data["manipulations"]):
+        button_code = f'''{kbd_manip_prefix}_{mannum}'''
+        apm5_data['manipulations_menu'][button_code]=f'''{manip['name']}'''
+        # Обновляем глобальные идентификаторы кнопок манипуляций.
+        welcome_handlers[button_code] = apm5_manipulations_hndl
+
+    keyboard = tgm.make_inline_keyboard(mm)
     return text, keyboard
+
+
+def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
+    if 'done' in key:
+        # Завершаем, запомним, где и кто работал с птицей.
+        storage.insert_place_history(apm5_data["arm_id"], user["bird"]["bar_code"], user["id"])
+        return ui_welcome(user)
+
+    manip = key.split('__')[1]  
+    manip_num = int(manip)  
+    manipulation = apm5_data["manipulations"][manip_num]
+    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
+    storage.insert_history(manipulation["id"], animal_id, apm5_data["arm_id"], user["id"])
+
+    hhmmss = datetime.now().strftime("%H:%M:%S")
+    manip_feedback = f'''Записали «{hhmmss}: {manipulation['name']}»'''
+
+    text = f'{apm5_data["title"]} → {manip_feedback}. \n{apm5_text_action}'
+    keyboard = tgm.make_inline_keyboard(apm5_data['manipulations_menu'])
+    return text, keyboard
+
 
 welcome_handlers["kbd_apm5_done"] = apm5_done_hndl
