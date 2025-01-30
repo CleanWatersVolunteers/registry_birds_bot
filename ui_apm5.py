@@ -3,6 +3,9 @@ import tgm
 from storage import storage
 from datetime import datetime
 
+datetime_format = "%d.%m.%y %H:%M:%S"
+date_format = "%d.%m.%y"
+
 apm5_text_action = "Выполните необходимые операции и нажмите 'Готово'"
 
 apm5_done = {
@@ -23,7 +26,6 @@ def apm5_done_hndl(user, key=None, msg=None) -> (str,):
         
     return ui_welcome(user)
 
-capture_datetime_format = "%d.%m.%y %H:%M:%S"
 
 ############################################
 # Global API
@@ -61,13 +63,13 @@ def manipulation_history_text(animal_id) -> (str,):
     result_string = ""
     current_date = None
     for item in history:
-        formatted_date = item['datetime'].strftime("%d.%m.%y")
+        formatted_date = item['datetime'].strftime(date_format)
         if current_date != formatted_date:
             if current_date is not None:
                 result_string += "\n"
             result_string += f"{formatted_date}\n"
         current_date = formatted_date
-        result_string += f"{item['datetime'].strftime(capture_datetime_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
+        result_string += f"{item['datetime'].strftime(datetime_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
     return result_string.strip()            
 
 def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
