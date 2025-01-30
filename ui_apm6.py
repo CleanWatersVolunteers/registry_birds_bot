@@ -13,14 +13,13 @@ apm6_cancel = {
 
 apm6_data = {
     "arm_id": None,
-    "title": None
+    "title": None,
+    "place_id": 3,
 }
 
 apm6_text_manipulations = "Проведем манипуляции?"
 
-# Беспокоит хардкодинг, но не понял, как гибко и правильно взять соответствующий place
-place_for_pervichka_stacionar = 4
-manipulations = storage.get_manipulations(place_for_pervichka_stacionar)
+manipulations = storage.get_manipulations(apm6_data["place_id"])
 
 # Заполняем кнопкоменюшку манипуляций
 # глобальный префикс для кнопок доступных манипуляций
