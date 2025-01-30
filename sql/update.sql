@@ -1,2 +1,6 @@
 -- Лишний столбец animals.female #102
-ALTER TABLE `animals` DROP COLUMN `female`;
+alter table `animals` drop COLUMN `female`;
+
+-- Исправить записи в таблице manipulations #107
+UPDATE `manipulations` SET `place_list`='3,5' WHERE `name`='Бриллиантовые глаза';
+UPDATE `manipulations` SET `place_list`='3,5' WHERE `name`='Энтерофурил + физ.раствор 20мл в рот';
