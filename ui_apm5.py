@@ -66,7 +66,20 @@ def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     storage.insert_history(manipulation["id"], animal_id, apm5_data["arm_id"], user["id"])
 
     hhmmss = datetime.now().strftime("%H:%M:%S")
-    manip_feedback = f'''Записали «{hhmmss}: {manipulation['name']}»'''
+
+    history = sorted(storage.get_animal_history(animal_id), key=lambda item: item['datetime'])
+    result_string = ""
+    current_date = None
+    for item in history:
+        formatted_date = item['datetime'].strftime("%d.%m.%y")
+        if current_date != formatted_date:
+            if current_date is not None:
+                result_string += "\n"
+            result_string += f"{formatted_date}\n"
+            current_date = formatted_date
+            result_string += f"{item['datetime'].strftime('%H:%M')} - {item['manipulation_name']} - {item['tg_nickname']}\n"
+
+    manip_feedback = result_string.strip()
 
     text = f'{apm5_data["title"]} → {manip_feedback}. \n{apm5_text_action}'
     keyboard = tgm.make_inline_keyboard(apm5_data['manipulations_menu'])
