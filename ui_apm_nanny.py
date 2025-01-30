@@ -37,8 +37,8 @@ def nunny_done_hndl(user, key=None, msg=None)->(str,):
         return ui_welcome(user)
 
     match = re.search(r'\d+$', key)
-    if match:
-        manipulation_id = match.group()
+
+    manipulation_id = match.group()
 
     storage.insert_history(manipulation_id=manipulation_id, animal_id=user["bird"]["bar_code"],
                                    arms_id=nunny_data["arm_id"], tg_nickname=user["id"])
