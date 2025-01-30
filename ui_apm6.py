@@ -17,7 +17,7 @@ apm6_data = {
     "place_id": 3,
 }
 
-apm6_text_manipulations = "Проведем манипуляции?"
+apm6_text_manipulations = "Выполните необходимые манипуляции и нажмите 'Готово'"
 
 manipulations = storage.get_manipulations(apm6_data["place_id"])
 
@@ -25,7 +25,7 @@ manipulations = storage.get_manipulations(apm6_data["place_id"])
 # глобальный префикс для кнопок доступных манипуляций
 kbd_manip_prefix = 'kbd_apm6_manip_'
 apm6_manipulations = {
-    f"{kbd_manip_prefix}_cancel": "Больше ничего не надо",
+    f"{kbd_manip_prefix}_cancel": "Готово",
 }
 for mannum, manip in enumerate(manipulations):
     button_code = f'''{kbd_manip_prefix}_{mannum}'''
