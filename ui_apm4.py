@@ -5,6 +5,7 @@ import re
 
 apm4_text_action = "Введите массу животного в граммах"
 apm4_text_incorrect = "Неверный ввод:"
+apm4_text_animal_header = "Животное №:"
 
 apm4_cancel = {
     "kbd_cancel":"Отмена",
@@ -39,7 +40,9 @@ def ui_apm4_mode(user, key=None, msg=None)->(str,):
         place_id = match.group()
     apm4_data["arm_id"] = storage.get_arm_id(place_id, user["location_id"])
     apm4_data["title"] = ui_welcome_mode[key]
-    text = f'{apm4_data["title"]}:\n{apm4_text_action}'
+    text = f'{apm4_data["title"]}:\n'
+    text += f'{apm4_text_animal_header}{user["bird"]["bar_code"]}\n'
+    text += apm4_text_action
     keyboard = tgm.make_inline_keyboard(apm4_cancel)
     return text, keyboard
 
