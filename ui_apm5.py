@@ -37,7 +37,7 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     apm5_data["title"] = ui_welcome_mode[key]
 
     animal_id = storage.get_animal_id(user["bird"]["bar_code"])
-    text = f'{apm5_data["title"]}:\n\n{manipulation_history_text(animal_id)}\n\n{apm5_text_action}'
+    text = f'{apm5_data["title"]}:{manipulation_history_text(animal_id)}\n{apm5_text_action}'
 
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
     apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
@@ -69,7 +69,10 @@ def manipulation_history_text(animal_id) -> (str,):
             result_string += f"{formatted_date}\n"
         current_date = formatted_date
         result_string += f"{item['datetime'].strftime(datetime_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
-    return result_string.strip()            
+        result_string = result_string.strip()
+        if result_string:
+            result_string = '\n\n' + result_string + '\n'
+    return result_string
 
 def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     if 'done' in key:
@@ -83,7 +86,7 @@ def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     animal_id = storage.get_animal_id(user["bird"]["bar_code"])
     storage.insert_history(manipulation["id"], animal_id, apm5_data["arm_id"], user["id"])
 
-    text = f'{apm5_data["title"]}\n\n{manipulation_history_text(animal_id)}\n\n{apm5_text_action}'
+    text = f'{apm5_data["title"]}{manipulation_history_text(animal_id)}\n{apm5_text_action}'
     keyboard = tgm.make_inline_keyboard(apm5_data['manipulations_menu'])
     return text, keyboard
 
