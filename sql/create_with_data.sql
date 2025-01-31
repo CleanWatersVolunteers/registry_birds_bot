@@ -32,7 +32,11 @@ CREATE TABLE IF NOT EXISTS `arms` (
   `id` int NOT NULL AUTO_INCREMENT,
   `place_id` int NOT NULL,
   `location_id` int NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_arms_places1_idx` (`place_id`),
+  KEY `fk_arms_locations1_idx` (`location_id`),
+  CONSTRAINT `fk_arms_locations1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`),
+  CONSTRAINT `fk_arms_places1` FOREIGN KEY (`place_id`) REFERENCES `places` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп данных таблицы registry_birds.arms: ~8 rows (приблизительно)
@@ -54,7 +58,13 @@ CREATE TABLE IF NOT EXISTS `history` (
   `manipulation_id` int NOT NULL,
   `arm_id` int NOT NULL,
   `tg_nickname` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_history_animals1_idx` (`animal_id`),
+  KEY `fk_history_manipulations1_idx` (`manipulation_id`),
+  KEY `fk_history_arms1_idx` (`arm_id`),
+  CONSTRAINT `fk_history_animals1` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
+  CONSTRAINT `fk_history_arms1` FOREIGN KEY (`arm_id`) REFERENCES `arms` (`id`),
+  CONSTRAINT `fk_history_manipulations1` FOREIGN KEY (`manipulation_id`) REFERENCES `manipulations` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп структуры для таблица registry_birds.locations
@@ -65,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `locations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.locations: ~3 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.locations: ~2 rows (приблизительно)
 INSERT INTO `locations` (`id`, `address`, `name`) VALUES
 	(0, 'Витязево, ул. Жемчужная, д9.', 'Жемчужная'),
 	(1, 'Анапа, Пионерский просп.д  68', 'Полярные Зори');
@@ -96,7 +106,11 @@ CREATE TABLE IF NOT EXISTS `numerical_history` (
   `value` int NOT NULL,
   `datetime` datetime NOT NULL,
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_numerical_history_numerical_history_type1_idx` (`type_id`),
+  KEY `fk_numerical_history_animals1_idx` (`animal_id`),
+  CONSTRAINT `fk_numerical_history_animals1` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
+  CONSTRAINT `fk_numerical_history_numerical_history_type1` FOREIGN KEY (`type_id`) REFERENCES `numerical_history_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп структуры для таблица registry_birds.numerical_history_type
@@ -135,7 +149,11 @@ CREATE TABLE IF NOT EXISTS `place_history` (
   `datetime` datetime NOT NULL,
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `arm_id` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `fk_place_history_animals_idx` (`animal_id`),
+  KEY `fk_place_history_arms1_idx` (`arm_id`),
+  CONSTRAINT `fk_place_history_animals` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
+  CONSTRAINT `fk_place_history_arms1` FOREIGN KEY (`arm_id`) REFERENCES `arms` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
