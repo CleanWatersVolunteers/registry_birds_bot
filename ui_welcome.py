@@ -3,7 +3,6 @@ from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes
 from storage import storage
 from barcode_reader import barCodeReader
-import re
 
 welcome_text_sel_addr = 'Выберите локацию'
 welcome_text_sel_bird = 'Загрузите птицу'
