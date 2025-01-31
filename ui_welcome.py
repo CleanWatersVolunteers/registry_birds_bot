@@ -82,7 +82,6 @@ def ui_welcome(user, key=None, msg=None):
             elif arm['arm_id'] == 5:
                 welcome_handlers[key] = ui_nanny_mode
 
-    ui_welcome_mode["kbd_mass"] = "Взвешивание"
     ui_welcome_mode["kbd_history"] = "История"
     ui_welcome_mode["kbd_load_bird"] = "Загрузить птицу"
     ui_welcome_mode["kbd_sel_addr"] = "Сменить локацию"
@@ -134,11 +133,9 @@ from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
 from ui_apm_nanny import *
-from ui_mass import *
 from ui_history import *
 
 welcome_handlers["kbd_load_bird"] = ui_load_bird
-welcome_handlers["kbd_mass"] = ui_mass_entry_mode
 welcome_handlers["kbd_history"] = ui_history_mode
 
 
