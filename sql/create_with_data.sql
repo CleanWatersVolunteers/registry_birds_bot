@@ -46,7 +46,7 @@ INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 	(6, 1, 1),
 	(7, 2, 2),
 	(8, 5, 0),
-    (9, 5, 1);
+	(9, 5, 1);
 
 -- Дамп структуры для таблица registry_birds.history
 CREATE TABLE IF NOT EXISTS `history` (
@@ -89,7 +89,7 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(4, 'Энтерофурил + физ.раствор 20мл в рот', '3,5'),
 	(5, 'Рингер 50/50 + Глюкоза 10мл', '3'),
 	(6, 'Бриллиантовые глаза', '3,5'),
-	(7, 'Взвешивание', '2,5');
+	(7, 'Взвешивание', '5');
 
 -- Дамп структуры для таблица registry_birds.numerical_history
 CREATE TABLE IF NOT EXISTS `numerical_history` (
