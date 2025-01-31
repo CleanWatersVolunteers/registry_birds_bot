@@ -20,6 +20,7 @@ nunny_data = {
     "num_feeding_type_id": None,
     "num_weight_type_id": None
 }
+
 global_bird_sitter_actions = {
     "bird_sitter_actions": {}
 }
