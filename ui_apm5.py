@@ -56,7 +56,6 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     keyboard = tgm.make_inline_keyboard(manipulations_menu)
     return text, keyboard
 
-
 def manipulation_history_text(animal_id) -> (str,):
     history = sorted(storage.get_animal_history(animal_id), key=lambda item: item['datetime'])
     result_string = ""
