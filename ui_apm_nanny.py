@@ -35,10 +35,11 @@ def nanny_done_hndl(user, key=None, msg=None)->(str,):
 
     match = re.search(r'\d+$', key)
     manipulation_id = match.group()
-    storage.insert_history(manipulation_id=manipulation_id, animal_id=nanny_data["animal_id"],
+    if global_bird_sitter_actions["bird_sitter_actions"][key] not in ('Кормление', 'Взвешивание'):
+        storage.insert_history(manipulation_id=manipulation_id, animal_id=nanny_data["animal_id"],
                                    arms_id=nanny_data["arm_id"], tg_nickname=user["id"])
 
-    if global_bird_sitter_actions["bird_sitter_actions"][key] in ('Кормление', 'Взвешивание'):
+    else:
         numerical_history_type = storage.get_numerical_history_type()
         for item in numerical_history_type:
             if item["name"] == 'Съедено рыбы':
