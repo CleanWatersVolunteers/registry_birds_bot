@@ -3,6 +3,9 @@ import tgm
 from storage import storage
 import re
 
+nunny_minimal_weight = 50
+nunny_minimal_fish = 1
+
 nunny_text_action = 'Выберите действие'
 nunny_text_entry_fish = 'Введите количество съеденных рыб'
 nunny_text_weighing_action = "Введите массу животного в граммах"
@@ -25,14 +28,6 @@ global_bird_sitter_actions = {
     "bird_sitter_actions": {}
 }
 
-def get_numerical_types() -> None:
-    numerical_history_type = storage.get_numerical_history_type()
-    for item in numerical_history_type:
-        if item["name"] == 'Съедено рыбы':
-            nunny_data["num_feeding_type_id"] = item["id"]
-        elif item["name"] == 'Вес':
-            nunny_data["num_weight_type_id"] = item["id"]
-
 def nunny_done_hndl(user, key=None, msg=None)->(str,):
     if not "bird" in user:
         return ui_welcome(user)
@@ -41,22 +36,31 @@ def nunny_done_hndl(user, key=None, msg=None)->(str,):
     manipulation_id = match.group()
     storage.insert_history(manipulation_id=manipulation_id, animal_id=user["bird"]["bar_code"],
                                    arms_id=nunny_data["arm_id"], tg_nickname=user["id"])
-    get_numerical_types()
-    if global_bird_sitter_actions["bird_sitter_actions"][key] == 'Кормление':
-        user["mode"] = "kbd_mode_feeding"
-        text = f'{nunny_text_entry_fish}'
-        keyboard = tgm.make_inline_keyboard(nunny_cancel)
-        return text, keyboard
-    if global_bird_sitter_actions["bird_sitter_actions"][key] == 'Взвешивание':
-        user["mode"] = "kbd_mode_weighting"
-        text = f'{nunny_text_weighing_action}'
-        keyboard = tgm.make_inline_keyboard(nunny_cancel)
-        return text, keyboard
+
+    if global_bird_sitter_actions["bird_sitter_actions"][key] in ('Кормление', 'Взвешивание'):
+        numerical_history_type = storage.get_numerical_history_type()
+        for item in numerical_history_type:
+            if item["name"] == 'Съедено рыбы':
+                nunny_data["num_feeding_type_id"] = item["id"]
+            elif item["name"] == 'Вес':
+                nunny_data["num_weight_type_id"] = item["id"]
+
+        if global_bird_sitter_actions["bird_sitter_actions"][key] == 'Кормление':
+            user["mode"] = "kbd_mode_feeding"
+            text = f'{nunny_text_entry_fish}'
+            keyboard = tgm.make_inline_keyboard(nunny_cancel)
+            return text, keyboard
+
+        else:
+            user["mode"] = "kbd_mode_weighting"
+            text = f'{nunny_text_weighing_action}'
+            keyboard = tgm.make_inline_keyboard(nunny_cancel)
+            return text, keyboard
 
     return ui_welcome(user)
 
 def nunny_weighting_hndl(user, key=None, msg=None)->(str,):
-    if not msg.isdigit() or int(msg) < 50:
+    if not msg.isdigit() or int(msg) < nunny_minimal_weight:
         error_text = nunny_text_incorrect_digit if not msg.isdigit() else nunny_text_incorrect_weight
         text = f'{nunny_data["title"]}:\n{error_text}\n'
         text += nunny_text_weighing_action
@@ -68,7 +72,7 @@ def nunny_weighting_hndl(user, key=None, msg=None)->(str,):
     return ui_welcome(user)
 
 def nunny_feeding_hndl(user, key=None, msg=None)->(str,):
-    if not msg.isdigit() or int(msg) < 1:
+    if not msg.isdigit() or int(msg) < nunny_minimal_fish:
         error_text = nunny_text_incorrect_digit if not msg.isdigit() else nunny_text_incorrect_fish_number
         text = f'{nunny_data["title"]}:\n{error_text}\n'
         text += nunny_text_entry_fish
