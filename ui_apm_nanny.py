@@ -37,9 +37,7 @@ def nunny_done_hndl(user, key=None, msg=None)->(str,):
         return ui_welcome(user)
 
     match = re.search(r'\d+$', key)
-
     manipulation_id = match.group()
-
     storage.insert_history(manipulation_id=manipulation_id, animal_id=user["bird"]["bar_code"],
                                    arms_id=nunny_data["arm_id"], tg_nickname=user["id"])
     get_numerical_types()
@@ -103,5 +101,3 @@ def ui_nanny_mode(user, key=None, msg=None)->(str,):
 
 welcome_handlers[f"kbd_mode_feeding"] = nunny_feeding_hndl
 welcome_handlers[f"kbd_mode_weighting"] = nunny_weighting_hndl
-
-
