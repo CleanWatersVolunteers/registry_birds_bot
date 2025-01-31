@@ -7,10 +7,10 @@ UPDATE `manipulations` SET `place_list`='3,5' WHERE `name`='Энтерофури
 UPDATE `manipulations` SET `place_list`='3' WHERE  `name`='Рингер 50/50 + Глюкоза 10мл';
 
 INSERT INTO `places` (`id`, `name`) VALUES
-	(5, 'Нянька');
+(5, 'Нянька');
 
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
- (7, 'Взвешивание', '2,5');
+(7, 'Взвешивание', '5');
 
 INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 (8, 5, 0),
