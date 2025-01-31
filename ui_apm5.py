@@ -69,9 +69,9 @@ def manipulation_history_text(animal_id) -> (str,):
             result_string += f"{formatted_date}\n"
         current_date = formatted_date
         result_string += f"{item['datetime'].strftime(datetime_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
-        result_string = result_string.strip()
-        if result_string:
-            result_string = '\n\n' + result_string + '\n'
+    result_string = result_string.strip()
+    if result_string:
+        result_string = '\n\n' + result_string + '\n'
     return result_string
 
 def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
