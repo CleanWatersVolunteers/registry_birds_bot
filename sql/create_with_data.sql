@@ -138,6 +138,11 @@ CREATE TABLE IF NOT EXISTS `place_history` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS last_numbersettings ( 
+    id INT PRIMARY KEY DEFAULT 1,  -- Единственная строка с фиксированным ID = 1 
+    qr_start_value INT NOT NULL    -- Значение, которое будет перезаписываться 
+);
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
