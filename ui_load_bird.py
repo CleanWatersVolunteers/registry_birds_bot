@@ -1,4 +1,4 @@
-from ui_welcome import welcome_handlers, ui_welcome
+from ui_welcome import welcome_addr_hndl, welcome_handlers, ui_welcome
 from ui_apm1 import ui_apm1_mode
 import tgm
 from storage import storage
@@ -42,3 +42,4 @@ def ui_load_bird_barcode(user, key=None, msg=None)->(str,):
     return ui_apm1_mode(user, key, msg)
 
 welcome_handlers["kbd_barcode_entry"] = ui_load_bird_barcode
+welcome_handlers["kbd_back_to_load_barcode"] = welcome_addr_hndl

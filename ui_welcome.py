@@ -1,6 +1,6 @@
 import tgm
 from telegram import InlineKeyboardMarkup, Update
-from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes
+from telegram.ext import ContextTypes
 from storage import storage
 from barcode_reader import barCodeReader
 import re
@@ -111,7 +111,9 @@ def welcome_addr_hndl(user, key=None, msg=None):
     else:
         user["location_id"] = None
         user["location_name"] = None
-    if "bird" in user:
+        
+    if "bird" in user and user.get('location_name'): 
+    # Кейс, когда выбираем "Сменить локацию", уже добавив птицу
         return ui_welcome(user)
     return ui_load_bird(user, key, msg)
 
