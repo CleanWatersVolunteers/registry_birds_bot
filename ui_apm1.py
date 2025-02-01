@@ -19,12 +19,14 @@ apm1_text_enter_time = "Введите время отлова в формате
 apm1_text_enter_polituon = "Введите степень загрязнения(1-10)"
 apm1_text_incorrect = "Неверный ввод:"
 
+cancel_button_label = "Отмена"
+
 apm1_date = {
     "kbd_mode_apm1_date_now":"Сегодня",
-    "kbd_cancel":"Отмена",
+    "kbd_cancel":cancel_button_label,
 }
 apm1_cancel = {
-    "kbd_cancel":"Отмена",
+    "kbd_cancel":cancel_button_label,
 }
 
 apm1_cancel_barcode_input = {
