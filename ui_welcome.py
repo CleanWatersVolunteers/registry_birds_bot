@@ -1,41 +1,41 @@
-import tgm  # Вероятно, кастомный модуль для работы с Telegram
-from ui_generate_qr import ui_generate_qr_start  # Импорт модуля меню генерации
-from telegram import InlineKeyboardMarkup, Update  # Импортируем клавиатуру и Update из telegram API
-from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes  # Обработчики событий
+import tgm  
+from ui_generate_qr import ui_generate_qr_start 
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update  
+from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes  
 from storage import storage
-from barcode_reader import barCodeReader  # Импорт модуля для чтения штрих-кодов
+from barcode_reader import barCodeReader  
 import re
 
+# 📌 Текстовые константы
+TEXT_SELECT_LOCATION = "📌 Выберите локацию"
+TEXT_LOAD_BIRD = "Загрузите птицу"
+TEXT_ANIMAL_NUMBER = "Номер животного"
+TEXT_CAPTURE_PLACE = "Место отлова"
+TEXT_CAPTURE_TIME = "Время отлова"
+TEXT_POLLUTION_DEGREE = "Степень загрязнения"
+TEXT_WEIGHT = "Вес"
+TEXT_NOT_SPECIFIED = "Не указан"
+TEXT_SPECIES = "Вид"
+TEXT_CLINICAL_CONDITION = "Клиническое состояние"
+TEXT_FEEDING = "Кормление"
+TEXT_MASS = "Взвешивание"
+TEXT_HISTORY = "История"
+TEXT_CHANGE_LOCATION = "Сменить локацию"
+TEXT_GENERATE_QR_BUTTON = "🔲 ГЕНЕРАЦИЯ QR"
+TEXT_QR_GENERATION = "📌 Выберите способ генерации QR-кодов:"
+TEXT_GENERATING_QR = "⏳ Генерация QR-кодов для {numbers}..."
+TEXT_GENERATING_COUNT_QR = "⏳ Генерация {count} QR-кодов..."
+TEXT_QR_CODES_READY = "📄 Ваши QR-коды"
 
-welcome_text_sel_addr = 'Выберите локацию'
-welcome_text_sel_genqr = 'Генерация QR-кодов'
-welcome_text_sel_bird = 'Загрузите птицу'
-capture_datetime_format = "%d.%m.%y %H:%M"
+CAPTURE_DATETIME_FORMAT = "%d.%m.%y %H:%M"
 
+# 📌 Глобальные переменные
 ui_welcome_mode = {}
-
 kbd_addr_list = {}
 
 ##########################################
 # UI menu (Формирование интерфейса)
 ##########################################
-
-async def ui_generate_qr_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-
-    # Показываем меню выбора
-    text = "📌 Выберите способ генерации QR-кодов:"
-    keyboard = tgm.make_inline_keyboard({
-        "kbd_generate_old_qr": "Старые QR",
-        "kbd_generate_24_qr": "24 новых",
-        "kbd_generate_48_qr": "48 новых",
-        "kbd_generate_72_qr": "72 новых",
-        "kbd_back_qr": "Назад"
-    })
-
-    await query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
-
 
 def add_hdr_item(label, value):
     text = f'{label}: '
@@ -46,80 +46,65 @@ def add_hdr_item(label, value):
     return text
 
 def ui_welcome_get_card(bar_code):
-    text = add_hdr_item("Номер животного", bar_code)
+    text = add_hdr_item(TEXT_ANIMAL_NUMBER, bar_code)
     animal = storage.get_animal_by_bar_code(bar_code)
-    if animal is not None:
-        text += add_hdr_item("Место отлова", animal["place_capture"])
-        text += add_hdr_item("Время отлова", animal["capture_datetime"].strftime(capture_datetime_format))
-        text += add_hdr_item("Степень загрязнения", animal["degree_pollution"])
-
-        text += add_hdr_item("Вес", f"{animal['weight']} гр." if animal["weight"] is not None else "Не указан")
-        text += add_hdr_item("Вид", animal["species"] if animal["species"] is not None else "Не указан")
-        text += add_hdr_item("Клиническое состояние", animal["clinical_condition_admission"] if animal["clinical_condition_admission"] is not None else "Не указано")
+    if animal:
+        text += add_hdr_item(TEXT_CAPTURE_PLACE, animal["place_capture"])
+        text += add_hdr_item(TEXT_CAPTURE_TIME, animal["capture_datetime"].strftime(CAPTURE_DATETIME_FORMAT))
+        text += add_hdr_item(TEXT_POLLUTION_DEGREE, animal["degree_pollution"])
+        text += add_hdr_item(TEXT_WEIGHT, f"{animal['weight']} гр." if animal["weight"] else TEXT_NOT_SPECIFIED)
+        text += add_hdr_item(TEXT_SPECIES, animal["species"] if animal["species"] else TEXT_NOT_SPECIFIED)
+        text += add_hdr_item(TEXT_CLINICAL_CONDITION, animal["clinical_condition_admission"] if animal["clinical_condition_admission"] else TEXT_NOT_SPECIFIED)
         text += '---------------\n'
     return text
 
 def ui_welcome(user, key=None, msg=None):
-
     if not user:
         print('[!!] User not found!')
         return "Ошибка!", None
 
-    if user["location_id"] is None or user["location_name"] is None:
+    if user.get("location_id") is None or user.get("location_name") is None:
         return welcome_sel_addr(user, key)
 
     bird = user.get("bird")
     if not bird:
         return ui_load_bird(user, key, msg)
 
-    text = f'Адрес: {user["location_name"]}\n'
-    text += ui_welcome_get_card(bird["bar_code"])
+    text = f'Адрес: {user["location_name"]}\n' + ui_welcome_get_card(bird["bar_code"])
 
     arm_list = storage.get_arms(user["location_id"])
-
-    if arm_list is not None:
+    if arm_list:
         for arm in arm_list:
             key = f"kbd_mode_apm{arm['arm_id']}"
             ui_welcome_mode[key] = arm['arm_name']
-
-            # nado bu Убрать хардкод обработчиков
-            if arm['arm_id'] == 0:
-                welcome_handlers[key] = ui_apm1_mode
-            elif arm['arm_id'] == 1:
-                welcome_handlers[key] = ui_apm2_mode
-            elif arm['arm_id'] == 2:
-                welcome_handlers[key] = ui_apm4_mode
-            elif arm['arm_id'] == 3:
-                welcome_handlers[key] = ui_apm5_mode
-            elif arm['arm_id'] == 4:
-                welcome_handlers[key] = ui_apm6_mode
+            welcome_handlers[key] = globals().get(f"ui_apm{arm['arm_id']}_mode", None)
 
     ui_welcome_mode.update({
-        "kbd_feeding": "Кормление",
-        "kbd_mass": "Взвешивание",
-        "kbd_history": "История",
-        "kbd_load_bird": "Загрузить птицу",
-        "kbd_sel_addr": "Выбор локации и QR-коды",
+        "kbd_feeding": TEXT_FEEDING,
+        "kbd_mass": TEXT_MASS,
+        "kbd_history": TEXT_HISTORY,
+        "kbd_load_bird": TEXT_LOAD_BIRD,
+        "kbd_sel_addr": TEXT_CHANGE_LOCATION,
     })
 
     return text, tgm.make_inline_keyboard(ui_welcome_mode)
 
 
 def welcome_sel_addr(user, key=None, msg=None):
+    """Формирует меню выбора локации."""
     locations = storage.get_location()
     kbd_addr_list.clear()
 
-    if locations is not None:
+    if locations:
         for location in locations:
             key = f"kbd_addr_{location['location_id']}"
             kbd_addr_list[key] = location['location_name']
             welcome_handlers[key] = welcome_addr_hndl
 
-    # Добавляем кнопку "ГЕНЕРАЦИЯ КОДА"
-    kbd_addr_list["kbd_generate_qr"] = "🔲 ГЕНЕРАЦИЯ QR"
+    kbd_addr_list["kbd_generate_qr"] = TEXT_GENERATE_QR_BUTTON
     welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start
 
-    return welcome_text_sel_addr, tgm.make_inline_keyboard(kbd_addr_list)
+    return TEXT_SELECT_LOCATION, tgm.make_inline_keyboard(kbd_addr_list)
 
 def welcome_addr_hndl(user, key=None, msg=None):
     if key in kbd_addr_list:
@@ -173,23 +158,19 @@ welcome_handlers.update({
 ##########################################
 
 async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update["message"]["from"]["username"]
+    user_id = update.message.from_user.username
     user = storage.get_user(user_id)
 
     if not user:
-        print(f'[..] New user {user_id}')
         storage.add_user(user_id)
         user = storage.get_user(user_id)
 
-    #Проверяем, ожидается ли ввод QR-кодов
     if context.user_data.get("awaiting_qr_numbers", False):
-        await ui_receive_qr_numbers(update, context)  # Передаём управление обработчику QR-кодов
-        return  # Выходим, чтобы не выполнять `ui_welcome`
+        await ui_receive_qr_numbers(update, context)
+        return
 
-    #Если это обычное сообщение, выполняем стандартный обработчик
-    text, keyboard = welcome_handlers.get(user["mode"], ui_welcome)(user, msg=update.message.text)
-
-    await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
+    text, keyboard = welcome_handlers.get(user.get("mode"), ui_welcome)(user, msg=update.message.text)
+    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -204,7 +185,7 @@ async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     # Если нажата кнопка "ГЕНЕРАЦИЯ QR"
     if query.data == "kbd_generate_qr":
-        await ui_generate_qr_start(update, context)  # Вызов меню генерации QR-кодов
+        await ui_generate_qr_start(update, context) 
         return
 
     handler_function = welcome_handlers.get(query.data, ui_welcome)
@@ -212,12 +193,11 @@ async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     # Если обработчик — это функция генерации QR-кодов или возврата, вызываем без `msg`
     if handler_function in [ui_generate_qr_24, ui_generate_qr_48, ui_generate_qr_72, ui_generate_qr_old, ui_generate_qr_back]:
         await handler_function(update, context)
-        return  # Выходим, чтобы не выполнять код ниже
+        return 
 
     # Если это другая функция, вызываем с `msg`
     text, keyboard = handler_function(user, query.data, msg=query.message.text)
 
-    # Проверяем, что `keyboard` — это словарь, преобразуем в InlineKeyboardMarkup
     if isinstance(keyboard, dict):
         keyboard = [[InlineKeyboardButton(label, callback_data=key)] for key, label in keyboard.items()]
 
@@ -246,7 +226,6 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
     return None
 
-# Импорт и обработчики для qr
 from ui_generate_qr import (
     ui_generate_qr_start,
     ui_generate_qr_old,
