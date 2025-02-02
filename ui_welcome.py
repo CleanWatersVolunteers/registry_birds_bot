@@ -145,7 +145,7 @@ welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start
 from ui_load_bird import *
 from ui_apm1 import *
 from ui_apm2 import *
-# TODO Возможно, не нужно?
+# todo Больше не нужно?
 # from ui_apm3 import *
 from ui_apm4 import *
 from ui_apm5 import *
@@ -181,6 +181,12 @@ async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     else:
         print(f'[!!] Got unknown msg entry {user["mode"]}')
         text, keyboard = ui_welcome(user)
+
+    if context.user_data.get("awaiting_qr_numbers", False):
+        await ui_receive_qr_numbers(update, context)  
+        return 
+
+    text, keyboard = welcome_handlers.get(user["mode"], ui_welcome)(user, msg=update.message.text)
 
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
     return None

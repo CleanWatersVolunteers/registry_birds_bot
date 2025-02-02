@@ -328,11 +328,11 @@ class storage:
 class QRCodeStorage:
     @staticmethod
     def get_qr_start_value():
-        query = "SELECT qr_start_value FROM last_numbersettings WHERE id = 1;"
+        query = "SELECT qr_start_value FROM last_number WHERE id = 1;"
         result = storage.execute_query(query, fetch=True)
         return result[0]["qr_start_value"] if result else None
 
     @staticmethod
     def set_qr_start_value(new_value):
-        query = "UPDATE last_numbersettings SET qr_start_value = %s WHERE id = 1;"
+        query = "UPDATE last_number SET qr_start_value = %s WHERE id = 1;"
         storage.execute_query(query, (new_value,))
