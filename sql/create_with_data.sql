@@ -156,6 +156,15 @@ CREATE TABLE IF NOT EXISTS `place_history` (
   CONSTRAINT `fk_place_history_arms1` FOREIGN KEY (`arm_id`) REFERENCES `arms` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Таблица хранения последнего числа печати
+CREATE TABLE IF NOT EXISTS last_numbersettings ( 
+    id INT PRIMARY KEY DEFAULT 1,  -- фиксированный ID = 1 
+    qr_start_value INT NOT NULL
+);
+
+INSERT INTO last_number (qr_start_value) VALUES (0);
+
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
