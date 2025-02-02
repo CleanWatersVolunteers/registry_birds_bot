@@ -6,7 +6,7 @@ from barcode_reader import barCodeReader
 from ui_generate_qr import ui_generate_qr_start
 import re
 
-# 📌 Текстовые константы
+# Текстовые константы
 TEXT_SELECT_LOCATION = "Выберите локацию"
 TEXT_LOAD_BIRD = "Загрузите птицу"
 TEXT_ANIMAL_NUMBER = "Номер животного"
@@ -29,12 +29,12 @@ TEXT_QR_CODES_READY = "📄 Ваши QR-коды"
 
 CAPTURE_DATETIME_FORMAT = "%d.%m.%y %H:%M"
 
-# 📌 Глобальные переменные
+# Глобальные переменные
 ui_welcome_mode = {}
 kbd_addr_list = {}
 
 ##########################################
-# UI menu (Формирование интерфейса)
+# UI menu 
 ##########################################
 
 def add_hdr_item(label, value):
@@ -63,21 +63,34 @@ def ui_welcome(user, key=None, msg=None):
         print('[!!] User not found!')
         return "Ошибка!", None
 
-    if user.get("location_id") is None or user.get("location_name") is None:
+    if user["location_id"] is None or user["location_name"] is None:
         return welcome_sel_addr(user, key)
 
-    bird = user.get("bird")
+    bird = None
+    if "bird" in user:
+        bird = user["bird"]
     if not bird:
         return ui_load_bird(user, key, msg)
 
-    text = f'Адрес: {user["location_name"]}\n' + ui_welcome_get_card(bird["bar_code"])
-
+    text = f'Адрес: {user["location_name"]}\n'
+    text += ui_welcome_get_card(bird["bar_code"])
     arm_list = storage.get_arms(user["location_id"])
-    if arm_list:
+    # todo Очищать welcome_handlers при смене локации
+    if arm_list is not None:
         for arm in arm_list:
             key = f"kbd_mode_apm{arm['arm_id']}"
             ui_welcome_mode[key] = arm['arm_name']
-            welcome_handlers[key] = globals().get(f"ui_apm{arm['arm_id']}_mode", None)
+            # todo Продумать как убрать хардкод
+            if arm['arm_id'] == 0:
+                welcome_handlers[key] = ui_apm1_mode
+            elif arm['arm_id'] == 1:
+                welcome_handlers[key] = ui_apm2_mode
+            elif arm['arm_id'] == 2:
+                welcome_handlers[key] = ui_apm4_mode
+            elif arm['arm_id'] == 3:
+                welcome_handlers[key] = ui_apm5_mode
+            elif arm['arm_id'] == 4:
+                welcome_handlers[key] = ui_apm6_mode
 
     ui_welcome_mode.update({
         "kbd_feeding": TEXT_FEEDING,
@@ -89,9 +102,7 @@ def ui_welcome(user, key=None, msg=None):
 
     return text, tgm.make_inline_keyboard(ui_welcome_mode)
 
-
 def welcome_sel_addr(user, key=None, msg=None):
-    """Формирует меню выбора локации."""
     locations = storage.get_location()
     kbd_addr_list.clear()
 
@@ -120,7 +131,7 @@ def welcome_addr_hndl(user, key=None, msg=None):
     return ui_load_bird(user, key, msg)
 
 ##########################################
-# Callback handlers (обработчики событий)
+# Callback handlers
 ##########################################
 
 welcome_handlers = {
@@ -129,13 +140,12 @@ welcome_handlers = {
     "kbd_done": ui_welcome,
 }
 
-welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start  # Обработчик перехода в меню qr
+welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start  
 
-# Импортируем обработчики действий
 from ui_load_bird import *
 from ui_apm1 import *
 from ui_apm2 import *
-# nado bu Возможно, не нужно?
+# TODO Возможно, не нужно?
 # from ui_apm3 import *
 from ui_apm4 import *
 from ui_apm5 import *
@@ -144,7 +154,6 @@ from ui_feeding import *
 from ui_mass import *
 from ui_history import *
 
-# Добавляем кнопки в меню
 welcome_handlers.update({
     "kbd_load_bird": ui_load_bird,
     "kbd_feeding": ui_feeding_mode,
@@ -152,25 +161,30 @@ welcome_handlers.update({
     "kbd_history": ui_history_mode,
 })
 
-
 ##########################################
-# Main callback process (главная логика)
+# Main callback process
 ##########################################
 
 async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.message.from_user.username
+    # print(update.message)
+    user_id = update["message"]["from"]["username"]
     user = storage.get_user(user_id)
-
     if not user:
+        print(f'[..] New user {user_id}')
         storage.add_user(user_id)
         user = storage.get_user(user_id)
 
-    if context.user_data.get("awaiting_qr_numbers", False):
-        await ui_receive_qr_numbers(update, context)
-        return
+    if not user["mode"]:
+        text, keyboard = ui_welcome(user)
+    elif user["mode"] in welcome_handlers:
+        text, keyboard = welcome_handlers[user["mode"]](user, msg=update.message.text)
+    else:
+        print(f'[!!] Got unknown msg entry {user["mode"]}')
+        text, keyboard = ui_welcome(user)
 
-    text, keyboard = welcome_handlers.get(user.get("mode"), ui_welcome)(user, msg=update.message.text)
-    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
+    return None
+
 
 async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query

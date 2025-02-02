@@ -3,11 +3,6 @@ from mysql.connector import pooling
 from config import Config
 from datetime import datetime
 
-import mysql.connector
-from mysql.connector import pooling
-from config import Config
-from datetime import datetime
-
 class storage:
     capture_datetime_string_format = "%d.%m.%Y %H:%M"
     capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
