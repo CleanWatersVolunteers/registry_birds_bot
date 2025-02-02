@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `registration_datetime` datetime NOT NULL,
   `place_capture` varchar(45) NOT NULL,
   `capture_datetime` datetime NOT NULL,
-  `degree_pollution` int NOT NULL,
+  `degree_pollution` varchar(45) NOT NULL,
   `weight` int DEFAULT NULL,
   `species` varchar(45) DEFAULT NULL,
   `clinical_condition_admission` varchar(45) DEFAULT NULL,
