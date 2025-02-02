@@ -3,6 +3,11 @@ from mysql.connector import pooling
 from config import Config
 from datetime import datetime
 
+import mysql.connector
+from mysql.connector import pooling
+from config import Config
+from datetime import datetime
+
 class storage:
     capture_datetime_string_format = "%d.%m.%Y %H:%M"
     capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
@@ -324,3 +329,15 @@ class storage:
         if username in cls.__users:
             return cls.__users[username]
         return None
+
+class QRCodeStorage:
+    @staticmethod
+    def get_qr_start_value():
+        query = "SELECT qr_start_value FROM last_numbersettings WHERE id = 1;"
+        result = storage.execute_query(query, fetch=True)
+        return result[0]["qr_start_value"] if result else None
+
+    @staticmethod
+    def set_qr_start_value(new_value):
+        query = "UPDATE last_numbersettings SET qr_start_value = %s WHERE id = 1;"
+        storage.execute_query(query, (new_value,))
