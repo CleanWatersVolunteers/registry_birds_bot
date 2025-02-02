@@ -1,6 +1,8 @@
+from ui_welcome import welcome_addr_hndl, welcome_handlers, ui_welcome
+from ui_apm1 import ui_apm1_mode
 import tgm
 from storage import storage
-from ui_welcome import welcome_addr_hndl, welcome_handlers, ui_welcome, welcome_sel_addr
+from ui_welcome import welcome_sel_addr
 from ui_apm1 import ui_apm1_mode
 
 lb_text_header = 'Загрузка птицы:\n'
@@ -46,4 +48,5 @@ def ui_cancel_load_bird(user, key=None, msg=None):
 
 welcome_handlers["kbd_cancel"] = ui_cancel_load_bird
 welcome_handlers["kbd_barcode_entry"] = ui_load_bird_barcode
+welcome_handlers["kbd_back_to_load_barcode"] = welcome_addr_hndl
 
