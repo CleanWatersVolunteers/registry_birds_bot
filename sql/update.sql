@@ -6,6 +6,9 @@ UPDATE `manipulations` SET `place_list`='3,5' WHERE `name`='Бриллианто
 UPDATE `manipulations` SET `place_list`='3,5' WHERE `name`='Энтерофурил + физ.раствор 20мл в рот';
 UPDATE `manipulations` SET `place_list`='3' WHERE  `name`='Рингер 50/50 + Глюкоза 10мл';
 
+-- Изменить работу с полем "Степень загрязнения" #123
+ALTER TABLE `animals` CHANGE COLUMN `degree_pollution` `degree_pollution` varchar(45) NOT NULL
+
 INSERT INTO `places` (`id`, `name`) VALUES (5, 'Нянька');
 
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (7, 'Взвешивание', '5');
