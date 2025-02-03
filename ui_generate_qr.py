@@ -131,22 +131,16 @@ async def ui_generate_qr_common(user=None, key=None, msg=None, update: Update = 
         await ui_generate_qr_start(update=update, context=context)
         return None
 
-    return TEXT_GENERATING_COUNT_QR.format(count=count), None 
+    return TEXT_GENERATING_COUNT_QR.format(count=count), None
 
-
-
-    try:
-        await query.message.delete()
-    except Exception as e:
-        print(f"[!!] Ошибка удаления старого меню: {e}")
-
-    await ui_generate_qr_start(update, context)
 
 async def ui_generate_qr_24(*args, **kwargs):
     return await ui_generate_qr_common(*args, **kwargs, count=24)
 
+
 async def ui_generate_qr_48(*args, **kwargs):
     return await ui_generate_qr_common(*args, **kwargs, count=48)
+
 
 async def ui_generate_qr_72(*args, **kwargs):
     return await ui_generate_qr_common(*args, **kwargs, count=72)
@@ -204,5 +198,5 @@ async def ui_generate_qr_back(user=None, key=None, msg=None, update: Update = No
         except Exception:
             await query.message.reply_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
         return None
-    
+
     return ui_welcome(user)  # Для вызова из `ui_button_pressed`
