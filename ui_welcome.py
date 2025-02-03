@@ -182,12 +182,6 @@ async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         print(f'[!!] Got unknown msg entry {user["mode"]}')
         text, keyboard = ui_welcome(user)
 
-    if context.user_data.get("awaiting_qr_numbers", False):
-        await ui_receive_qr_numbers(update, context)  
-        return 
-
-    text, keyboard = welcome_handlers.get(user["mode"], ui_welcome)(user, msg=update.message.text)
-
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
     return None
 
@@ -198,30 +192,33 @@ async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     user_id = query["from_user"]["username"]
     user = storage.get_user(user_id)
-
     if not user:
-        print(f'[!!] User not found: {user_id}')
-        return
+        print(f'[..] New user {user_id}')
+        storage.add_user(user_id)
+        user = storage.get_user(user_id)
 
-    # Если нажата кнопка "ГЕНЕРАЦИЯ QR"
-    if query.data == "kbd_generate_qr":
-        await ui_generate_qr_start(update, context)
-        return
+    if query.data in welcome_handlers:
+        handler = welcome_handlers[query.data]
 
-    handler_function = welcome_handlers.get(query.data, ui_welcome)
+        # Проверяем, требует ли обработчик update/context
+        if handler in [
+            ui_generate_qr_start,
+            ui_generate_qr_old,
+            ui_generate_qr_24,
+            ui_generate_qr_48,
+            ui_generate_qr_72,
+            ui_generate_qr_back,
+        ]:
+            await handler(update=update, context=context)
+            return
 
-    # Если обработчик — это функция генерации QR-кодов или возврата, вызываем без `msg`
-    if handler_function in [ui_generate_qr_24, ui_generate_qr_48, ui_generate_qr_72, ui_generate_qr_old, ui_generate_qr_back]:
-        await handler_function(update, context)
-        return
-
-        # Если это другая функция, вызываем с `msg`
-    text, keyboard = handler_function(user, query.data, msg=query.message.text)
-
-    if isinstance(keyboard, dict):
-        keyboard = tgm.make_inline_keyboard(keyboard)
+        text, keyboard = handler(user, query.data, msg=query.message.text)
+    else:
+        print(f'[!!] Got unknown kbd entry {query.data}')
+        text, keyboard = ui_welcome(user)
 
     await query.edit_message_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+
 
 
 # Barcode callback
@@ -244,7 +241,6 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         else:
             text, keyboard = ui_load_bird_barcode(user, msg='')
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
-    return None
 
 from ui_generate_qr import (
     ui_generate_qr_start,
