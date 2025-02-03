@@ -11,7 +11,7 @@ nanny_text_entry_fish = 'Введите количество съеденных 
 nanny_text_weighing_action = "Введите массу животного в граммах"
 nanny_text_incorrect_digit = "Вводите только цифры"
 nanny_text_incorrect_fish_number = "Количество должно быть больше 0"
-nanny_text_incorrect_weight = "Вес должна быть от 50"
+nanny_text_incorrect_weight = f"Вес должна быть от {nanny_minimal_weight}"
 
 nanny_cancel = {
     "kbd_cancel":"Отмена",
