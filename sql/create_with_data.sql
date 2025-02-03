@@ -157,12 +157,12 @@ CREATE TABLE IF NOT EXISTS `place_history` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Таблица хранения последнего числа печати
-CREATE TABLE IF NOT EXISTS last_numbersettings ( 
+CREATE TABLE IF NOT EXISTS qr_last_number ( 
     id INT PRIMARY KEY DEFAULT 1,  -- фиксированный ID = 1 
-    qr_start_value INT NOT NULL
-);
+    qr_start_value INT NOT NULL);
 
-INSERT INTO last_number (qr_start_value) VALUES (0);
+-- Запись последнего числа печати
+INSERT INTO qr_last_number (qr_start_value) VALUES (0);
 
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
