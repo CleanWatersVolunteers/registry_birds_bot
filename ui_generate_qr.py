@@ -48,10 +48,10 @@ def merge_pdfs(pdf_buffers):
     combined_pdf.seek(0)
     return combined_pdf
 
-async def ui_generate_qr_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
+async def ui_generate_qr_start(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None):
     keyboard = tgm.make_inline_keyboard(qr_generation_menu)
-    try:
+    if update:
+        query = update.callback_query
         if query:
             await query.answer()
             try:
@@ -59,23 +59,27 @@ async def ui_generate_qr_start(update: Update, context: ContextTypes.DEFAULT_TYP
             except Exception as e:
                 print(f"[!!] Ошибка удаления старого меню: {e}")
             await query.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
+            return None
         elif update.message:
             await update.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
-    except Exception as e:
-        print(f"[!!] Ошибка при обновлении меню QR-кодов: {e}")
-        await update.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
+            return None
+    return TEXT_SELECT_QR_GENERATION, keyboard
 
 
-async def ui_generate_qr_old(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    if query.message:
+
+async def ui_generate_qr_old(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None):
+    if update:
+        query = update.callback_query
+        await query.answer()
         try:
             await query.message.delete()
         except Exception as e:
             print(f"[!!] Ошибка удаления старого меню: {e}")
-    await query.message.chat.send_message(TEXT_ENTER_OLD_QR)
-    context.user_data["awaiting_qr_numbers"] = True
+        await query.message.chat.send_message(TEXT_ENTER_OLD_QR)
+        context.user_data["awaiting_qr_numbers"] = True
+        return None
+    return TEXT_ENTER_OLD_QR, None  # Для вызова из `ui_button_pressed`
+
 
 async def ui_receive_qr_numbers(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.user_data.get("awaiting_qr_numbers"):
@@ -94,33 +98,42 @@ async def ui_receive_qr_numbers(update: Update, context: ContextTypes.DEFAULT_TY
     await update.message.reply_document(document=pdf_buffer, filename=filename, caption=TEXT_QR_CODES_READY)
     await ui_generate_qr_start(update, context)
 
-async def ui_generate_qr_common(update: Update, context: ContextTypes.DEFAULT_TYPE, count: int) -> None:
-    query = update.callback_query
-    await query.answer()
+async def ui_generate_qr_common(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None, count: int = 24):
+    if update:
+        query = update.callback_query
+        await query.answer()
 
-    # Получаем последний использованный QR-код из БД
-    start_number = QRCodeStorage.get_qr_start_value()
-    if start_number is None:
-        print("[!!] Ошибка: Не удалось получить start_number из БД!")
-        await query.message.reply_text("❌ Ошибка: невозможно получить начальный номер QR-кодов.")
-        return
+        start_number = QRCodeStorage.get_qr_start_value()
+        if start_number is None:
+            await query.message.reply_text("❌ Ошибка: невозможно получить начальный номер QR-кодов.")
+            return None
 
-    start_number += 1
-    end_number = start_number + count - 1
+        start_number += 1
+        end_number = start_number + count - 1
+        print(f"[..] Генерация QR-кодов с {start_number} по {end_number}")
 
-    print(f"[..] Генерация QR-кодов с {start_number} по {end_number}")
+        loading_message = await query.message.reply_text(TEXT_GENERATING_COUNT_QR.format(count=count))
+        pdf_buffers = [generate_qr_pdf([str(start_number + (i * 24) + j) for j in range(24)]) for i in range(count // 24)]
+        combined_pdf = merge_pdfs(pdf_buffers) if len(pdf_buffers) > 1 else pdf_buffers[0]
+        filename = FILENAME_QR_CODES_COUNT.format(count=count, start=start_number, end=end_number)
 
-    loading_message = await query.message.reply_text(TEXT_GENERATING_COUNT_QR.format(count=count))
+        await loading_message.delete()
+        await query.message.reply_document(document=combined_pdf, filename=filename, caption=TEXT_QR_CODES_READY)
 
-    pdf_buffers = [generate_qr_pdf([str(start_number + (i * 24) + j) for j in range(24)]) for i in range(count // 24)]
-    combined_pdf = merge_pdfs(pdf_buffers) if len(pdf_buffers) > 1 else pdf_buffers[0]
-    filename = FILENAME_QR_CODES_COUNT.format(count=count, start=start_number, end=end_number)
+        QRCodeStorage.set_qr_start_value(end_number)
+        print(f"[OK] Последний QR-код обновлен в БД: {end_number}")
 
-    await loading_message.delete()
-    await query.message.reply_document(document=combined_pdf, filename=filename, caption=TEXT_QR_CODES_READY)
+        try:
+            await query.message.delete()
+        except Exception as e:
+            print(f"[!!] Ошибка удаления старого меню: {e}")
 
-    QRCodeStorage.set_qr_start_value(end_number)
-    print(f"[OK] Последний QR-код обновлен в БД: {end_number}")
+        await ui_generate_qr_start(update=update, context=context)
+        return None
+
+    return TEXT_GENERATING_COUNT_QR.format(count=count), None 
+
+
 
     try:
         await query.message.delete()
@@ -129,14 +142,15 @@ async def ui_generate_qr_common(update: Update, context: ContextTypes.DEFAULT_TY
 
     await ui_generate_qr_start(update, context)
 
-async def ui_generate_qr_24(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ui_generate_qr_common(update, context, 24)
+async def ui_generate_qr_24(*args, **kwargs):
+    return await ui_generate_qr_common(*args, **kwargs, count=24)
 
-async def ui_generate_qr_48(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ui_generate_qr_common(update, context, 48)
+async def ui_generate_qr_48(*args, **kwargs):
+    return await ui_generate_qr_common(*args, **kwargs, count=48)
 
-async def ui_generate_qr_72(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await ui_generate_qr_common(update, context, 72)
+async def ui_generate_qr_72(*args, **kwargs):
+    return await ui_generate_qr_common(*args, **kwargs, count=72)
+
 
 def generate_qr_pdf(qr_numbers):
     pdf_buffer = BytesIO()
@@ -174,14 +188,21 @@ def generate_qr_pdf(qr_numbers):
     pdf_buffer.seek(0)
     return pdf_buffer
 
-async def ui_generate_qr_back(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    user_id = query.from_user.username
-    user = storage.get_user(user_id)
-    from ui_welcome import ui_welcome
-    text, keyboard = ui_welcome(user)
-    try:
-        await query.message.edit_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
-    except Exception:
-        await query.message.reply_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+async def ui_generate_qr_back(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None):
+    if update:
+        query = update.callback_query
+        await query.answer()
+
+        user_id = query.from_user.username
+        user = storage.get_user(user_id)
+
+        from ui_welcome import ui_welcome
+        text, keyboard = ui_welcome(user)
+
+        try:
+            await query.message.edit_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+        except Exception:
+            await query.message.reply_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+        return None
+    
+    return ui_welcome(user)  # Для вызова из `ui_button_pressed`
