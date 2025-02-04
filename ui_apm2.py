@@ -21,6 +21,7 @@ def apm2_done_hndl(user, key=None, msg=None) -> (str,):
 ############################################
 def ui_apm2_mode(user, key=None, msg=None) -> (str,):
     user["mode"] = "kbd_mode_apm2"
+    key = user.pop('apm')
     match = re.search(r'\d+$', key)
     if match:
         storage.insert_place_history(int(match.group()), user["bird"]["bar_code"], user["id"])

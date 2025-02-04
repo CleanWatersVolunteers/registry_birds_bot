@@ -84,14 +84,15 @@ def ui_welcome(user, key=None, msg=None):
             if arm['arm_id'] == 0:
                 welcome_handlers[key] = ui_apm1_mode
             elif arm['arm_id'] == 1:
-                welcome_handlers[key] = ui_apm2_mode
+                welcome_handlers[key] = welcome_addr_hndl
+                user['apm'] = key
             elif arm['arm_id'] == 2:
                 welcome_handlers[key] = ui_apm4_mode
             elif arm['arm_id'] == 3:
                 welcome_handlers[key] = ui_apm5_mode
             elif arm['arm_id'] == 4:
-                welcome_handlers[key] = ui_apm6_mode
-
+                welcome_handlers[key] = ui_apm6_mode  
+                                  
     ui_welcome_mode.update({
         "kbd_feeding": TEXT_FEEDING,
         "kbd_mass": TEXT_MASS,
@@ -126,7 +127,7 @@ def welcome_addr_hndl(user, key=None, msg=None):
         else:
             print("Число не найдено.")
 
-    if "bird" in user:
+    if "bird" in user and not user.get('apm'):
         return ui_welcome(user)
     return ui_load_bird(user, key, msg)
 
