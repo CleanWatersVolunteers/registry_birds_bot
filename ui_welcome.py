@@ -80,6 +80,7 @@ def ui_welcome(user, key=None, msg=None):
             ui_welcome_mode[key] = arm['arm_name']
             user['apm'] = key
             # todo Продумать как убрать хардкод
+            # Как вариант, можно записывать не в два словаря, а в один pd.DataFrame
             if arm['arm_id'] == 0:
                 welcome_handlers[key] = ui_apm1_mode
             elif arm['arm_id'] == 1:
