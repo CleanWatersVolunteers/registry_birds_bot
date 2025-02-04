@@ -17,8 +17,6 @@ TEXT_WEIGHT = "Вес"
 TEXT_NOT_SPECIFIED = "Не указан"
 TEXT_SPECIES = "Вид"
 TEXT_CLINICAL_CONDITION = "Клиническое состояние"
-TEXT_FEEDING = "Кормление"
-TEXT_MASS = "Взвешивание"
 TEXT_HISTORY = "История"
 TEXT_CHANGE_LOCATION = "Смена локации или генерация кода"
 TEXT_GENERATE_QR_BUTTON = "🔲 Генерация QR"
@@ -34,7 +32,7 @@ ui_welcome_mode = {}
 kbd_addr_list = {}
 
 ##########################################
-# UI menu 
+# UI menu
 ##########################################
 
 def add_hdr_item(label, value):
@@ -91,11 +89,11 @@ def ui_welcome(user, key=None, msg=None):
             elif arm['arm_id'] == 3:
                 welcome_handlers[key] = ui_apm5_mode
             elif arm['arm_id'] == 4:
-                welcome_handlers[key] = ui_apm6_mode  
-                                  
+                welcome_handlers[key] = ui_apm6_mode
+            elif arm['arm_id'] == 5:
+                welcome_handlers[key] = ui_nanny_mode
+
     ui_welcome_mode.update({
-        "kbd_feeding": TEXT_FEEDING,
-        "kbd_mass": TEXT_MASS,
         "kbd_history": TEXT_HISTORY,
         "kbd_load_bird": TEXT_LOAD_BIRD,
         "kbd_sel_addr": TEXT_CHANGE_LOCATION,
@@ -141,7 +139,7 @@ welcome_handlers = {
     "kbd_done": ui_welcome,
 }
 
-welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start  
+welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start
 
 from ui_load_bird import *
 from ui_apm1 import *
@@ -151,14 +149,11 @@ from ui_apm2 import *
 from ui_apm4 import *
 from ui_apm5 import *
 from ui_apm6 import *
-from ui_feeding import *
-from ui_mass import *
+from ui_apm_nanny import *
 from ui_history import *
 
 welcome_handlers.update({
     "kbd_load_bird": ui_load_bird,
-    "kbd_feeding": ui_feeding_mode,
-    "kbd_mass": ui_mass_entry_mode,
     "kbd_history": ui_history_mode,
 })
 
