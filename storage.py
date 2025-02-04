@@ -27,7 +27,7 @@ class storage:
                 connection.commit()  # Подтверждаем изменения
                 return True
         except mysql.connector.Error as err:
-            print(f"Ошибка при выполнении запроса: {err}")
+            print(f"Ошибка при выполнении запроса: {err}\n{query}")
             return None
         finally:
             cursor.close()
