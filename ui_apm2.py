@@ -12,9 +12,7 @@ apm2_done = {
 }
 
 def apm2_done_hndl(user, key=None, msg=None) -> (str,):
-    if "bird" in user:
-        user["bird"]["stage2"] = "OK"
-    return ui_welcome(user)
+   return ui_welcome(user)
 
 ############################################
 # Global API
@@ -23,7 +21,7 @@ def ui_apm2_mode(user, key=None, msg=None) -> (str,):
     user["mode"] = "kbd_mode_apm2"
     match = re.search(r'\d+$', key)
     if match:
-        storage.insert_place_history(int(match.group()), user["bird"]["bar_code"], user["id"])
+        storage.insert_place_history(int(match.group()), user["bird"]["animal_id"], user["id"])
     text = f'{ui_welcome_mode[key]}\n'
     text += f'{apm2_text_animal_header}{user["bird"]["bar_code"]}\n'
     text += apm2_text_action

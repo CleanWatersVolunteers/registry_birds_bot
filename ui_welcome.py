@@ -43,10 +43,10 @@ def add_hdr_item(label, value):
         text += '-\n'
     return text
 
-def ui_welcome_get_card(bar_code):
-    text = add_hdr_item(TEXT_ANIMAL_NUMBER, bar_code)
-    animal = storage.get_animal_by_bar_code(bar_code)
+def ui_welcome_get_card(animal_id):
+    animal = storage.get_animal_by_id(animal_id)
     if animal:
+        text = add_hdr_item(TEXT_ANIMAL_NUMBER, animal["bar_code"])
         text += add_hdr_item(TEXT_CAPTURE_PLACE, animal["place_capture"])
         text += add_hdr_item(TEXT_CAPTURE_TIME, animal["capture_datetime"].strftime(CAPTURE_DATETIME_FORMAT))
         text += add_hdr_item(TEXT_POLLUTION_DEGREE, animal["degree_pollution"])
@@ -54,7 +54,8 @@ def ui_welcome_get_card(bar_code):
         text += add_hdr_item(TEXT_SPECIES, animal["species"] if animal["species"] else TEXT_NOT_SPECIFIED)
         text += add_hdr_item(TEXT_CLINICAL_CONDITION, animal["clinical_condition_admission"] if animal["clinical_condition_admission"] else TEXT_NOT_SPECIFIED)
         text += '---------------\n'
-    return text
+        return text
+    return None
 
 def ui_welcome(user, key=None, msg=None):
     if not user:
@@ -71,7 +72,7 @@ def ui_welcome(user, key=None, msg=None):
         return ui_load_bird(user, key, msg)
 
     text = f'Адрес: {user["location_name"]}\n'
-    text += ui_welcome_get_card(bird["bar_code"])
+    text += ui_welcome_get_card(bird["animal_id"])
     arm_list = storage.get_arms(user["location_id"])
     # todo Очищать welcome_handlers при смене локации
     if arm_list is not None:

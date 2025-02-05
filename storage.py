@@ -3,6 +3,7 @@ from mysql.connector import pooling
 from config import Config
 from datetime import datetime
 
+
 class storage:
     capture_datetime_string_format = "%d.%m.%Y %H:%M"
     capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
@@ -25,7 +26,7 @@ class storage:
                 return results
             else:
                 connection.commit()  # Подтверждаем изменения
-                return True
+                return cursor.lastrowid
         except mysql.connector.Error as err:
             print(f"Ошибка при выполнении запроса: {err}\n{query}")
             return None
@@ -34,17 +35,13 @@ class storage:
             connection.close()  # Закрываем соединение, возвращая его в пул
 
     @classmethod
-    def insert_place_history(cls, arm_id, bar_code, tg_nickname):
-        animal_id = cls.get_animal_id(bar_code)
-        if animal_id is not None:
-            query = """
+    def insert_place_history(cls, arm_id, animal_id, tg_nickname):
+        query = """
             INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
             VALUES (NOW(), %s, %s, %s)
             """
-            data = (animal_id, tg_nickname, arm_id)
-            cls.execute_query(query, data)
-        else:
-            print(f"invalid animal_id: {animal_id}")
+        data = (animal_id, tg_nickname, arm_id)
+        cls.execute_query(query, data)
 
     @classmethod
     def get_place_history(cls, animal_id):
@@ -87,10 +84,9 @@ class storage:
             print("Животное не найдено.")
             return None
 
-    # todo Удалить после перехода на id
     @classmethod
     def get_animal_by_bar_code(cls, bar_code) -> dict:
-        query = "SELECT * FROM animals WHERE bar_code = %s"
+        query = "SELECT *, id AS animal_id FROM animals WHERE bar_code = %s"
         data = (bar_code,)
         result = cls.execute_query(query, data, fetch=True)
         if result:
@@ -107,16 +103,6 @@ class storage:
         """
         data = (animal_id, type_id, value, tg_nickname)
         cls.execute_query(query, data)
-
-    def get_animal_by_id(cls, animal_id) -> dict:
-        query = "SELECT * FROM animals WHERE id = %s"
-        data = (animal_id,)
-        result = cls.execute_query(query, data, fetch=True)
-        if result:
-            return result[0]  # Возвращаем первый (и единственный) объект
-        else:
-            print("Животное не найдено.")
-            return None
 
     @classmethod
     def get_numerical_history_type(cls):
@@ -216,7 +202,7 @@ class storage:
         VALUES (NOW(), %s, %s, %s, %s)
         """
         data = (animal["bar_code"], animal["place_capture"], capture_datetime_formatted, animal["degree_pollution"])
-        cls.execute_query(query, data)
+        return cls.execute_query(query, data)
 
     @classmethod
     def get_manipulations(cls, place_number):
@@ -228,9 +214,8 @@ class storage:
         return []
 
     # Обновление таблицы animals
-    # todo Переделать на WHERE id = id
     @classmethod
-    def update_animal(cls, bar_code, weight=None, species=None, clinical_condition_admission=None) -> bool:
+    def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None) -> bool:
         query = "UPDATE animals SET "
         updates = []
         data = []
@@ -250,15 +235,15 @@ class storage:
             print("Нет данных для обновления.")
             return False
 
-        query += ", ".join(updates) + " WHERE bar_code = %s"
-        data.append(bar_code)
+        query += ", ".join(updates) + " WHERE id = %s"
+        data.append(animal_id)
 
         result = cls.execute_query(query, data)
         if result is None:
             print("Ошибка обновления данных.")
             return False
         else:
-            print(f"Данные для бар-кода {bar_code} успешно обновлены.")
+            print(f"Данные animals для id {animal_id} успешно обновлены.")
             return True
 
     @classmethod
@@ -324,6 +309,7 @@ class storage:
         if username in cls.__users:
             return cls.__users[username]
         return None
+
 
 class QRCodeStorage:
     @staticmethod

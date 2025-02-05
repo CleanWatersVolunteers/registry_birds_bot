@@ -64,7 +64,7 @@ def ui_nanny_mode(user, key=None, msg=None) -> (str,):
     # Инициализируем arm
     nanny_data["arm_id"] = storage.get_arm_id(nanny_data["place_id"], user["location_id"])
     nanny_data["title"] = ui_welcome_mode[key]
-    nanny_data["animal_id"] = storage.get_animal_id(user["bird"]["bar_code"])
+    nanny_data["animal_id"] = user["bird"]["animal_id"]
     text = nanny_get_body(user)
 
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям

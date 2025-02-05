@@ -20,9 +20,6 @@ apm5_data = {
 }
 
 def apm5_done_hndl(user, key=None, msg=None) -> (str,):
-    if "bird" in user:
-        user["bird"]["stage5"] = "OK"
-        
     return ui_welcome(user)
 
 
@@ -35,9 +32,7 @@ def ui_apm5_mode(user, key=None, msg=None) -> (str,):
     # Инициализируем arm    
     apm5_data["arm_id"] = storage.get_arm_id(apm5_data["place_id"], user["location_id"])
     apm5_data["title"] = ui_welcome_mode[key]
-
-    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
-    text = f'{apm5_data["title"]}:{manipulation_history_text(animal_id)}\n{apm5_text_action}'
+    text = f'{apm5_data["title"]}:{manipulation_history_text(user["bird"]["animal_id"])}\n{apm5_text_action}'
 
     # Динамически обновляем кнопкоменюшку манипуляций по доступным манипуляциям
     apm5_data["manipulations"] = storage.get_manipulations(apm5_data["place_id"])
@@ -76,16 +71,15 @@ def manipulation_history_text(animal_id) -> (str,):
 def apm5_manipulations_hndl(user, key=None, msg=None)->(str,):
     if 'done' in key:
         # Завершаем, запомним, где и кто работал с птицей.
-        storage.insert_place_history(apm5_data["arm_id"], user["bird"]["bar_code"], user["id"])
+        storage.insert_place_history(apm5_data["arm_id"], user["bird"]["animal_id"], user["id"])
         return ui_welcome(user)
 
     manip = key.split('__')[1]  
     manip_num = int(manip)  
     manipulation = apm5_data["manipulations"][manip_num]
-    animal_id = storage.get_animal_id(user["bird"]["bar_code"])
-    storage.insert_history(manipulation["id"], animal_id, apm5_data["arm_id"], user["id"])
+    storage.insert_history(manipulation["id"], user["bird"]["animal_id"], apm5_data["arm_id"], user["id"])
 
-    text = f'{apm5_data["title"]}{manipulation_history_text(animal_id)}\n{apm5_text_action}'
+    text = f'{apm5_data["title"]}{manipulation_history_text(user["bird"]["animal_id"])}\n{apm5_text_action}'
     keyboard = tgm.make_inline_keyboard(apm5_data['manipulations_menu'])
     return text, keyboard
 
