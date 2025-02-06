@@ -162,13 +162,18 @@ welcome_handlers.update({
 ##########################################
 
 async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # print(update.message)
     user_id = update["message"]["from"]["username"]
     user = storage.get_user(user_id)
+    
     if not user:
         print(f'[..] New user {user_id}')
         storage.add_user(user_id)
         user = storage.get_user(user_id)
+
+    # Проверка: ожидается ли ввод номеров для QR-кодов
+    if context.user_data.get("awaiting_qr_numbers"):
+        await ui_receive_qr_numbers(update, context)
+        return  # Завершаем выполнение, чтобы другие хендлеры не перехватывали
 
     if not user["mode"]:
         text, keyboard = ui_welcome(user)
@@ -179,8 +184,6 @@ async def ui_message_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         text, keyboard = ui_welcome(user)
 
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
-    return None
-
 
 async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
