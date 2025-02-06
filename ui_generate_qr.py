@@ -29,6 +29,9 @@ TEXT_GENERATING_COUNT_QR = "⏳ Генерация {count} QR-кодов..."
 TEXT_QR_CODES_READY = "📄 Ваши QR-коды"
 FILENAME_QR_CODES = "qr_codes_{user_input}.pdf"
 FILENAME_QR_CODES_COUNT = "qr_codes_{count}_{start}-{end}.pdf"
+TEXT_QR_NOT_PREVIOUSLY_PRINTED = "❌ Этот код не был распечатан ранее. Повторите ввод."
+
+
 
 qr_generation_menu = {
     "kbd_generate_old_qr": "Старые QR",
@@ -97,6 +100,19 @@ async def ui_receive_qr_numbers(update: Update, context: ContextTypes.DEFAULT_TY
         context.user_data["awaiting_qr_numbers"] = True  # Включаем снова, если ошибка
         return
 
+    # Получаем максимальный QR-код из базы данных
+    current_max_qr = QRCodeStorage.get_qr_start_value()
+
+    # Проверка на наличие новых кодов
+    invalid_codes = [code for code in qr_numbers if int(code) >= current_max_qr]
+    if invalid_codes:
+        await update.message.reply_text(
+            f"{TEXT_QR_NOT_PREVIOUSLY_PRINTED}\nНеверные коды: {', '.join(invalid_codes)}"
+        )
+        context.user_data["awaiting_qr_numbers"] = True  # Повторный запрос ввода
+        return
+
+    # Генерация QR-кодов
     loading_message = await update.message.reply_text(TEXT_GENERATING_QR.format(numbers=', '.join(qr_numbers)))
     pdf_buffer = generate_qr_pdf(qr_numbers)
     filename = FILENAME_QR_CODES.format(user_input=user_input.replace(' ', ''))
@@ -104,8 +120,8 @@ async def ui_receive_qr_numbers(update: Update, context: ContextTypes.DEFAULT_TY
     await loading_message.delete()
     await update.message.reply_document(document=pdf_buffer, filename=filename, caption=TEXT_QR_CODES_READY)
     
+    # Возвращение в меню генерации QR-кодов
     await ui_generate_qr_start(update=update, context=context)
-
 
 
 async def ui_generate_qr_common(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None, count: int = 24):
