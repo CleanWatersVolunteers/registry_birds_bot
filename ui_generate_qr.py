@@ -76,27 +76,37 @@ async def ui_generate_qr_old(user=None, key=None, msg=None, update: Update = Non
         except Exception as e:
             print(f"[!!] Ошибка удаления старого меню: {e}")
         await query.message.chat.send_message(TEXT_ENTER_OLD_QR)
+        
+        # Включаем режим ожидания ввода QR-номеров
         context.user_data["awaiting_qr_numbers"] = True
         return None
-    return TEXT_ENTER_OLD_QR, None  # Для вызова из `ui_button_pressed`
+
+    return TEXT_ENTER_OLD_QR, None
 
 
 async def ui_receive_qr_numbers(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.user_data.get("awaiting_qr_numbers"):
-        return
-    context.user_data["awaiting_qr_numbers"] = False
+        return  # Если бот не ждёт ввод номеров, выходим
+
+    context.user_data["awaiting_qr_numbers"] = False  # Сбрасываем флаг после получения ввода
     user_input = update.message.text.strip()
     qr_numbers = sorted(set(re.findall(r'\d+', user_input)))
+    
     if not qr_numbers:
         await update.message.reply_text(TEXT_ERROR_NO_NUMBERS)
-        context.user_data["awaiting_qr_numbers"] = True
+        context.user_data["awaiting_qr_numbers"] = True  # Включаем снова, если ошибка
         return
+
     loading_message = await update.message.reply_text(TEXT_GENERATING_QR.format(numbers=', '.join(qr_numbers)))
     pdf_buffer = generate_qr_pdf(qr_numbers)
     filename = FILENAME_QR_CODES.format(user_input=user_input.replace(' ', ''))
+    
     await loading_message.delete()
     await update.message.reply_document(document=pdf_buffer, filename=filename, caption=TEXT_QR_CODES_READY)
-    await ui_generate_qr_start(update, context)
+    
+    await ui_generate_qr_start(update=update, context=context)
+
+
 
 async def ui_generate_qr_common(user=None, key=None, msg=None, update: Update = None, context: ContextTypes.DEFAULT_TYPE = None, count: int = 24):
     if update:
