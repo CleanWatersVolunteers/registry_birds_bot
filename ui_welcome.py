@@ -79,13 +79,14 @@ def ui_welcome(user, key=None, msg=None):
         for arm in arm_list:
             key = f"kbd_mode_apm{arm['arm_id']}"
             ui_welcome_mode[key] = arm['arm_name']
-            user['apm'] = key
+            
             # todo Продумать как убрать хардкод
             # Как вариант, можно записывать не в два словаря, а в один pd.DataFrame
             if arm['arm_id'] == 0:
                 welcome_handlers[key] = ui_apm1_mode
             elif arm['arm_id'] == 1:
                 welcome_handlers[key] = welcome_addr_hndl
+                user['apm'] = key
             elif arm['arm_id'] == 2:
                 welcome_handlers[key] = ui_apm4_mode
             elif arm['arm_id'] == 3:
