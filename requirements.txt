@@ -5,3 +5,5 @@ pyzbar
 pytz
 mysql-connector-python
 numpy
+reportlab
+PyPDF2
