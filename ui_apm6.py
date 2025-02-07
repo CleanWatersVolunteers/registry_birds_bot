@@ -19,7 +19,7 @@ apm6_data = {
 def apm6_species_hndl(user, key=None, msg=None) -> (str,):
     if not "bird" in user:
         return ui_welcome(user)
-    storage.update_animal(user["bird"]["bar_code"], species=msg)
+    storage.update_animal(user["bird"]["animal_id"], species=msg)
     user["mode"] = "mode_apm6_clinic"
     text = f'{apm6_data["title"]}:\n{apm6_text_clinic_state}'
     keyboard = tgm.make_inline_keyboard(apm6_cancel)
@@ -27,8 +27,7 @@ def apm6_species_hndl(user, key=None, msg=None) -> (str,):
 
 def apm6_done_hndl(user, key=None, msg=None) -> (str,):
     if "bird" in user:
-        storage.update_animal(user["bird"]["bar_code"], clinical_condition_admission=msg)
-        user["bird"]["stage6"] = 'OK'
+        storage.update_animal(user["bird"]["animal_id"], clinical_condition_admission=msg)
     return ui_welcome(user)
 
 ############################################

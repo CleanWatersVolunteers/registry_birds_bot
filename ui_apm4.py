@@ -24,10 +24,9 @@ def apm4_done_hndl(user, key=None, msg=None)->(str,):
         text += apm4_text_action
         keyboard = tgm.make_inline_keyboard(apm4_cancel)
         return text, keyboard
-    storage.insert_place_history(apm4_data["arm_id"], user["bird"]["bar_code"], user["id"])
-    storage.update_animal(user["bird"]["bar_code"], weight = msg)
+    storage.insert_place_history(apm4_data["arm_id"], user["bird"]["animal_id"], user["id"])
+    storage.update_animal(user["bird"]["animal_id"], weight = msg)
     user["mode"] = None
-    user["bird"]["stage4"] = 'OK'
     return ui_welcome(user)
 
 ############################################

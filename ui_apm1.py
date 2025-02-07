@@ -111,7 +111,7 @@ def apm1_date_hndl(user, key=None, msg=None) -> (str,):
 
 def apm1_pollution_hndl(user, key=None, msg=None) -> (str,):
     user["bird"]["degree_pollution"] = apm1_pollution_grade[key]
-    storage.insert_animal(user["bird"])
+    user["bird"]["animal_id"] = storage.insert_animal(user["bird"])
     return ui_welcome(user)
 
 

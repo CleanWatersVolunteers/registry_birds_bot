@@ -12,7 +12,7 @@ lb_text_incorrect_barcode = f'Неверный ввод:'
 lb_text_not_found = '\nЖивотное не найдено.'
 
 lb_cancel = {
-    "kbd_cancel": "Назад",
+    "kbd_back_to_load_barcode": "Назад",
 }
 
 lb_ok = {
@@ -60,7 +60,6 @@ def ui_load_bird_barcode(user, key=None, msg=None):
 def ui_cancel_load_bird(user, key=None, msg=None):
     return welcome_sel_addr(user)
 
-welcome_handlers["kbd_cancel"] = ui_cancel_load_bird
 welcome_handlers["kbd_barcode_entry"] = ui_load_bird_barcode
-welcome_handlers["kbd_back_to_load_barcode"] = welcome_addr_hndl
+welcome_handlers["kbd_back_to_load_barcode"] = ui_cancel_load_bird
 welcome_handlers["kbd_return_barcode_entry"] = welcome_addr_hndl
