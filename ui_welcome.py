@@ -72,7 +72,10 @@ def ui_welcome(user, key=None, msg=None):
         return ui_load_bird(user, key, msg)
 
     text = f'Адрес: {user["location_name"]}\n'
-    text += ui_welcome_get_card(bird["animal_id"])
+    
+    if bird.get("animal_id"):
+        text += ui_welcome_get_card(bird["animal_id"])
+        
     arm_list = storage.get_arms(user["location_id"])
     # todo Очищать welcome_handlers при смене локации
     if arm_list is not None:

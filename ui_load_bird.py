@@ -11,8 +11,12 @@ lb_text_entry_barode = f'Введите баркод или загрузите �
 lb_text_incorrect_barcode = f'Неверный ввод:'
 lb_text_not_found = '\nЖивотное не найдено.'
 
-lb_cancel = {
-    "kbd_back_to_load_barcode": "Назад",
+back_text = "Назад"
+
+cancel_paths = {
+    "kbd_addr_0": "kbd_back_to_addr",
+    "kbd_mode_apm1": "kbd_cancel",
+    "kbd_return_barcode_entry": "kbd_cancel"
 }
 
 lb_ok = {
@@ -26,6 +30,10 @@ lb_ok = {
 def ui_load_bird(user, key=None, msg=None):
     user["mode"] = "kbd_barcode_entry"
     text = f'{lb_text_header}{lb_text_entry_barode}'
+    
+    # Определяем куда вернёмся после отмены по ключу
+    lb_cancel = {cancel_paths[key]: back_text}
+    
     keyboard = tgm.make_inline_keyboard(lb_cancel)
     return text, keyboard
 
@@ -61,5 +69,5 @@ def ui_cancel_load_bird(user, key=None, msg=None):
     return welcome_sel_addr(user)
 
 welcome_handlers["kbd_barcode_entry"] = ui_load_bird_barcode
-welcome_handlers["kbd_back_to_load_barcode"] = ui_cancel_load_bird
+welcome_handlers["kbd_back_to_addr"] = ui_cancel_load_bird
 welcome_handlers["kbd_return_barcode_entry"] = welcome_addr_hndl

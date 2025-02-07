@@ -29,7 +29,7 @@ apm1_cancel = {
 }
 
 apm1_cancel_barcode_input = {
-    "kbd_back_to_load_barcode": cancel_button_label,
+    "kbd_back_to_addr": cancel_button_label,
 }
 
 apm1_pollution_grade = {
