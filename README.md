@@ -8,7 +8,15 @@
 ### Зависимости
 Необходимо установить следующие зависимости 
 ```sh
-pip install requirements.txt
+pip install python-telegram-bot
+pip install opencv-python
+pip install opencv-contrib-python
+pip install pyzbar
+pip install pytz
+pip install mysql-connector-python
+pip install numpy
+pip install PyPDF2
+
 apt-get install libzbar0
 ```
 ## База данных
@@ -32,7 +40,7 @@ sudo mysql 	# запуск консоли mysql
 2. Создание новой базы 'registry_birds' из скрипта
 Запустить скрипт sql/create_with_data.sql командой
 ```sh
-cat sql/create_with_data.sql | mysql
+cat sql/create_with_data.sql | mysql -u newuser -p
 ```
 3. Проверить наличие базы командой
 ```sql
