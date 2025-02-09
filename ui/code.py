@@ -1,6 +1,8 @@
 
-def code_request():
-	return f'Введите код животного', {'Отмена':'entry_cancel'}
+def code_request(apm_list):
+	if len(apm_list) > 1:
+		return f'Введите код животного', {'Отмена':'entry_menu'}
+	return f'Введите код животного', None
 
 def code_parse(code)->int:
 	if isinstance(code, str):

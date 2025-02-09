@@ -1,5 +1,5 @@
 import asyncio
-from telegram import InlineKeyboardButton, Update, constants
+from telegram import InlineKeyboardButton, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 from logs import log
 
@@ -33,11 +33,10 @@ async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 	try:
 		if keyboard:
 			await update.message.reply_text(text, 
-				parse_mode=constants.ParseMode.MARKDOWN_V2, 
 				reply_markup=InlineKeyboardMarkup(kbd_to_inline(keyboard))
 			)
 		else:
-			await update.message.reply_text(text, parse_mode=constants.ParseMode.MARKDOWN_V2)
+			await update.message.reply_text(text)
 	except Exception as e:
 		print('[!!] Exception ', e)
 
@@ -52,41 +51,13 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	try:
 		if keyboard:
 			await query.edit_message_text(text=text, 
-				parse_mode=constants.ParseMode.MARKDOWN_V2, 
 				reply_markup=InlineKeyboardMarkup(kbd_to_inline(keyboard))
 			)
 		else:
-			await query.message.reply_text(text=text, 
-				parse_mode=constants.ParseMode.MARKDOWN_V2
-			)
+			await query.message.reply_text(text=text)
 		
 	except Exception as e:
 		print('[!!] Exception ', e)
-
-
-
-
-    # user = user_get_create(username)
-    # if not user:
-    #     print("[!!] Ошибка пользователя!", username)
-    #     text = "Ошибка\!"
-    #     await query.edit_message_text(text=text_escape(text), parse_mode=text_parse_mode)
-    #     return None
-
-    # # show menu
-    # if query.data in kbd_handlers_list.keys():
-    #     text, keyboard = kbd_handlers_list[query.data](user=user, key=query.data, message=query.message.text)
-    # else:
-    #     print(f"[!!] Got unexpected argument: {query.data}")
-    #     text = "Ошибка\!"
-    #     keyboard = None
-
-    # try:
-    #     if keyboard:
-    #         await query.edit_message_text(text=text_escape(text), parse_mode=text_parse_mode, reply_markup=InlineKeyboardMarkup(keyboard))
-
-    # return None
-
 
 async def main() -> None:
 	application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()

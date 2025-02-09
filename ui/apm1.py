@@ -1,8 +1,10 @@
+# Поступление
+
 from database import Database as db
 from datetime import datetime
 
 apm1_text_place = 'Введите место отлова'
-apm1_text_date = 'Введите дату и время отлова в формате ДД\.ММ\.ГГГГ ЧЧ:ММ'
+apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
 apm1_text_polution = 'Укажите степень загрязнения'
 
@@ -15,13 +17,19 @@ apm1_polution_grade = {
     "entry_cancel": "Отмена",
 }
 
+##################################
+# Global API
+##################################
+
 def apm1_start(username, text, key=None):
 	user = db.get_user(username)
 
+	if user["animal_id"] == None:
+		user["animal_id"] = db.get_animal_id(text)	
 	# barcode
 	if key == None:
 		code = text
-		if db.get_animal_id(code) > 0:
+		if user["animal_id"] != None:
 			return (
 				f'❌ Животное с номером {code} уже зарегистрировано\!', 
 				{"OK": "entry_cancel"},

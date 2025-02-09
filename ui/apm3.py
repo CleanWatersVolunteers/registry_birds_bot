@@ -1,6 +1,12 @@
+# Прием в стационар
+
 from database import Database as db
 
 apm3_text = f"Введите массу животного в граммах"
+
+##################################
+# Global API
+##################################
 
 def apm3_start(username, text, key=None):
 	user = db.get_user(username)
@@ -8,14 +14,14 @@ def apm3_start(username, text, key=None):
 		user["animal_id"] = db.get_animal_id(text)	
 		if user["animal_id"] == None:
 			return (
-				f'❌ Животное с номером {text} не найдено\!',
+				f'❌ Животное с номером {text} не найдено!',
 				{"Отмена": "entry_cancel"}, None
 			)
 	if key == 'apm3_mass':
 		if not text.isdigit():
 			return (
 				f'❌ Неверный ввод: {text}\n{apm3_text}',
-				{"Отмена": "entry_cancel"}
+				{"Отмена": "entry_cancel"}, 'apm3_mass'
 			)
 		user['mass'] = text
 		return (
