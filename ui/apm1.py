@@ -22,12 +22,12 @@ apm1_text_cancel = 'Отмена'
 apm1_text_today = 'Сегодня'
 
 apm1_pollution_grade = {
-    "apm1_pollution_0": "менее 25%",
-    "apm1_pollution_1": "25%",
-    "apm1_pollution_2": "50%",
-    "apm1_pollution_3": "75%",
-    "apm1_pollution_4": "100%",
-    "entry_cancel": apm1_text_cancel,
+	"apm1_pollution_0": "менее 25%",
+	"apm1_pollution_1": "25%",
+	"apm1_pollution_2": "50%",
+	"apm1_pollution_3": "75%",
+	"apm1_pollution_4": "100%",
+	"entry_cancel": apm1_text_cancel,
 }
 
 
@@ -40,6 +40,7 @@ def get_valid_time(time):
 		time = None
 	return time
 
+
 def apm1_time_validate(msg, user):
 	time = get_valid_time(msg)  # '10:15'
 	if not time:
@@ -50,6 +51,7 @@ def apm1_time_validate(msg, user):
 		)
 	user['capture_datetime'] = f'''{user['capture_datetime']} {time}'''
 	return apm1_get_pollution(user["code"])
+
 
 def apm1_manual_data_validate(msg, user):
 	date = GET_DATE(msg)  # '16.01.2025'
@@ -70,6 +72,7 @@ def apm1_manual_data_validate(msg, user):
 	user['capture_datetime'] = f'{date} {time}'
 	return apm1_get_pollution(user["code"])
 
+
 def apm1_get_place(code):
 	return (
 		f'{apm1_text_header} {code}\n{apm1_text_place}',
@@ -84,6 +87,7 @@ def apm1_get_time(code):
 		{apm1_text_cancel: "entry_cancel"},
 		'apm1_time_validate'
 	)
+
 
 def apm1_get_date(code):
 	return (
@@ -109,7 +113,8 @@ def show_result(user):
 	text += f'✅ Место отлова: {user["place"]}\n'
 	text += f'✅ Время отлова: {user["capture_datetime"]}\n'
 	text += f'✅ Степень загрязнения: {user["pollution"]}\n'
-	return text, {apm1_text_done: "apm1_done", apm1_text_cancel: "entry_cancel"},None
+	return text, {apm1_text_done: "apm1_done", apm1_text_cancel: "entry_cancel"}, None
+
 
 ##################################
 # Global API
@@ -123,7 +128,7 @@ def apm1_start(username, text, key=None):
 		user["animal_id"] = animal['animal_id']
 
 	if user["animal_id"] is None:
-		user["animal_id"] = db.get_animal_id(text)	
+		user["animal_id"] = db.get_animal_id(text)
 	# barcode
 	if key is None:
 		code = text
@@ -140,7 +145,7 @@ def apm1_start(username, text, key=None):
 		user['place'] = text
 		return apm1_get_date(user["code"])
 	if key == 'apm1_date':
-		user['capture_datetime'] = text # todo incorrect for today button
+		user['capture_datetime'] = text  # todo incorrect for today button
 		return apm1_get_pollution(user["code"])
 	if key == 'apm1_manual_date':
 		return apm1_manual_data_validate(text, user)
@@ -169,5 +174,6 @@ def apm1_entry(username, msg, key):
 		return text, {apm1_text_done: "apm1_done", apm1_text_cancel: "entry_cancel"}
 
 	if key == 'apm1_done':
-		storage.insert_animal(code = user["code"], capture_datetime = user["capture_datetime"], place = user["place"], pollution = user["pollution"])
+		storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"], place=user["place"],
+							  pollution=user["pollution"])
 	return None, None
