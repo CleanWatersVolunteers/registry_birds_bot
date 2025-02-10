@@ -29,19 +29,6 @@ class Database:
 		return {}
 
 
-
-
-	@classmethod
-	def get_apm_list(cls, name)->[]:
-		if name in cls.user_list:
-			return cls.user_list[name]["apm_list"]
-		return []
-
-	@classmethod
-	def insert_animal(cls, animal)->int:
-		print("[DB] New animal:", animal)
-		return 10 # id from db
-
 	@classmethod
 	def get_animal_id(cls, bar_code):
 		if bar_code == 2222:

@@ -194,14 +194,14 @@ class storage:
         return []
 
     @classmethod
-    def insert_animal(cls, animal):
-        capture_datetime = datetime.strptime(animal["capture_datetime"], cls.capture_datetime_string_format)
+    def insert_animal(cls, code, capture_datetime, place, pollution):
+        capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
         capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
         query = """
         INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
         VALUES (NOW(), %s, %s, %s, %s)
         """
-        data = (animal["bar_code"], animal["place_capture"], capture_datetime_formatted, animal["degree_pollution"])
+        data = (code, place, capture_datetime_formatted, pollution)
         return cls.execute_query(query, data)
 
     @classmethod
