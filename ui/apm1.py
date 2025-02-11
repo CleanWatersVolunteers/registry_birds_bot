@@ -10,7 +10,7 @@ GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
 GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
 GET_NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%d.%m.%Y")
 
-apm1_text_header = "Добавление птицы:"
+apm1_text_header = "Животное №:"
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
@@ -123,24 +123,18 @@ def show_result(user):
 
 def apm1_start(username, text, key=None):
 	user = db.get_user(username)
-	animal = storage.get_animal_by_bar_code(text)
-	if animal is not None:
-		user["animal_id"] = animal['animal_id']
-
-	if user["animal_id"] is None:
-		user["animal_id"] = db.get_animal_id(text)
-	# barcode
 	if key is None:
-		code = text
-		if user["animal_id"] is not None:
+		animal = storage.get_animal_by_bar_code(text)
+		if animal is not None:
 			return (
-				f'❌ Животное с номером {code} уже зарегистрировано!',
+				f'❌ Животное с номером {text} уже зарегистрировано!',
 				{apm1_text_ok: "entry_cancel"},
 				None
 			)
-		user["code"] = code
+		user["code"] = text
+		# todo Кажется костыль. По крайней мере в этом АРМ: animal_id быть не может, т.к. запись появится в базе после завершения работы над животным
 		user["animal_id"] = 0
-		return apm1_get_place(code)
+		return apm1_get_place(user["code"])
 	if key == 'apm1_place':
 		user['place'] = text
 		return apm1_get_date(user["code"])
