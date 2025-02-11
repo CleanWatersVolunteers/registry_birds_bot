@@ -61,13 +61,13 @@ def show_apm(username):
 				elif arm['arm_id'] == 1:
 					kbd[arm['arm_name']] = 'entry_apm2'
 				elif arm['arm_id'] == 2:
-					kbd[arm['arm_name']] = 'entry_apm4'
+					kbd[arm['arm_name']] = 'entry_apm3'
 				elif arm['arm_id'] == 3:
-					kbd[arm['arm_name']] = 'entry_apm5'
+					kbd[arm['arm_name']] = 'entry_apm4'
 				elif arm['arm_id'] == 4:
-					kbd[arm['arm_name']] = 'entry_apm6'
+					kbd[arm['arm_name']] = 'entry_apm5'
 				elif arm['arm_id'] == 5:
-					kbd[arm['arm_name']] = 'entry_apm7'
+					kbd[arm['arm_name']] = 'entry_apm6'
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
