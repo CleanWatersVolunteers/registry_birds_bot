@@ -10,24 +10,14 @@ from ui.apm6 import apm6_start, apm6_entry
 from ui.apm7 import apm7_start, apm7_entry
 from storage import storage
 
-entry_apm_list = {
-	"apm1": "Поступление",
-	"apm2": "Первичка на мойке",
-	"apm3": "Прием в стационар",
-	"apm4": "Первичка в стационаре",
-	"apm5": "Медицинский прием",
-	"apm6": "Нянька",
-	"apm7": "История",
-}
-
 apm_start_list = {
-	"apm1": apm1_start,
-	"apm2": apm2_start,
-	"apm3": apm3_start,
-	"apm4": apm4_start,
-	"apm5": apm5_start,
-	"apm6": apm6_start,
-	"apm7": apm7_start,
+	0: apm1_start,
+	1: apm2_start,
+	2: apm3_start,
+	3: apm4_start,
+	4: apm5_start,
+	5: apm6_start,
+	6: apm7_start,
 }
 apm_button_list = {
 	"apm1": apm1_entry,
@@ -45,6 +35,8 @@ def show_apm(username):
 	# todo Подставлять реальный location_id полученный из авторизации
 	location_id = 0
 	arm_list = storage.get_arms(location_id)
+	# arm_list = arm_list[:1]
+
 	user = db.get_user(username)
 	user["apm_list"] = arm_list
 	user["apm"] = None
@@ -55,26 +47,16 @@ def show_apm(username):
 		text = f'Выберите АРМ из списка ниже:'
 		if arm_list is not None:
 			for arm in arm_list:
-				# todo Продумать как убрать хардкод
-				if arm['arm_id'] == 0:
-					kbd[arm['arm_name']] = 'entry_apm1'
-				elif arm['arm_id'] == 1:
-					kbd[arm['arm_name']] = 'entry_apm2'
-				elif arm['arm_id'] == 2:
-					kbd[arm['arm_name']] = 'entry_apm3'
-				elif arm['arm_id'] == 3:
-					kbd[arm['arm_name']] = 'entry_apm4'
-				elif arm['arm_id'] == 4:
-					kbd[arm['arm_name']] = 'entry_apm5'
-				elif arm['arm_id'] == 5:
-					kbd[arm['arm_name']] = 'entry_apm6'
+				kbd[arm['arm_name']] = f'entry_apm{arm["arm_id"]}'
+			kbd['Выход'] = 'entry_exit'
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
 		text, kbd = code_request(user["apm_list"])
-		return f'{entry_apm_list[arm_list[0]]}\n{text}', kbd
+		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	else:
-		return 'APM не найдены!', None
+		kbd['Выход'] = 'entry_exit'
+		return 'APM не найдены!', kbd
 
 
 ##################################
@@ -95,27 +77,29 @@ def entry_start(username, text, key=None):
 			if user["animal_id"] == None:
 				code = code_parse(text)
 				if code > 0:
-					text, kbd, user["key"] = apm_start_list[user["apm"]](username, code, user["key"])
-					return f'{entry_apm_list[user["apm"]]}\n{text}', kbd
+					text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+					return f'{user["apm"]["arm_name"]}\n{text}', kbd
 				else:
 					txt, kbd = code_request(user["apm_list"])
-					return f'{entry_apm_list[user["apm"]]}\n❌ Неверный ввод: {text}\n{txt}', kbd
+					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {text}\n{txt}', kbd
 			else:
-				text, kbd, user["key"] = apm_start_list[user["apm"]](username, text, user["key"])
-				return f'{entry_apm_list[user["apm"]]}\n{text}', kbd
+				text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
+				return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(username)
 
 
 def entry_button(username, text, key):
+	if key == 'entry_exit':
+		db.clear_user(username)
+
 	user = db.get_user(username)
 	if not user:
 		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
-
 	if key == 'entry_cancel':
 		user["key"] = None
 		user["animal_id"] = None
 		text, kbd = code_request(user["apm_list"])
-		return f'{entry_apm_list[user["apm"]]}\n{text}', kbd
+		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 
 	if key == 'entry_menu':
 		return show_apm(username)
@@ -123,16 +107,19 @@ def entry_button(username, text, key):
 	# select item menu
 	keys = key.split('_')
 	if keys[0] == 'entry':
-		if keys[1] in entry_apm_list:
-			user["apm"] = keys[1]
-			text, kbd = code_request(user["apm_list"])
-			return f'{entry_apm_list[user["apm"]]}\n{text}', kbd
+		apm_id = int(keys[1][-1])
+		for apm in user["apm_list"]:
+			if apm['arm_id'] == apm_id:
+				user["apm"] = dict(apm)
+				text, kbd = code_request(user["apm_list"])
+				return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	if keys[0] in apm_button_list:
 		text, kbd = apm_button_list[keys[0]](username, text, key)
 		if not text:
 			user["key"] = None
 			user["animal_id"] = None
 			text, kbd = code_request(user["apm_list"])
-		# return show_apm(username)
-		return f'{entry_apm_list[user["apm"]]}\n{text}', kbd
+
+		return f'{user["apm"]["arm_name"]}\n{text}', kbd
+	print("[!!] Error key", key)
 	return text, None

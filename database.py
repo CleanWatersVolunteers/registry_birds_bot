@@ -1,6 +1,6 @@
 class Database:
-	apm_list = ['apm1', 'apm2', 'apm3','apm4','apm5','apm6','apm7'] # todo for test, read from base according user access
-	# apm_list = ['apm3'] 
+	# apm_list = ['apm1', 'apm2', 'apm3','apm4','apm5','apm6','apm7'] # todo for test, read from base according user access
+	apm_list = ['apm3'] 
 
 	user_list = {}
 
@@ -28,6 +28,10 @@ class Database:
 			return cls.user_list[name]
 		return {}
 
+	@classmethod
+	def clear_user(cls, name)->None:
+		if name in cls.user_list:
+			del cls.user_list[name]
 
 	@classmethod
 	def get_animal_id(cls, bar_code):
