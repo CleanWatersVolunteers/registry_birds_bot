@@ -41,6 +41,25 @@ qr_generation_menu = {
     "kbd_back_qr": "Назад"
 }
 
+async def ui_generate_qr_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    key = query.data
+    if key == "kbd_generate_old_qr":
+        await ui_generate_qr_old(update=update, context=context)
+    elif key == "kbd_generate_24_qr":
+        await ui_generate_qr_common(update=update, context=context, count=24)
+    elif key == "kbd_generate_48_qr":
+        await ui_generate_qr_common(update=update, context=context, count=48)
+    elif key == "kbd_generate_72_qr":
+        await ui_generate_qr_common(update=update, context=context, count=72)
+    elif key == "kbd_back_qr":
+        await ui_generate_qr_back(update=update, context=context)
+    else:
+        await ui_generate_qr_start(update=update, context=context)
+
+
 def merge_pdfs(pdf_buffers):
     merger = PdfMerger()
     for pdf_buffer in pdf_buffers:
@@ -58,15 +77,17 @@ async def ui_generate_qr_start(user=None, key=None, msg=None, update: Update = N
         if query:
             await query.answer()
             try:
-                await query.message.delete()
+                await query.message.edit_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
             except Exception as e:
-                print(f"[!!] Ошибка удаления старого меню: {e}")
-            await query.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
+                print(f"[!!] Ошибка при редактировании сообщения: {e}")
+                # Если сообщение не найдено, отправляем новое
+                await query.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
             return None
         elif update.message:
             await update.message.reply_text(TEXT_SELECT_QR_GENERATION, reply_markup=InlineKeyboardMarkup(keyboard))
             return None
     return TEXT_SELECT_QR_GENERATION, keyboard
+
 
 
 
@@ -150,10 +171,11 @@ async def ui_generate_qr_common(user=None, key=None, msg=None, update: Update = 
         print(f"[OK] Последний QR-код обновлен в БД: {end_number}")
 
         try:
-            await query.message.delete()
+            await query.message.delete()  # Попытка удалить старое меню
         except Exception as e:
             print(f"[!!] Ошибка удаления старого меню: {e}")
 
+        # Возвращение в меню генерации QR-кодов
         await ui_generate_qr_start(update=update, context=context)
         return None
 
