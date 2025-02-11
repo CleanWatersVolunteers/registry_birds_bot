@@ -3,7 +3,7 @@ from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from storage import storage
 from barcode_reader import barCodeReader
-from ui_generate_qr import ui_generate_qr_start
+from ui_generate_qr import ui_generate_qr_start, ui_generate_qr_handler, ui_receive_qr_numbers
 import re
 
 # Текстовые константы
@@ -139,7 +139,11 @@ welcome_handlers = {
     "kbd_done": ui_welcome,
 }
 
-welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start
+
+kbd_addr_list["kbd_generate_qr"] = TEXT_GENERATE_QR_BUTTON
+welcome_handlers.update({
+    "kbd_generate_qr": ui_generate_qr_start  # Только кнопка для перехода в меню генерации QR
+})
 
 from ui_load_bird import *
 from ui_apm1 import *
@@ -192,31 +196,22 @@ async def ui_button_pressed(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     user_id = query["from_user"]["username"]
     user = storage.get_user(user_id)
     if not user:
-        print(f'[..] New user {user_id}')
         storage.add_user(user_id)
         user = storage.get_user(user_id)
 
+    # Проверяем, если это кнопка из меню генерации QR-кодов
+    if query.data.startswith("kbd_generate_"):
+        await ui_generate_qr_handler(update=update, context=context)
+        return
+
     if query.data in welcome_handlers:
         handler = welcome_handlers[query.data]
-
-        # Проверяем, требует ли обработчик update/context
-        if handler in [
-            ui_generate_qr_start,
-            ui_generate_qr_old,
-            ui_generate_qr_24,
-            ui_generate_qr_48,
-            ui_generate_qr_72,
-            ui_generate_qr_back,
-        ]:
-            await handler(update=update, context=context)
-            return
-
         text, keyboard = handler(user, query.data, msg=query.message.text)
     else:
-        print(f'[!!] Got unknown kbd entry {query.data}')
         text, keyboard = ui_welcome(user)
 
     await query.edit_message_text(text=text, reply_markup=InlineKeyboardMarkup(keyboard))
+
 
 
 
@@ -241,21 +236,4 @@ async def ui_photo_entry(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             text, keyboard = ui_load_bird_barcode(user, msg='')
     await update.message.reply_text(f'{text}', reply_markup=InlineKeyboardMarkup(keyboard))
 
-from ui_generate_qr import (
-    ui_generate_qr_start,
-    ui_generate_qr_old,
-    ui_generate_qr_24,
-    ui_generate_qr_48,
-    ui_generate_qr_72,
-    ui_generate_qr_back,
-    ui_receive_qr_numbers
-)
 
-
-welcome_handlers.update({
-    "kbd_generate_old_qr": ui_generate_qr_old,
-    "kbd_generate_24_qr": ui_generate_qr_24,
-    "kbd_generate_48_qr": ui_generate_qr_48,
-    "kbd_generate_72_qr": ui_generate_qr_72,
-    "kbd_back_qr": ui_generate_qr_back
-})
