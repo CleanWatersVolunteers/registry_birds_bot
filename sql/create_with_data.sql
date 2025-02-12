@@ -15,7 +15,7 @@ USE `registry_birds`;
 -- Дамп структуры для таблица registry_birds.animals
 CREATE TABLE IF NOT EXISTS `animals` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `bar_code` int NOT NULL UNIQUE,
+  `bar_code` int NOT NULL,
   `registration_datetime` datetime NOT NULL,
   `place_capture` varchar(45) NOT NULL,
   `capture_datetime` datetime NOT NULL,
@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `species` varchar(45) DEFAULT NULL,
   `clinical_condition_admission` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `bar_code` (`bar_code`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -51,6 +52,19 @@ INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 	(7, 2, 2),
 	(8, 5, 0),
 	(9, 5, 1);
+
+-- Дамп структуры для таблица registry_birds.arm_access
+CREATE TABLE IF NOT EXISTS `arm_access` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `arm_id` int NOT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `password` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `fk_arm_access_arm_id` (`arm_id`),
+  CONSTRAINT `fk_arm_access_arm_id` FOREIGN KEY (`arm_id`) REFERENCES `arms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп структуры для таблица registry_birds.history
 CREATE TABLE IF NOT EXISTS `history` (

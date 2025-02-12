@@ -1,5 +1,6 @@
 from database import Database as db
-import re
+from datetime import datetime
+import pytz
 from ui.code import *
 from ui.apm1 import apm1_start, apm1_entry
 from ui.apm2 import apm2_start, apm2_entry
@@ -9,6 +10,8 @@ from ui.apm5 import apm5_start, apm5_entry
 from ui.apm6 import apm6_start, apm6_entry
 from ui.apm7 import apm7_start, apm7_entry
 from storage import storage
+
+NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
 
 entry_apm_list = {
 	"apm1": "Поступление",
@@ -86,6 +89,8 @@ def entry_start(username, text, key=None):
 
 	user = db.get_user(username)
 	if not user:
+		# todo Доделать авторизацию сохранив данные для дальнейшей работы
+		print(f'{storage.get_arm_access(NOW(), text)}')
 		if db.login(username, text):
 			user = db.get_user(username)
 	if not user:

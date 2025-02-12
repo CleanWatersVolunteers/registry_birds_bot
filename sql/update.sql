@@ -17,3 +17,9 @@ INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 	(8, 5, 0),
 	(9, 5, 1);
 UPDATE `registry_birds`.`manipulations` SET `place_list`='3' WHERE  `id`=6;
+
+-- Реализовать слой БД для СКУД #162
+INSERT INTO `arm_access` (`id`, `arm_id`, `start_date`, `end_date`, `password`) VALUES
+	(1, 1, '2025-02-12 00:00:00', '2026-02-12 00:00:00', '1111'),
+	(2, 2, '2025-02-12 01:09:39', '2026-02-12 02:09:45', '3333'),
+	(3, 3, '2025-03-12 02:10:11', '2025-06-12 02:10:27', '4444');
