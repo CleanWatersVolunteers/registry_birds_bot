@@ -1,6 +1,7 @@
 # Медицинский прием
 
 from database import Database as db
+from storage import storage
 
 apm5_text_species = "Введите вид животного"
 apm5_text_clinic_state = "Введите клиническое состояние"
@@ -12,7 +13,7 @@ apm5_text_clinic_state = "Введите клиническое состояни
 def apm5_start(username, text, key=None):
 	user = db.get_user(username)
 	if user["animal_id"] == None:
-		user["animal_id"] = db.get_animal_id(text)	
+		user["animal_id"] = storage.get_animal_id(text)	
 		if user["animal_id"] == None:
 			return (
 				f'❌ Животное с номером {text} не найдено!',
@@ -42,5 +43,9 @@ def apm5_start(username, text, key=None):
 def apm5_entry(username, text, key):
 	user = db.get_user(username)
 	if key == 'apm5_done':
-		db.update_animal(user["animal_id"], species=user["species"], clinical_condition_admission=user["clinic_state"])
+		storage.update_animal(
+			animal_id = user["animal_id"], 
+			species=user["species"], 
+			clinical_condition_admission=user["clinic_state"]
+		)
 	return None, None
