@@ -3,14 +3,14 @@
 from database import Database as db
 from storage import storage
 
-apm6_place_id = 6
+apm6_place_id = 5
 apm6_text = "Выберите манипуляцию:\n"
 
 def show_mpls(user, mpls):
 	kbd = dict()
 	text = ''
 	for mpl in mpls: # {'id':'1', "name":"манипуляция 1"}
-		if mpl["id"] in user["mpl_list"]:
+		if str(mpl["id"]) in user["mpl_list"]:
 			text += f'✅ {mpl["name"]}\n'
 		else:
 			kbd[mpl["name"]] = f'apm6_mpl_{mpl["id"]}'
