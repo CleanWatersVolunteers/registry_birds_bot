@@ -1,9 +1,8 @@
 # История
 
 from storage import storage
+from const import const
 
-apm7_text_ok = 'OK'
-apm7_text_animal_number = "Номер животного"
 apm7_text_capture_place = "Место отлова"
 apm7_text_capture_time = "Время отлова"
 apm7_text_pollution_degree = "Степень загрязнения"
@@ -30,7 +29,7 @@ def add_hdr_item(label, value):
 def ui_welcome_get_card(animal_id):
 	animal = storage.get_animal_by_id(animal_id)
 	if animal:
-		text = add_hdr_item(apm7_text_animal_number, animal["bar_code"])
+		text = add_hdr_item(const.text_animal_number, animal["bar_code"])
 		text += add_hdr_item(apm7_text_capture_place, animal["place_capture"])
 		text += add_hdr_item(apm7_text_capture_time, animal["capture_datetime"].strftime(apm7_capture_datetime_format))
 		text += add_hdr_item(apm7_text_pollution_degree, animal["degree_pollution"])
@@ -52,8 +51,8 @@ def apm7_start(username, text, key=None):
 	animal = storage.get_animal_by_bar_code(text)
 	if animal is None:
 		return (
-			f'❌ Животное с номером {text} не найдено!',
-			{apm7_text_ok: "entry_cancel"},
+			const.animal_not_found.format(code=text),
+			{const.text_ok: "entry_cancel"},
 			None
 		)
 
@@ -83,7 +82,7 @@ def apm7_start(username, text, key=None):
 		text += apm7_manipulations_not_found
 	else:
 		text += result_string.strip()
-	return text, {"Готово": "entry_cancel"}, None
+	return text, {const.text_done: "entry_cancel"}, None
 
 
 def apm7_entry(username, text, key):

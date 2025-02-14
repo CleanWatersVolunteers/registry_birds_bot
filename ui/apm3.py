@@ -2,13 +2,9 @@
 
 from database import Database as db
 from storage import storage
+from const import const
 
-apm3_text_header = "Животное №:"
 apm3_text = f"Введите массу животного в граммах"
-apm3_text_ok = 'OK'
-apm3_text_done = 'Готово'
-apm3_text_cancel = 'Отмена'
-apm3_text_incorrect = "Неверный ввод:"
 
 
 ##################################
@@ -18,31 +14,30 @@ apm3_text_incorrect = "Неверный ввод:"
 def apm3_start(username, text, key=None):
 	user = db.get_user(username)
 	if key is None:
-		code = text
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is None:
 			return (
-				f'❌ Животное с номером {code} не найдено!',
-				{apm3_text_ok: "entry_cancel"},
+				const.animal_not_found.format(code=text),
+				{const.text_ok: "entry_cancel"},
 				None
 			)
 		user["animal_id"] = animal['animal_id']
 		return (
-			f'{apm3_text_header} {text}\n{apm3_text}',
-			{apm3_text_cancel: "entry_cancel"},
+			f'{const.text_animal_number} {text}\n{apm3_text}',
+			{const.text_cancel: "entry_cancel"},
 			'apm3_weight'
 		)
 	if key == 'apm3_weight':
 		if not text.isdigit():
 			return (
-				f'{apm3_text_incorrect} {text}\n{apm3_text}',
-				{apm3_text_cancel: "entry_cancel"},
+				f'{const.text_incorrect} {text}\n{apm3_text}',
+				{const.text_cancel: "entry_cancel"},
 				'apm3_weight'
 			)
 		user['weight'] = text
 		return (
 			f'✅ Вес животного: {text} грамм',
-			{apm3_text_done: "apm3_done", apm3_text_cancel: "entry_cancel"},
+			{const.text_done: "apm3_done", const.text_cancel: "entry_cancel"},
 			None
 		)
 	return None, None

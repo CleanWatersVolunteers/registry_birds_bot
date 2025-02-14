@@ -2,12 +2,9 @@
 
 from database import Database as db
 from storage import storage
+from const import const
 
-apm2_text_animal_header = "Животное №:"
 apm2_text = f"Выполните необходимые манипуляции и нажмите 'Готово'"
-apm2_text_ok = 'OK'
-apm2_text_done = 'Готово'
-apm2_text_cancel = 'Отмена'
 
 
 ##################################
@@ -19,14 +16,14 @@ def apm2_start(username, text, key=None):
 	animal = storage.get_animal_by_bar_code(text)
 	if animal is None:
 		return (
-			f'❌ Животное с номером {text} не найдено!',
-			{apm2_text_ok: "entry_cancel"},
+			const.animal_not_found.format(code=text),
+			{const.text_ok: "entry_cancel"},
 			None
 		)
 	user["animal_id"] = animal['animal_id']
 	return (
-		f'{apm2_text_animal_header}{animal["bar_code"]}\n{apm2_text}',
-		{apm2_text_done: "apm2_done", apm2_text_cancel: "entry_cancel"},
+		f'{const.text_animal_number}{animal["bar_code"]}\n{apm2_text}',
+		{const.text_done: "apm2_done", const.text_cancel: "entry_cancel"},
 		None
 	)
 
