@@ -2,6 +2,7 @@
 
 from database import Database as db
 from storage import storage
+from const import const
 
 apm6_place_id = 5
 apm6_text = "Выберите манипуляцию:\n"
@@ -14,7 +15,7 @@ def show_mpls(user, mpls):
 			text += f'✅ {mpl["name"]}\n'
 		else:
 			kbd[mpl["name"]] = f'apm6_mpl_{mpl["id"]}'
-	kbd["Готово"] = "entry_cancel"
+	kbd[const.text_done] = "entry_cancel"
 	text += apm6_text
 	return text, kbd
 
@@ -28,8 +29,8 @@ def apm6_start(username, text, key=None):
 		user["animal_id"] = storage.get_animal_id(text)	
 		if user["animal_id"] == None:
 			return (
-				f'❌ Животное с номером {text} не найдено!',
-				{"Отмена": "entry_cancel"}, None
+				const.animal_not_found.format(code=text),
+				{const.text_ok: "entry_cancel"}, None
 			)
 		user["mpl_list"] = []
 	# get manipulation list
@@ -37,7 +38,7 @@ def apm6_start(username, text, key=None):
 	if len(mpls) == 0:
 		return (
 			"❌ Манипуляции не найдены!",
-			{"Выход": "entry_cancel"}, None
+			{const.text_exit: "entry_cancel"}, None
 		)
 	text,kbd = show_mpls(user, mpls)
 	return text, kbd, None

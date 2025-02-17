@@ -51,14 +51,14 @@ def show_apm(username):
 		if arm_list is not None:
 			for arm in arm_list:
 				kbd[arm['arm_name']] = f'entry_apm{arm["arm_id"]}'
-			kbd['Выход'] = 'entry_exit'
+			kbd[const.text_exit] = 'entry_exit'
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
 		text, kbd = code_request(user["apm_list"])
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	else:
-		kbd['Выход'] = 'entry_exit'
+		kbd[const.text_exit] = 'entry_exit'
 		return 'APM не найдены!', kbd
 
 

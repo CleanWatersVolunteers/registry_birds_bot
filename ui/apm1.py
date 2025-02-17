@@ -5,20 +5,16 @@ import pytz
 import re
 from database import Database as db
 from storage import storage
+from const import const
 
 GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
 GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
 GET_NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%d.%m.%Y")
 
-apm1_text_header = "Животное №:"
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
 apm1_text_pollution = 'Укажите степень загрязнения'
-apm1_text_incorrect = "Неверный ввод:"
-apm1_text_ok = 'OK'
-apm1_text_done = 'Готово'
-apm1_text_cancel = 'Отмена'
 apm1_text_today = 'Сегодня'
 
 apm1_pollution_grade = {
@@ -27,7 +23,7 @@ apm1_pollution_grade = {
 	"apm1_pollution_2": "50%",
 	"apm1_pollution_3": "75%",
 	"apm1_pollution_4": "100%",
-	"entry_cancel": apm1_text_cancel,
+	"entry_cancel": const.text_cancel,
 }
 
 
@@ -45,8 +41,8 @@ def apm1_time_validate(msg, user):
 	time = get_valid_time(msg)  # '10:15'
 	if not time:
 		return (
-			f'{apm1_text_incorrect} {msg}\n{apm1_text_time}',
-			{apm1_text_cancel: "entry_cancel"},
+			f'{const.text_incorrect} {msg}\n{apm1_text_time}',
+			{const.text_cancel: "entry_cancel"},
 			'apm1_time_validate'
 		)
 	user['capture_datetime'] = f'''{user['capture_datetime']} {time}'''
@@ -65,8 +61,8 @@ def apm1_manual_data_validate(msg, user):
 			date = None
 	if not time or not date:
 		return (
-			f'{apm1_text_incorrect} {msg}\n{apm1_text_date}',
-			{apm1_text_today: "apm1_today", apm1_text_cancel: "entry_cancel"},
+			f'{const.text_incorrect} {msg}\n{apm1_text_date}',
+			{apm1_text_today: "apm1_today", const.text_cancel: "entry_cancel"},
 			'apm1_pollution'
 		)
 	user['capture_datetime'] = f'{date} {time}'
@@ -75,24 +71,24 @@ def apm1_manual_data_validate(msg, user):
 
 def apm1_get_place(code):
 	return (
-		f'{apm1_text_header} {code}\n{apm1_text_place}',
-		{apm1_text_cancel: "entry_cancel"},
+		f'{const.text_animal_number} {code}\n{apm1_text_place}',
+		{const.text_cancel: "entry_cancel"},
 		'apm1_place'
 	)
 
 
 def apm1_get_time(code):
 	return (
-		f'{apm1_text_header} {code}\n{apm1_text_time}',
-		{apm1_text_cancel: "entry_cancel"},
+		f'{const.text_animal_number} {code}\n{apm1_text_time}',
+		{const.text_cancel: "entry_cancel"},
 		'apm1_time_validate'
 	)
 
 
 def apm1_get_date(code):
 	return (
-		f'{apm1_text_header} {code}\n{apm1_text_date}',
-		{apm1_text_today: "apm1_today", apm1_text_cancel: "entry_cancel"},
+		f'{const.text_animal_number} {code}\n{apm1_text_date}',
+		{apm1_text_today: "apm1_today", const.text_cancel: "entry_cancel"},
 		'apm1_manual_date'
 	)
 
@@ -102,18 +98,18 @@ def apm1_get_pollution(code):
 	for key in apm1_pollution_grade:
 		kbd[apm1_pollution_grade[key]] = key
 	return (
-		f'{apm1_text_header} {code}\n{apm1_text_pollution}',
+		f'{const.text_animal_number} {code}\n{apm1_text_pollution}',
 		kbd,
 		'apm1_pollution'
 	)
 
 
 def show_result(user):
-	text = f'✅ Животное: {user["code"]}\n'
+	text = f'✅ {const.text_animal_number} {user["code"]}\n'
 	text += f'✅ Место отлова: {user["place"]}\n'
 	text += f'✅ Время отлова: {user["capture_datetime"]}\n'
 	text += f'✅ Степень загрязнения: {user["pollution"]}\n'
-	return text, {apm1_text_done: "apm1_done", apm1_text_cancel: "entry_cancel"}, None
+	return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
 
 ##################################
@@ -128,7 +124,7 @@ def apm1_start(username, text, key=None):
 		if animal is not None:
 			return (
 				f'❌ Животное с номером {text} уже зарегистрировано!',
-				{apm1_text_ok: "entry_cancel"},
+				{const.text_ok: "entry_cancel"},
 				None
 			)
 		user["code"] = text
@@ -160,12 +156,12 @@ def apm1_entry(username, msg, key):
 	keys = key.split('_')
 	if keys[1] == 'pollution':
 		user["pollution"] = apm1_pollution_grade[key]
-		text = f'Проверьте, что данные введены верно и нажмите {apm1_text_done}\n'
-		text += f'✅ Животное: {user["code"]}\n'
+		text = f'Проверьте, что данные введены верно и нажмите {const.text_done}\n'
+		text += f'✅ {const.text_animal_number} {user["code"]}\n'
 		text += f'✅ Место отлова: {user["place"]}\n'
 		text += f'✅ Время отлова: {user["capture_datetime"]}\n'
 		text += f'✅ Степень загрязнения: {user["pollution"]}\n'
-		return text, {apm1_text_done: "apm1_done", apm1_text_cancel: "entry_cancel"}
+		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}
 
 	if key == 'apm1_done':
 		storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"], place=user["place"],
