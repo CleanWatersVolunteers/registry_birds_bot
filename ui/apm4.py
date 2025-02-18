@@ -5,18 +5,17 @@ from storage import storage
 from const import const
 
 apm4_place_id = 3
-apm4_text = "Выберите манипуляцию:\n"
 
 def show_mpls(user, mpls):
 	kbd = dict()
-	text = ''
+	text = f'{const.text_animal_number} {user["bar_code"]}\n'
 	for mpl in mpls: # {'id':'1', "name":"манипуляция 1"}
 		if str(mpl["id"]) in user["mpl_list"]:
 			text += f'✅ {mpl["name"]}\n'
 		else:
 			kbd[mpl["name"]] = f'apm4_mpl_{mpl["id"]}'
 	kbd["Готово"] = "entry_cancel"
-	text += apm4_text
+	text += f'{const.text_manipulation_done}'
 	return text, kbd
 
 ##################################
@@ -25,14 +24,17 @@ def show_mpls(user, mpls):
 
 def apm4_start(username, text, key=None):
 	user = db.get_user(username)
-	if user["animal_id"] == None:
-		user["animal_id"] = storage.get_animal_id(text)	
-		if user["animal_id"] == None:
+	if key is None:
+		animal = storage.get_animal_by_bar_code(text)
+		if animal is None:
 			return (
 				const.animal_not_found.format(code=text),
-				{const.text_ok: "entry_cancel"}, None
+				{const.text_ok: "entry_cancel"},
+				None
 			)
-		user["mpl_list"] = []
+		user["animal_id"] = animal['animal_id']
+		user["bar_code"] = text
+	user["mpl_list"] = []
 	# get manipulation list
 	mpls = storage.get_manipulations(apm4_place_id)
 	if len(mpls) == 0:
