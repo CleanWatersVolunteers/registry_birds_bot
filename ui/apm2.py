@@ -4,8 +4,6 @@ from database import Database as db
 from storage import storage
 from const import const
 
-apm2_text = f"Выполните необходимые манипуляции и нажмите 'Готово'"
-
 
 ##################################
 # Global API
@@ -22,7 +20,7 @@ def apm2_start(username, text, key=None):
 		)
 	user["animal_id"] = animal['animal_id']
 	return (
-		f'{const.text_animal_number}{animal["bar_code"]}\n{apm2_text}',
+		f'{const.text_animal_number}{animal["bar_code"]}\n{const.text_manipulation_done}',
 		{const.text_done: "apm2_done", const.text_cancel: "entry_cancel"},
 		None
 	)

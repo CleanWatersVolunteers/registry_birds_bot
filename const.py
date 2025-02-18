@@ -7,3 +7,4 @@ class const:
 	text_animal_number = 'Животное №:'
 	text_exit = 'Выход'
 	animal_not_found = '❌ Животное с номером {code} не найдено!'
+	text_manipulation_done = "Выполните необходимые манипуляции и нажмите 'Готово'"
