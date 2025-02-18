@@ -119,7 +119,7 @@ def entry_button(username, text, key):
 				text, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	if keys[0] in apm_button_list:
-		text, kbd = apm_button_list[keys[0]](username, text, key)
+		text, kbd, user["key"] = apm_button_list[keys[0]](username, text, key)
 		if not text:
 			user["key"] = None
 			user["animal_id"] = None

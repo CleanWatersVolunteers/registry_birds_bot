@@ -86,4 +86,4 @@ def apm7_start(username, text, key=None):
 
 
 def apm7_entry(username, text, key):
-	return None, None
+	return None, None, None

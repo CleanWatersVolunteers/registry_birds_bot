@@ -54,4 +54,4 @@ def apm3_entry(username, msg, key):
 		storage.insert_place_history(arm_id, user["animal_id"], username)
 		storage.update_animal(user["animal_id"], weight=user['weight'])
 		user['weight'] = None  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
-	return None, None
+	return None, None, None
