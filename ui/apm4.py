@@ -6,10 +6,11 @@ from const import const
 
 apm4_place_id = 3
 
+
 def show_mpls(user, mpls):
 	kbd = dict()
 	text = f'{const.text_animal_number} {user["bar_code"]}\n'
-	for mpl in mpls: # {'id':'1', "name":"манипуляция 1"}
+	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
 		if str(mpl["id"]) in user["mpl_list"]:
 			text += f'✅ {mpl["name"]}\n'
 		else:
@@ -42,8 +43,9 @@ def apm4_start(username, text, key=None):
 			"❌ Манипуляции не найдены!",
 			{const.text_exit: "entry_cancel"}, None
 		)
-	text,kbd = show_mpls(user, mpls)
+	text, kbd = show_mpls(user, mpls)
 	return text, kbd, None
+
 
 def apm4_entry(username, text, key):
 	user = db.get_user(username)
@@ -51,10 +53,10 @@ def apm4_entry(username, text, key):
 	user["mpl_list"].append(id)
 	storage.insert_history(
 		manipulation_id=id,
-		animal_id = user["animal_id"],
-		arms_id = user["apm"]["arm_id"],
-		tg_nickname = username
+		animal_id=user["animal_id"],
+		arms_id=user["apm"]["arm_id"],
+		tg_nickname=username
 	)
 	mpls = storage.get_manipulations(apm4_place_id)
-	text,kbd = show_mpls(user, mpls)
-	return text,kbd
+	text, kbd = show_mpls(user, mpls)
+	return text, kbd, None

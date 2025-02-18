@@ -6,7 +6,6 @@ from const import const
 
 apm5_text_species = "Введите вид животного"
 apm5_text_clinic_state = "Введите клиническое состояние"
-apm5_text_check = f'Проверьте, что данные введены верно и нажмите "{const.text_done}"\n'
 
 
 ##################################
@@ -40,7 +39,7 @@ def apm5_start(username, text, key=None):
 	if key == 'apm5_clinic_state':
 		user["clinic_state"] = text
 		text = f'{const.text_animal_number} {user["bar_code"]}\n'
-		text += f'{apm5_text_check}\n'
+		text += f'{const.text_data_check}\n'
 		text += f'❓ Вид: {user["species"]}\n'
 		text += f'❓ Клиническое состояние: {user["clinic_state"]}\n'
 		return text, {const.text_done: "apm5_done", const.text_cancel: "entry_cancel"}, None
@@ -61,4 +60,4 @@ def apm5_entry(username, text, key):
 			clinical_condition_admission=user["clinic_state"]
 		)
 
-	return None, None
+	return None, None, None

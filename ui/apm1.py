@@ -156,14 +156,14 @@ def apm1_entry(username, msg, key):
 	keys = key.split('_')
 	if keys[1] == 'pollution':
 		user["pollution"] = apm1_pollution_grade[key]
-		text = f'Проверьте, что данные введены верно и нажмите {const.text_done}\n'
+		text = f'{const.text_data_check}'
 		text += f'✅ {const.text_animal_number} {user["code"]}\n'
 		text += f'✅ Место отлова: {user["place"]}\n'
 		text += f'✅ Время отлова: {user["capture_datetime"]}\n'
 		text += f'✅ Степень загрязнения: {user["pollution"]}\n'
-		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}
+		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
 	if key == 'apm1_done':
 		storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"], place=user["place"],
 							  pollution=user["pollution"])
-	return None, None
+	return None, None, None

@@ -8,3 +8,4 @@ class const:
 	text_exit = 'Выход'
 	animal_not_found = '❌ Животное с номером {code} не найдено!'
 	text_manipulation_done = "Выполните необходимые манипуляции и нажмите 'Готово'"
+	text_data_check = "Проверьте, что данные введены верно и нажмите 'Готово'\n"
