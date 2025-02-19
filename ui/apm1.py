@@ -30,7 +30,7 @@ apm1_pollution_grade = {
 }
 
 
-def get_date(date: str) -> str | None:
+def get_date(date: str):
 	date = GET_DATE(date)
 	if date:
 		date = date[0]
@@ -39,7 +39,7 @@ def get_date(date: str) -> str | None:
 	return date
 
 
-def get_time(time) -> str | None:
+def get_time(time):
 	time = GET_TIME(time)
 	if time:
 		time = time[0]

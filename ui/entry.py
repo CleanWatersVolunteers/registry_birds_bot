@@ -125,3 +125,30 @@ def entry_button(username, text, key):
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	print("[!!] Error key", key)
 	return text, None
+
+
+def entry_photo(username, data):
+	kbd = {}
+
+	user = db.get_user(username)
+	if not user:
+		# todo Доделать авторизацию сохранив данные для дальнейшей работы
+		access_data = storage.get_arm_access(NOW(), text)
+		if db.login(username, text, access_data[0]["location_id"]):
+			user = db.get_user(username)
+	if not user:
+		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
+	else:
+		if user["apm"]:
+			if user["animal_id"] is None:
+				code = code_parse(data)
+				if code > 0:
+					text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+					return f'{user["apm"]["arm_name"]}\n{text}', kbd
+				else:
+					txt, kbd = code_request(user["apm_list"])
+					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {text}\n{txt}', kbd
+			else:
+				text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
+				return f'{user["apm"]["arm_name"]}\n{text}', kbd
+		return show_apm(user)
