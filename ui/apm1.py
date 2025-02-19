@@ -9,11 +9,14 @@ from const import const
 
 GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
 GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
-GET_NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%d.%m.%Y")
+GET_NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime(const.date_format)
+GET_DATETIME = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4} \d{1,2}:\d{1,2}', text)
+GET_NOW_TIME = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime(const.datetime_format)
 
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
+apm1_wrong_time_input = "Ошибка, дата отлова не может быть раньше 24 часов или позже текущего времени"
 apm1_text_pollution = 'Укажите степень загрязнения'
 apm1_text_today = 'Сегодня'
 
@@ -27,46 +30,81 @@ apm1_pollution_grade = {
 }
 
 
-def get_valid_time(time):
+def get_date(date: str) -> str | None:
+	date = GET_DATE(date)
+	if date:
+		date = date[0]
+		if not is_valid_datetime(date, const.date_format):
+			return None
+	return date
+
+
+def get_time(time) -> str | None:
 	time = GET_TIME(time)
 	if time:
 		time = time[0]
-	t = time.split(':')
-	if int(t[0]) > 23 or int(t[1]) > 59:
-		time = None
+		if not is_valid_datetime(time, const.time_format):
+			return None
 	return time
 
 
+def is_valid_datetime(date_str, date_format="%d.%m.%Y"):
+	"""Проверяет, существует ли указанная дата в календаре."""
+	try:
+		datetime.strptime(date_str, date_format)
+		return True
+	except ValueError:
+		return False
+
+
+def validate_datetime(user, date_input, time_input):
+	"""
+	Проверяет, соответствует ли время следующим условиям:
+		1 - Текущее время не раньше, чем указанное время
+		2 - Текущее время не позже 24 часов, чем указанное время
+	"""
+	time_now = GET_NOW_TIME()
+	user_time = GET_DATETIME(f'{date_input} {time_input}').string
+
+	# Преобразуем строки в формат datetime
+	time1 = datetime.strptime(time_now, const.datetime_format)
+	time2 = datetime.strptime(user_time, const.datetime_format)
+	time_diff = time1 - time2
+
+	if time1 < time2 or time_diff.days > 0:
+		return (
+			f'{const.text_incorrect} {user_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
+			{apm1_text_today: "apm1_today", const.text_cancel: "entry_cancel"},
+			'apm1_manual_date'
+		)
+	else:
+		user['capture_datetime'] = user_time
+		return apm1_get_pollution(user["code"])
+
+
+# Проверка времени
 def apm1_time_validate(msg, user):
-	time = get_valid_time(msg)  # '10:15'
+	time = get_time(msg)  # '10:15'
 	if not time:
 		return (
 			f'{const.text_incorrect} {msg}\n{apm1_text_time}',
 			{const.text_cancel: "entry_cancel"},
 			'apm1_time_validate'
 		)
-	user['capture_datetime'] = f'''{user['capture_datetime']} {time}'''
-	return apm1_get_pollution(user["code"])
+	return validate_datetime(user, user["capture_datetime"], time)
 
 
+# Проверка даты и времени
 def apm1_manual_data_validate(msg, user):
-	date = GET_DATE(msg)  # '16.01.2025'
-	now = GET_NOW()  # '17.01.2025'
-	time = get_valid_time(msg)  # '10:15'
-	if date:
-		date = date[0]
-		d = date.split('.')  # ['16', '01', '2025']
-		n = now.split('.')  # ['17', '01', '2025']
-		if n[2] != d[2] or n[1] != d[1] or int(d[0]) < (int(n[0]) - 1) or int(d[0]) > int(n[0]):
-			date = None
+	date = get_date(msg)  # '16.01.2025'
+	time = get_time(msg)  # '10:15'
 	if not time or not date:
 		return (
 			f'{const.text_incorrect} {msg}\n{apm1_text_date}',
 			{apm1_text_today: "apm1_today", const.text_cancel: "entry_cancel"},
-			'apm1_pollution'
+			'apm1_manual_date'
 		)
-	user['capture_datetime'] = f'{date} {time}'
-	return apm1_get_pollution(user["code"])
+	return validate_datetime(user, date, time)
 
 
 def apm1_get_place(code):
@@ -77,6 +115,7 @@ def apm1_get_place(code):
 	)
 
 
+# Ввод времени
 def apm1_get_time(code):
 	return (
 		f'{const.text_animal_number} {code}\n{apm1_text_time}',
@@ -85,6 +124,7 @@ def apm1_get_time(code):
 	)
 
 
+# Ввод даты и времени полностью или сегодняшней даты
 def apm1_get_date(code):
 	return (
 		f'{const.text_animal_number} {code}\n{apm1_text_date}',
@@ -106,8 +146,8 @@ def apm1_get_pollution(code):
 
 def show_result(user):
 	text = f'✅ {const.text_animal_number} {user["code"]}\n'
-	text += f'✅ Место отлова: {user["place"]}\n'
-	text += f'✅ Время отлова: {user["capture_datetime"]}\n'
+	text += f'✅ {const.text_capture_place}: {user["place"]}\n'
+	text += f'✅ {const.text_capture_time}: {user["capture_datetime"]}\n'
 	text += f'✅ Степень загрязнения: {user["pollution"]}\n'
 	return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
@@ -158,8 +198,8 @@ def apm1_entry(username, msg, key):
 		user["pollution"] = apm1_pollution_grade[key]
 		text = f'{const.text_data_check}'
 		text += f'✅ {const.text_animal_number} {user["code"]}\n'
-		text += f'✅ Место отлова: {user["place"]}\n'
-		text += f'✅ Время отлова: {user["capture_datetime"]}\n'
+		text += f'✅ {const.text_capture_place}: {user["place"]}\n'
+		text += f'✅ {const.text_capture_time}: {user["capture_datetime"]}\n'
 		text += f'✅ Степень загрязнения: {user["pollution"]}\n'
 		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
