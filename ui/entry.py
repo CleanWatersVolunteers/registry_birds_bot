@@ -33,12 +33,9 @@ apm_button_list = {
 }
 
 
-def show_apm(username):
+def show_apm(user):
 	kbd = {}
-	# todo Подставлять реальный location_id полученный из авторизации
-	location_id = 0
-	arm_list = storage.get_arms(location_id)
-	user = db.get_user(username)
+	arm_list = storage.get_arms(user["location_id"])
 	user["apm_list"] = arm_list
 	user["apm"] = None
 	user["key"] = None
@@ -72,14 +69,14 @@ def entry_start(username, text, key=None):
 	user = db.get_user(username)
 	if not user:
 		# todo Доделать авторизацию сохранив данные для дальнейшей работы
-		print(f'{storage.get_arm_access(NOW(), text)}')
-		if db.login(username, text):
+		access_data = storage.get_arm_access(NOW(), text)
+		if db.login(username, text, access_data[0]["location_id"]):
 			user = db.get_user(username)
 	if not user:
 		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
 	else:
 		if user["apm"]:
-			if user["animal_id"] == None:
+			if user["animal_id"] is None:
 				code = code_parse(text)
 				if code > 0:
 					text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
@@ -90,7 +87,7 @@ def entry_start(username, text, key=None):
 			else:
 				text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
 				return f'{user["apm"]["arm_name"]}\n{text}', kbd
-		return show_apm(username)
+		return show_apm(user)
 
 
 def entry_button(username, text, key):
@@ -107,7 +104,7 @@ def entry_button(username, text, key):
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 
 	if key == 'entry_menu':
-		return show_apm(username)
+		return show_apm(user)
 
 	# select item menu
 	keys = key.split('_')

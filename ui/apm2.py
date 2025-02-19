@@ -30,8 +30,7 @@ def apm2_entry(username, text, key):
 	user = db.get_user(username)
 	# todo Использовать arm_id из базы #154
 	place_id = 1
-	location_id = 0
-	arm_id = storage.get_arm_id(place_id, location_id)
+	arm_id = storage.get_arm_id(place_id, user["location_id"])
 	# todo Использовать arm_id из базы #154
 	storage.insert_place_history(arm_id, user["animal_id"], username)
 	return None, None, None
