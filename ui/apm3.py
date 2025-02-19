@@ -48,8 +48,7 @@ def apm3_entry(username, msg, key):
 	if key == "apm3_done":
 		# todo Использовать arm_id из базы #154
 		place_id = 2
-		location_id = 0
-		arm_id = storage.get_arm_id(place_id, location_id)
+		arm_id = storage.get_arm_id(place_id, user["location_id"])
 		# todo Использовать arm_id из базы #154
 		storage.insert_place_history(arm_id, user["animal_id"], username)
 		storage.update_animal(user["animal_id"], weight=user['weight'])

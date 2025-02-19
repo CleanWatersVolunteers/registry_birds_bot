@@ -11,13 +11,14 @@ class Database:
 		pass
 
 	@classmethod
-	def login(cls, name, pswd)->bool:
+	def login(cls, name, pswd, location_id)->bool:
 		if not name in cls.user_list:
 			if pswd != '1111':
 				return False
 			cls.user_list[name] = dict()
 			cls.user_list[name]["apm_list"] = cls.apm_list
 			cls.user_list[name]["apm"] = None
+			cls.user_list[name]["location_id"] = location_id
 			cls.user_list[name]["animal_id"] = None
 		# return True if login OK else False
 		return True
