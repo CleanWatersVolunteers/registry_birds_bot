@@ -87,10 +87,11 @@ def entry_start(username, text, key=None):
 		return f'Здравствуйте {username}!\n⚠ Введите пароль', None
 	else:
 		if user["apm"]:
-			code = code_parse(text)
-			if code == 0:
-				txt, kbd = code_request(user["apm_list"])
-				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
+			if not 'animal_id' in user:
+				code = code_parse(text)
+				if code == 0:
+					txt, kbd = code_request(user["apm_list"])
+					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, text, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user, arm_list)
@@ -104,9 +105,10 @@ def entry_photo(username, data):
 		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
 	else:
 		if user["apm"]:
-			if code == 0:
-				txt, kbd = code_request(user["apm_list"])
-				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
+			if not 'animal_id' in user:
+				if code == 0:
+					txt, kbd = code_request(user["apm_list"])
+					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user, user["apm_list"])
