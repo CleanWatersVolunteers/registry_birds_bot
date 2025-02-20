@@ -38,6 +38,6 @@ def code_parse(code)->int:
 	codes = code_reader(code)
 	if len(codes) == 1:
 		if codes[0].isdigit():
-			return codes[0]
+			return int(codes[0])
 	return 0
 	

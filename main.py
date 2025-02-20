@@ -62,11 +62,11 @@ async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 	text, keyboard = entry_photo(username, data)
 	try:
 		if keyboard:
-			await query.edit_message_text(text=text, 
+			await update.message.reply_text(text=text,
 				reply_markup=InlineKeyboardMarkup(kbd_to_inline(keyboard))
 			)
 		else:
-			await query.message.reply_text(text=text)
+			await update.message.reply_text(text=text)
 		
 	except Exception as e:
 		print('[!!] Exception ', e)
