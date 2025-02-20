@@ -58,7 +58,6 @@ def nanny_feeding(msg, user, username) -> (str,):
 
 
 def show_mpls(user, mpls):
-	print("show_mpls")
 	kbd = dict()
 	text = f'{const.text_animal_number} {user["bar_code"]}\n'
 	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
@@ -81,7 +80,7 @@ def apm6_start(username, text, key=None):
 		return nanny_feeding(text, user, username)
 	elif key == 'apm6_weighing':
 		return nanny_weighing(text, user, username)
-		
+
 	if key is None:
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is None:
@@ -108,7 +107,7 @@ def apm6_entry(username, text, key):
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
 		manipulation_id = match.group()
-		print(f'manipulation_id: {manipulation_id}')
+		print(f'[..] Выбрана manipulation_id: {manipulation_id}')
 		user["mpl_list"].append(manipulation_id)
 		if int(manipulation_id) == feeding_manipulations_id:
 			return (
