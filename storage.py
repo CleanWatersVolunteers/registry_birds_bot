@@ -287,6 +287,19 @@ class storage:
 			return arm_id
 		return None
 
+	@classmethod
+	def access_data(cls, place_id, location_id):
+		query = """
+			SELECT aa.*, p.name
+			FROM arm_access aa
+			JOIN arms a ON aa.arm_id = a.id
+			JOIN places p ON p.id = a.place_id
+			WHERE a.place_id = %s AND a.location_id = %s
+			ORDER BY start_date
+			"""
+		data = (place_id, location_id)
+		return cls.execute_query(query, data, fetch=True)
+
 	# Возвращает информацию для авторизации
 	@classmethod
 	def get_arm_access(cls, datetime_now, password):

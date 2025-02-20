@@ -45,7 +45,6 @@ def show_apm(user, arm_list):
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
 		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
-		arm_list.append({'arm_id': 7, 'arm_name': '🔲 Генерация QR', 'place_id': 7})
 		text = f'Выберите АРМ из списка ниже:'
 		if arm_list is not None:
 			for arm in arm_list:
@@ -130,10 +129,11 @@ def entry_button(username, text, key):
 	if key == 'entry_menu':
 		return show_apm(user, user["apm_list"])
 
-	if key == 'entry_apm7': # QR-generate
+	if key == 'entry_apm7':  # Старший смены
+		if user["apm"] is None:
+			user["apm"] = dict({"arm_name": "Старший смены"})
 		text, kbd, user["key"] = apm8_entry(username, text, key)
 		return text, kbd
-
 
 	# select item menu
 	keys = key.split('_')

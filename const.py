@@ -12,6 +12,7 @@ class const:
 	text_capture_time = "Время отлова"
 	text_capture_place = "Место отлова"
 
+	datetime_short_format = "%d.%m.%y %H:%M"
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"

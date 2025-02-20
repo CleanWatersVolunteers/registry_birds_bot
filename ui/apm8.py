@@ -1,51 +1,62 @@
-# Генерация QR
-
-from database import Database as db
+# Старший смены
 from storage import storage
 from const import const
 
-gen_text_sel_mode = "📌 Выберите способ генерации QR-кодов"
+apm8_location_id = 0  # Пока хардкод
 
-gen_kbd_sel_mode = {
-	"Старые QR":"apm8_old",
-	"24 новых":"apm8_new24",
-	"48 новых":"apm8_new48",
-	"72 новых":"apm8_new72",
-	"Отмена":"entry_cancel"
-}
+
+def get_duty_info(item):
+	return f'\nПароль: {item["password"]}\nНачало: {item["start_date"].strftime(const.datetime_short_format)}\nОкончание: {item["end_date"].strftime(const.datetime_short_format)}'
+
+
+def arm_info(place_id):
+	data = storage.access_data(place_id, apm8_location_id)
+	if data:
+		text = '------------------------\n'
+		has_place_name = False
+		for item in data:
+			if not has_place_name:
+				text += f'{item["name"]}\n-----------------{get_duty_info(item)}'
+				has_place_name = True
+			else:
+				text += f'{get_duty_info(item)}'
+			text += '\n-----------------'
+		kbd = {const.text_done: 'entry_apm7'}
+		return text, kbd, None
+	else:
+		return (
+			f'Нет данных',
+			{const.text_done: "entry_apm7"},
+			None
+		)
+
+
 ##################################
 # Global API
 ##################################
 
 def apm8_start(username, text, key=None):
-	print("GEN START:", username, text, key)
-	# user = db.get_user(username)
-	# animal = storage.get_animal_by_bar_code(text)
-	# if animal is None:
-	# 	return (
-	# 		const.animal_not_found.format(code=text),
-	# 		{const.text_ok: "entry_cancel"},
-	# 		None
-	# 	)
-	# user["animal_id"] = animal['animal_id']
-	# return (
-	# 	f'{const.text_animal_number}{animal["bar_code"]}\n{const.text_manipulation_done}',
-	# 	{const.text_done: "apm2_done", const.text_cancel: "entry_cancel"},
-	# 	None
-	# )
-	return None, None, None 
+	if key is None:
+		kbd = {}
+		arm_list = storage.get_arms(apm8_location_id)
+		if arm_list is not None:
+			for arm in arm_list:
+				kbd[arm['arm_name']] = f'entry_apm{arm["arm_id"]}'
+			kbd[const.text_exit] = 'entry_cancel'
+			return text, kbd
+	return None, None, None
 
 
 def apm8_entry(username, text, key):
-	print("GEN ENTRY:", username, text, key)
-	kbd = {}
-	text = gen_text_sel_mode
-	# kbd = gen_kbd_sel_mode
-	kbd["Готово"] = "entry_menu"
-	# user = db.get_user(username)
-	# # todo Использовать arm_id из базы #154
-	# place_id = 1
-	# arm_id = storage.get_arm_id(place_id, user["location_id"])
-	# # todo Использовать arm_id из базы #154
-	# storage.insert_place_history(arm_id, user["animal_id"], username)
-	return text, kbd, None # text, kbd, key
+	if 'place_' in key:
+		return arm_info(key.split('_')[2])
+	if key == 'entry_apm7':
+		kbd = {}
+		text = 'Рабочие смены:'
+		arm_list = storage.get_arms(apm8_location_id)
+		if arm_list is not None:
+			for arm in arm_list:
+				kbd[arm["arm_name"]] = f'apm8_place_{arm["place_id"]}'
+			kbd[const.text_exit] = 'entry_exit'
+			return text, kbd, None
+	return None, None, None
