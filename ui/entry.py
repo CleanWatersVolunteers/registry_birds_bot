@@ -9,6 +9,7 @@ from ui.apm4 import apm4_start, apm4_entry
 from ui.apm5 import apm5_start, apm5_entry
 from ui.apm6 import apm6_start, apm6_entry
 from ui.apm7 import apm7_start, apm7_entry
+from ui.apm8 import apm8_start, apm8_entry
 from storage import storage
 
 NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
@@ -21,6 +22,7 @@ apm_start_list = {
 	4: apm5_start,
 	5: apm6_start,
 	6: apm7_start,
+	7: apm8_start,
 }
 apm_button_list = {
 	"apm1": apm1_entry,
@@ -30,6 +32,7 @@ apm_button_list = {
 	"apm5": apm5_entry,
 	"apm6": apm6_entry,
 	"apm7": apm7_entry,
+	"apm8": apm8_entry,
 }
 
 
@@ -44,6 +47,7 @@ def show_apm(user):
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
 		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'id': 9})
+		arm_list.append({'arm_id': 7, 'arm_name': '🔲 Генерация QR', 'id': 10})
 		text = f'Выберите АРМ из списка ниже:'
 		if arm_list is not None:
 			for arm in arm_list:
@@ -80,7 +84,7 @@ def entry_start(username, text, key=None):
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user)
 
@@ -95,7 +99,7 @@ def entry_photo(username, data):
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user)
 
@@ -114,6 +118,11 @@ def entry_button(username, text, key):
 
 	if key == 'entry_menu':
 		return show_apm(user)
+
+	if key == 'entry_apm7': # QR-generate
+		text, kbd, user["key"] = apm8_entry(username, text, key)
+		return text, kbd
+
 
 	# select item menu
 	keys = key.split('_')
