@@ -20,8 +20,8 @@ weighting_history_type_id = 2
 
 nanny_text_entry_fish = 'Введите количество съеденных рыб'
 nanny_text_weighing_action = "Введите массу животного в граммах"
-nanny_text_incorrect_digit = "Вводите только цифры"
-nanny_text_incorrect_fish_number = "Количество должно быть больше 0"
+nanny_text_incorrect_digit = "❌ Вводите только цифры"
+nanny_text_incorrect_fish_number = "❌ Количество должно быть больше 0"
 nanny_text_incorrect_weight = f"Вес должен быть от {nanny_minimal_weight} гр."
 
 
@@ -78,9 +78,10 @@ def show_mpls(user, mpls):
 def apm6_start(username, text, key=None):
 	user = db.get_user(username)
 	if key == 'apm6_feeding':
-		nanny_feeding(text, user, username)
+		return nanny_feeding(text, user, username)
 	elif key == 'apm6_weighing':
-		nanny_weighing(text, user, username)
+		return nanny_weighing(text, user, username)
+		
 	if key is None:
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is None:
