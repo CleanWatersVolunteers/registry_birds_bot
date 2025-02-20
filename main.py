@@ -55,8 +55,6 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	username = update["message"]["from"]["username"]
 
-
-	file_id = update.message.photo[0].file_id
 	new_file = await update.message.effective_attachment[-1].get_file()
 	data = await new_file.download_as_bytearray()
 	text, keyboard = entry_photo(username, data)
