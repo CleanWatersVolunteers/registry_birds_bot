@@ -33,17 +33,15 @@ apm_button_list = {
 }
 
 
-def show_apm(user):
+def show_apm(user, arm_list):
 	kbd = {}
-	arm_list = storage.get_arms(user["location_id"])
 	user["apm_list"] = arm_list
 	user["apm"] = None
 	user["key"] = None
 	user["animal_id"] = None
-
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
-		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'id': 9})
+		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
 		text = f'Выберите АРМ из списка ниже:'
 		if arm_list is not None:
 			for arm in arm_list:
@@ -65,24 +63,34 @@ def show_apm(user):
 
 def entry_start(username, text, key=None):
 	kbd = {}
-
+	arm_list = {}
 	user = db.get_user(username)
 	if not user:
-		# todo Доделать авторизацию сохранив данные для дальнейшей работы
-		access_data = storage.get_arm_access(NOW(), text)
-		if db.login(username, text, access_data[0]["location_id"]):
-			user = db.get_user(username)
+		file = open('developer.txt', 'r')
+		developer_name = file.read()
+		file.close()
+		if developer_name == username:
+			location_id = 0  # Пока хардкод, можно потом вынести в developer.txt
+			arm_list = storage.get_arms(location_id)
+			user = db.create_user(username, location_id)
+		else:
+			arm_list = storage.get_arm_access(NOW(), password=text)
+			if len(arm_list) > 0:
+				user = db.create_user(username, arm_list[0]["location_id"])
+			else:
+				return f'Здравствуйте {username}!\nПароль не верный\n⚠ Введите пароль', None
 	if not user:
-		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
+		return f'Здравствуйте {username}!\n⚠ Введите пароль', None
 	else:
 		if user["apm"]:
 			code = code_parse(text)
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, code, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
-		return show_apm(user)
+		return show_apm(user, arm_list)
+
 
 def entry_photo(username, data):
 	kbd = {}
@@ -95,9 +103,10 @@ def entry_photo(username, data):
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, code, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
-		return show_apm(user)
+		return show_apm(user, user["apm_list"])
+
 
 def entry_button(username, text, key):
 	if key == 'entry_exit':
@@ -105,7 +114,7 @@ def entry_button(username, text, key):
 
 	user = db.get_user(username)
 	if not user:
-		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
+		return f'Здравствуйте {username}!\n⚠ Введите пароль', None
 	if key == 'entry_cancel':
 		user["key"] = None
 		user["animal_id"] = None
@@ -113,7 +122,7 @@ def entry_button(username, text, key):
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 
 	if key == 'entry_menu':
-		return show_apm(user)
+		return show_apm(user, user["apm_list"])
 
 	# select item menu
 	keys = key.split('_')
@@ -134,4 +143,3 @@ def entry_button(username, text, key):
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	print("[!!] Error key", key)
 	return text, None
-
