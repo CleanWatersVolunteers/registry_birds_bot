@@ -45,7 +45,7 @@ def show_apm(user, arm_list):
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
 		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
-  	arm_list.append({'arm_id': 7, 'arm_name': '🔲 Генерация QR', 'place_id': 7})
+		arm_list.append({'arm_id': 7, 'arm_name': '🔲 Генерация QR', 'place_id': 7})
 		text = f'Выберите АРМ из списка ниже:'
 		if arm_list is not None:
 			for arm in arm_list:
@@ -91,7 +91,7 @@ def entry_start(username, text, key=None):
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, text, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user, arm_list)
 
@@ -107,7 +107,7 @@ def entry_photo(username, data):
 			if code == 0:
 				txt, kbd = code_request(user["apm_list"])
 				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
-			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, str(code), user["key"])
+			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user, user["apm_list"])
 
