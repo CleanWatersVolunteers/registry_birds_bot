@@ -263,9 +263,9 @@ class storage:
 	def get_arms(cls, location_id):
 		query = """
 	SELECT
-		p.id  AS arm_id, 
-		p.name AS arm_name,
-		a.id AS id
+		p.id AS arm_id, 
+		a.place_id AS place_id,
+		p.name AS arm_name
 	FROM places p
 	INNER JOIN arms a ON a.place_id = p.id
 	WHERE a.location_id = %s
@@ -289,17 +289,19 @@ class storage:
 
 	# Возвращает информацию для авторизации
 	@classmethod
-	def get_arm_access(cls, datetime_now, password=None):
+	def get_arm_access(cls, datetime_now, password):
 		query = """
 		SELECT 
 			a.id AS arm_id,
 			a.place_id,
 			a.location_id,
+			p.name AS arm_name,
 			aa.start_date,
 			aa.end_date,
 			aa.password
 		FROM arms a
 		JOIN arm_access aa ON a.id = aa.arm_id
+		JOIN places p ON p.id = a.place_id
 		WHERE %s BETWEEN aa.start_date AND aa.end_date
 	"""
 		if password is not None:
