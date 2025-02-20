@@ -68,7 +68,7 @@ def is_valid_datetime(date_str, date_format="%d.%m.%Y"):
     except ValueError:
         return False
     
-def get_time(time) -> str | None:
+def get_time(time):
     time = GET_TIME(time)
     if time:
         time = time[0]
@@ -76,7 +76,7 @@ def get_time(time) -> str | None:
             return None
     return time
 
-def get_date(date: str) -> str | None:
+def get_date(date: str):
     date = GET_DATE(date)
     if date:
         date = date[0]
@@ -84,13 +84,13 @@ def get_date(date: str) -> str | None:
             return None
     return date
 
-def generate_time_error_message(msg: str) -> tuple[str,]:
+def generate_time_error_message(msg: str):
     text = f'{apm1_text_header} {msg}'
     text += apm1_text_enter_time
     keyboard = tgm.make_inline_keyboard(apm1_cancel_datetime_input)
     return text, keyboard
 
-def validate_datetime(user: dict[str, str]) -> Optional[tuple[str,]]:
+def validate_datetime(user):
     """
     Проверяет, соответствует ли время следующим условиям:
         1 - Текущее время не раньше, чем указанное время

@@ -76,19 +76,28 @@ def entry_start(username, text, key=None):
 		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
 	else:
 		if user["apm"]:
-			if user["animal_id"] is None:
-				code = code_parse(text)
-				if code > 0:
-					text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
-					return f'{user["apm"]["arm_name"]}\n{text}', kbd
-				else:
-					txt, kbd = code_request(user["apm_list"])
-					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {text}\n{txt}', kbd
-			else:
-				text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, text, user["key"])
-				return f'{user["apm"]["arm_name"]}\n{text}', kbd
+			code = code_parse(text)
+			if code == 0:
+				txt, kbd = code_request(user["apm_list"])
+				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
+			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			return f'{user["apm"]["arm_name"]}\n{text}', kbd
 		return show_apm(user)
 
+def entry_photo(username, data):
+	kbd = {}
+	user = db.get_user(username)
+	code = code_parse(data)
+	if not user:
+		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
+	else:
+		if user["apm"]:
+			if code == 0:
+				txt, kbd = code_request(user["apm_list"])
+				return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
+			text, kbd, user["key"] = apm_start_list[user["apm"]["arm_id"]](username, code, user["key"])
+			return f'{user["apm"]["arm_name"]}\n{text}', kbd
+		return show_apm(user)
 
 def entry_button(username, text, key):
 	if key == 'entry_exit':
@@ -125,3 +134,4 @@ def entry_button(username, text, key):
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	print("[!!] Error key", key)
 	return text, None
+

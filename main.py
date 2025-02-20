@@ -8,19 +8,14 @@ from ui_welcome import *
 
 
 from database import Database as db
-from ui.entry import entry_start, entry_button
+from ui.entry import entry_start, entry_button, entry_photo
 
 
 f = open('token', 'r')
 TELEGRAM_BOT_TOKEN = f.read()
 f.close()
 
-# log.init("logs.txt") 					# todo remove it
-# storage.init("user.base","birds.base")  # todo remove it
-
-
 db.init()
-
 
 def kbd_to_inline(text_list):
 	keyboard = []
@@ -45,8 +40,6 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	await query.answer()
 
 	username = query.from_user.username
-	button = query.data.split('_')[0]
-
 	text, keyboard = entry_button(username, query.message.text, query.data)
 	try:
 		if keyboard:
@@ -59,12 +52,30 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	except Exception as e:
 		print('[!!] Exception ', e)
 
+async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+	username = update["message"]["from"]["username"]
+
+	new_file = await update.message.effective_attachment[-1].get_file()
+	data = await new_file.download_as_bytearray()
+	text, keyboard = entry_photo(username, data)
+	try:
+		if keyboard:
+			await update.message.reply_text(text=text,
+				reply_markup=InlineKeyboardMarkup(kbd_to_inline(keyboard))
+			)
+		else:
+			await update.message.reply_text(text=text)
+		
+	except Exception as e:
+		print('[!!] Exception ', e)
+
+
 async def main() -> None:
 	application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
 	application.add_handler(CommandHandler("start", cb_user_message))
 	application.add_handler(MessageHandler(filters.TEXT, cb_user_message))
-	# application.add_handler(MessageHandler(filters.PHOTO, tg_user_photo))
+	application.add_handler(MessageHandler(filters.PHOTO, cb_user_photo))
 
 	application.add_handler(CallbackQueryHandler(cb_user_button))
 
