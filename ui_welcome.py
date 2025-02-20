@@ -82,17 +82,6 @@ def ui_welcome(user, key=None, msg=None):
             # todo Продумать как убрать хардкод
             if arm['arm_id'] == 0:
                 welcome_handlers[key] = ui_apm1_mode
-            elif arm['arm_id'] == 1:
-                welcome_handlers[key] = ui_apm2_mode
-            elif arm['arm_id'] == 2:
-                welcome_handlers[key] = ui_apm4_mode
-            elif arm['arm_id'] == 3:
-                welcome_handlers[key] = ui_apm5_mode
-            elif arm['arm_id'] == 4:
-                welcome_handlers[key] = ui_apm6_mode
-            elif arm['arm_id'] == 5:
-                welcome_handlers[key] = ui_nanny_mode
-
     ui_welcome_mode.update({
         "kbd_history": TEXT_HISTORY,
         "kbd_load_bird": TEXT_LOAD_BIRD,
@@ -143,18 +132,9 @@ welcome_handlers["kbd_generate_qr"] = ui_generate_qr_start
 
 from ui_load_bird import *
 from ui_apm1 import *
-from ui_apm2 import *
-# todo Больше не нужно?
-# from ui_apm3 import *
-from ui_apm4 import *
-from ui_apm5 import *
-from ui_apm6 import *
-from ui_apm_nanny import *
-from ui_history import *
 
 welcome_handlers.update({
     "kbd_load_bird": ui_load_bird,
-    "kbd_history": ui_history_mode,
 })
 
 ##########################################

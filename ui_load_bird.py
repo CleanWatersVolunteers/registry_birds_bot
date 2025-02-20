@@ -1,5 +1,4 @@
 from ui_welcome import welcome_addr_hndl, welcome_handlers, ui_welcome
-from ui_apm1 import ui_apm1_mode
 import tgm
 from storage import storage
 from ui_welcome import welcome_sel_addr
