@@ -1,0 +1,9 @@
+python-telegram-bot
+opencv-python
+opencv-contrib-python
+pyzbar
+pytz
+mysql-connector-python
+numpy
+PyPDF2
+reportlab

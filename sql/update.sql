@@ -1,3 +1,4 @@
+USE `registry_birds`;
 -- Лишний столбец animals.female #102
 alter table `animals` drop COLUMN `female`;
 
