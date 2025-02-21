@@ -12,9 +12,9 @@ from ui.apm7 import apm7_start, apm7_entry
 from ui.apm8 import apm8_start, apm8_entry
 from storage import storage
 
-
 NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
-SUPERVISER_ARM = 7
+WELLCOME = 'Здравствуйте {username}!\n⚠ Введите пароль'
+SUPERVISOR_ARM = 7
 
 apm_start_list = {
 	0: apm1_start,
@@ -55,9 +55,9 @@ def show_apm(user, arm_list):
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
-		if user["apm"]["place_id"] == SUPERVISER_ARM:
+		if user["apm"]["place_id"] == SUPERVISOR_ARM:
 			key = 'entry_apm7'
-			text, kbd, user["key"] = apm8_entry(None, None, key)
+			text, kbd, user["key"] = apm8_entry(user, None, key)
 			return text, kbd
 		text, kbd = code_request(user["apm_list"])
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
@@ -71,7 +71,6 @@ def show_apm(user, arm_list):
 ##################################
 
 def entry_start(username, text, key=None):
-	kbd = {}
 	arm_list = {}
 	user = db.get_user(username)
 	if not user:
@@ -89,9 +88,10 @@ def entry_start(username, text, key=None):
 			else:
 				return f'Здравствуйте {username}!\nПароль не верный\n⚠ Введите пароль', None
 	if not user:
-		return f'Здравствуйте {username}!\n⚠ Введите пароль', None
+		return f'{WELLCOME.format(username=username)}', None
 	else:
 		if user["apm"]:
+			kbd = {}
 			if not 'animal_id' in user:
 				code = code_parse(text)
 				if code == 0:
@@ -103,14 +103,14 @@ def entry_start(username, text, key=None):
 
 
 def entry_photo(username, data):
-	kbd = {}
 	user = db.get_user(username)
-	code = code_parse(data)
 	if not user:
-		return f'Здравствуйте  {username}!\n⚠ Введите пароль', None
+		return f'{WELLCOME.format(username=username)}', None
 	else:
 		if user["apm"]:
+			kbd = {}
 			if not 'animal_id' in user:
+				code = code_parse(data)
 				if code == 0:
 					txt, kbd = code_request(user["apm_list"])
 					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
@@ -125,7 +125,7 @@ def entry_button(username, text, key):
 
 	user = db.get_user(username)
 	if not user:
-		return f'Здравствуйте {username}!\n⚠ Введите пароль', None
+		return f'{WELLCOME.format(username=username)}', None
 	if key == 'entry_cancel':
 		user["key"] = None
 		user["animal_id"] = None
@@ -138,7 +138,7 @@ def entry_button(username, text, key):
 	if key == 'entry_apm7':  # Старший смены
 		if user["apm"] is None:
 			user["apm"] = dict({"arm_name": "Старший смены"})
-		text, kbd, user["key"] = apm8_entry(None, None, key)
+		text, kbd, user["key"] = apm8_entry(user, None, key)
 		return text, kbd
 
 	# select item menu
