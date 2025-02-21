@@ -56,6 +56,7 @@ def apm7_start(username, text, key=None):
 	place_history = storage.get_place_history(animal["animal_id"])
 
 	combined_history = numerical_history + history + place_history
+	# todo Shadows name 'item' from outer scope
 	sorted_history = sorted(combined_history, key=lambda item: item['datetime'])
 	result_string = ""
 	current_date = None
