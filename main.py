@@ -6,7 +6,7 @@ from logs import log
 import re
 from database import Database as db
 from storage import QRCodeStorage
-from ui.entry import entry_start, entry_button, entry_photo
+from ui.entry import entry_start, entry_button, entry_photo, SUPERVISER_ARM
 from ui.gen import (
 	qr_cmd_gen24,
 	qr_cmd_gen48,
@@ -80,6 +80,17 @@ async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	cmd = update.message.text
+
+	try:
+		username = update['message']['from']['username']
+		user = db.get_user(username)
+		if user["apm"]["place_id"] != SUPERVISER_ARM:
+			await update.message.reply_text("❌ Команда запрещена")
+			return None
+	except Exception as e:
+		print(f'[!!] {e}')
+		await update.message.reply_text(f'Здравствуйте {username}!\n⚠ Введите пароль')
+		return None
 
 	try:
 		cmds = cmd.split(' ')
