@@ -11,6 +11,12 @@ from ui.apm6 import apm6_start, apm6_entry
 from ui.apm7 import apm7_start, apm7_entry
 from ui.apm8 import apm8_start, apm8_entry
 from storage import storage
+from ui.gen import (
+	qr_cmd_gen24,
+	qr_cmd_gen48,
+	qr_cmd_gen72,
+	qr_cmd_old
+)
 
 NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
 
@@ -45,7 +51,11 @@ def show_apm(user, arm_list):
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
 		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
-		text = f'Выберите АРМ из списка ниже:'
+		text = f'Выберите АРМ из списка ниже:\n'
+		text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
+		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
+		text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
+		text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
 		if arm_list is not None:
 			for arm in arm_list:
 				kbd[arm['arm_name']] = f'entry_apm{arm["arm_id"]}'
