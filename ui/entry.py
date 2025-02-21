@@ -9,15 +9,12 @@ from ui.apm4 import apm4_start, apm4_entry
 from ui.apm5 import apm5_start, apm5_entry
 from ui.apm6 import apm6_start, apm6_entry
 from ui.apm7 import apm7_start, apm7_entry
+from ui.apm8 import apm8_start, apm8_entry
 from storage import storage
-from ui.gen import (
-	qr_cmd_gen24,
-	qr_cmd_gen48,
-	qr_cmd_gen72,
-	qr_cmd_old
-)
+
 
 NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
+SUPERVISER_ARM = 7
 
 apm_start_list = {
 	0: apm1_start,
@@ -27,6 +24,7 @@ apm_start_list = {
 	4: apm5_start,
 	5: apm6_start,
 	6: apm7_start,
+	7: apm8_start,
 }
 apm_button_list = {
 	"apm1": apm1_entry,
@@ -36,7 +34,9 @@ apm_button_list = {
 	"apm5": apm5_entry,
 	"apm6": apm6_entry,
 	"apm7": apm7_entry,
+	"apm8": apm8_entry,
 }
+
 
 def show_apm(user, arm_list):
 	kbd = {}
@@ -48,10 +48,6 @@ def show_apm(user, arm_list):
 		#  todo Когда-нибудь История переедет в мед. приём
 		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
 		text = f'Выберите АРМ из списка ниже:\n'
-		text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
-		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
-		text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
-		text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
 		if arm_list is not None:
 			for arm in arm_list:
 				kbd[arm['arm_name']] = f'entry_apm{arm["arm_id"]}'
@@ -59,6 +55,10 @@ def show_apm(user, arm_list):
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
+		if user["apm"]["place_id"] == SUPERVISER_ARM:
+			key = 'entry_apm7'
+			text, kbd, user["key"] = apm8_entry(None, None, key)
+			return text, kbd
 		text, kbd = code_request(user["apm_list"])
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	else:
@@ -134,6 +134,12 @@ def entry_button(username, text, key):
 
 	if key == 'entry_menu':
 		return show_apm(user, user["apm_list"])
+
+	if key == 'entry_apm7':  # Старший смены
+		if user["apm"] is None:
+			user["apm"] = dict({"arm_name": "Старший смены"})
+		text, kbd, user["key"] = apm8_entry(None, None, key)
+		return text, kbd
 
 	# select item menu
 	keys = key.split('_')

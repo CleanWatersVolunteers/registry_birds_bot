@@ -51,7 +51,8 @@ INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 	(6, 1, 1),
 	(7, 2, 2),
 	(8, 5, 0),
-	(9, 5, 1);
+	(9, 5, 1),
+	(10, 7, 0);
 
 -- Дамп структуры для таблица registry_birds.arm_access
 CREATE TABLE IF NOT EXISTS `arm_access` (
@@ -64,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `arm_access` (
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `fk_arm_access_arm_id` (`arm_id`),
   CONSTRAINT `fk_arm_access_arm_id` FOREIGN KEY (`arm_id`) REFERENCES `arms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп структуры для таблица registry_birds.history
 CREATE TABLE IF NOT EXISTS `history` (
@@ -158,7 +159,8 @@ INSERT INTO `places` (`id`, `name`) VALUES
 	(2, 'Прием в стационар'),
 	(3, 'Первичка в стационаре'),
 	(4, 'Медицинский прием'),
-	(5, 'Нянька');
+	(5, 'Нянька'),
+	(7, 'Старший смены');
 
 -- Дамп структуры для таблица registry_birds.place_history
 CREATE TABLE IF NOT EXISTS `place_history` (

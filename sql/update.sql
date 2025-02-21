@@ -23,3 +23,9 @@ INSERT INTO `arm_access` (`id`, `arm_id`, `start_date`, `end_date`, `password`) 
 	(1, 1, '2025-02-12 00:00:00', '2026-02-12 00:00:00', '1111'),
 	(2, 2, '2025-02-12 01:09:39', '2026-02-12 02:09:45', '3333'),
 	(3, 3, '2025-03-12 02:10:11', '2025-06-12 02:10:27', '4444');
+
+-- Реализовать АРМ "Старший смены" #197
+INSERT INTO `places` (`id`, `name`) VALUES(7, 'Старший смены');
+INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES (10, 7, 0);
+INSERT INTO `arm_access` (`id`, `arm_id`, `start_date`, `end_date`, `password`) VALUES
+    (8, 10, '2025-02-20 12:32:32', '2026-02-21 12:32:40', '1010');
