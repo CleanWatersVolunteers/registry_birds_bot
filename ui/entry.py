@@ -59,7 +59,11 @@ def show_apm(user, arm_list):
 			key = 'entry_apm7'
 			text, kbd, user["key"] = apm8_entry(user, None, key)
 			return text, kbd
-		text, kbd = code_request(user["apm_list"])
+		text, kbd = code_request(user)
+		if not text:
+			# TODO db.clear_user(username)
+			kbd[const.text_exit] = 'entry_exit'
+			return 'APM не найдены!', kbd
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	else:
 		kbd[const.text_exit] = 'entry_exit'
@@ -85,6 +89,7 @@ def entry_start(username, text, key=None):
 			arm_list = storage.get_arm_access(NOW(), password=text)
 			if len(arm_list) > 0:
 				user = db.create_user(username, arm_list[0]["location_id"])
+				user['pass'] = text
 			else:
 				return f'Здравствуйте {username}!\nПароль не верный\n⚠ Введите пароль', None
 	if not user:
@@ -95,7 +100,11 @@ def entry_start(username, text, key=None):
 			if not 'animal_id' in user:
 				code = code_parse(text)
 				if code == 0:
-					txt, kbd = code_request(user["apm_list"])
+					txt, kbd = code_request(user)
+					if not text:
+						db.clear_user(username)
+						kbd[const.text_exit] = 'entry_exit'
+						return 'APM не найдены!', kbd
 					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, text, user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
@@ -112,7 +121,11 @@ def entry_photo(username, data):
 			if not 'animal_id' in user:
 				code = code_parse(data)
 				if code == 0:
-					txt, kbd = code_request(user["apm_list"])
+					txt, kbd = code_request(user)
+					if not text:
+						db.clear_user(username)
+						kbd[const.text_exit] = 'entry_exit'
+						return 'APM не найдены!', kbd
 					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{txt}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
@@ -129,7 +142,11 @@ def entry_button(username, text, key):
 	if key == 'entry_cancel':
 		user["key"] = None
 		user["animal_id"] = None
-		text, kbd = code_request(user["apm_list"])
+		text, kbd = code_request(user)
+		if not text:
+			db.clear_user(username)
+			kbd[const.text_exit] = 'entry_exit'
+			return 'APM не найдены!', kbd
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 
 	if key == 'entry_menu':
@@ -148,15 +165,22 @@ def entry_button(username, text, key):
 		for apm in user["apm_list"]:
 			if apm['arm_id'] == apm_id:
 				user["apm"] = dict(apm)
-				text, kbd = code_request(user["apm_list"])
+				text, kbd = code_request(user)
+				if not text:
+					db.clear_user(username)
+					kbd[const.text_exit] = 'entry_exit'
+					return 'APM не найдены!', kbd
 				return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	if keys[0] in apm_button_list:
 		text, kbd, user["key"] = apm_button_list[keys[0]](username, text, key)
 		if not text:
 			user["key"] = None
 			user["animal_id"] = None
-			text, kbd = code_request(user["apm_list"])
-
+			text, kbd = code_request(user)
+			if not text:
+				db.clear_user(username)
+				kbd[const.text_exit] = 'entry_exit'
+				return 'APM не найдены!', kbd
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	print("[!!] Error key", key)
 	return text, None

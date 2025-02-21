@@ -22,10 +22,13 @@ def code_reader(image) -> []:
 # Global API
 ##################################
 
-def code_request(apm_list):
-	if len(apm_list) > 1:
-		return code_animal_text, {const.text_cancel:'entry_menu'}
-	return code_animal_text, {const.text_exit:'entry_exit'}
+def code_request(user):
+	try:
+		arm_list = storage.get_arm_access(NOW(), password=user['pass'])
+		if len(arm_list) > 1:
+			return code_animal_text, {const.text_cancel:'entry_menu'}
+	finally:
+		return None, {}
 
 def code_parse(code)->int:
 	# code from text
