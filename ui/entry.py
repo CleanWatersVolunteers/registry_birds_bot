@@ -14,6 +14,7 @@ from storage import storage
 
 
 NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
+SUPERVISER_ARM = 7
 
 apm_start_list = {
 	0: apm1_start,
@@ -54,6 +55,10 @@ def show_apm(user, arm_list):
 		return text, kbd
 	elif len(arm_list) == 1:
 		user["apm"] = arm_list[0]
+		if user["apm"]["place_id"] == SUPERVISER_ARM:
+			key = 'entry_apm7'
+			text, kbd, user["key"] = apm8_entry(None, None, key)
+			return text, kbd
 		text, kbd = code_request(user["apm_list"])
 		return f'{user["apm"]["arm_name"]}\n{text}', kbd
 	else:
@@ -133,7 +138,7 @@ def entry_button(username, text, key):
 	if key == 'entry_apm7':  # Старший смены
 		if user["apm"] is None:
 			user["apm"] = dict({"arm_name": "Старший смены"})
-		text, kbd, user["key"] = apm8_entry(username, text, key)
+		text, kbd, user["key"] = apm8_entry(None, None, key)
 		return text, kbd
 
 	# select item menu

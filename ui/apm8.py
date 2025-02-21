@@ -27,7 +27,7 @@ def arm_info(place_id):
 				has_place_name = True
 			else:
 				text += f'{get_duty_info(item)}'
-			text += '\n{apm8_text_line}'
+			text += f'\n{apm8_text_line}'
 		kbd = {const.text_done: 'entry_apm7'}
 		return text, kbd, None
 	else:
@@ -54,8 +54,7 @@ def apm8_entry(username, text, key):
 		text = f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
 		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
 		text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
-		text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
-		'{apm8_text_line}\n'
+		text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n\n'
 		text += 'Рабочие смены:'
 		arm_list = storage.get_arms(apm8_location_id)
 		if arm_list is not None:
