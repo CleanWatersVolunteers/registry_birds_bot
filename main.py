@@ -1,19 +1,28 @@
 import asyncio
-from telegram import InlineKeyboardButton, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 from logs import log
 
-from ui_welcome import *
-
-
-
+import re
 from database import Database as db
+from storage import QRCodeStorage
 from ui.entry import entry_start, entry_button, entry_photo
+from ui.gen import (
+	qr_cmd_gen24,
+	qr_cmd_gen48,
+	qr_cmd_gen72,
+	qr_cmd_old,
 
+	gen_pdf
+)
 
 f = open('token', 'r')
 TELEGRAM_BOT_TOKEN = f.read()
 f.close()
+
+
+TEXT_QR_CODES_READY = "📄 Ваши QR-коды"
+TEXT_QR_NOT_PREVIOUSLY_PRINTED = "❌ Этот код не был распечатан ранее. Повторите ввод."
 
 db.init()
 
@@ -69,10 +78,51 @@ async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 	except Exception as e:
 		print('[!!] Exception ', e)
 
+async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+	cmd = update.message.text
+
+	try:
+		cmds = cmd.split(' ')
+
+		start_number = QRCodeStorage.get_qr_start_value()
+		end_number = start_number
+		if cmds[0] == f'/{qr_cmd_gen24}':
+			end_number = start_number + 24	
+		elif cmds[0] == f'/{qr_cmd_gen48}':
+			end_number = start_number + 48	
+		elif cmds[0] == f'/{qr_cmd_gen72}':
+			end_number = start_number + 72	
+		elif cmds[0] != f'/{qr_cmd_old}' or len(cmds) != 2:
+			raise Exception("Unknown command")
+
+		msg = await update.message.reply_text("⏳ Генерация QR-кодов..")
+
+		if end_number == start_number: # Old records
+			codes = sorted(set(re.findall(r'\d+', cmds[1])))
+			pdf_name, pdf_data = gen_pdf(codes)
+		else: # Gen new records
+			pdf_name, pdf_data = gen_pdf([str(code) for code in range(start_number, end_number)])
+			QRCodeStorage.set_qr_start_value(end_number)
+
+		await msg.delete()
+		await update.message.reply_document(document=pdf_data, filename=pdf_name, caption=TEXT_QR_CODES_READY)
+	except Exception as e:
+		print(f'[!!] {e}')
+		text = f"❌ Неправильный ввод: {cmd}\n"
+		text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
+		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
+		text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
+		text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
+		await update.message.reply_text(text)
+
 
 async def main() -> None:
 	application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
+	application.add_handler(CommandHandler(qr_cmd_gen24, cb_cmd_gen))
+	application.add_handler(CommandHandler(qr_cmd_gen48, cb_cmd_gen))
+	application.add_handler(CommandHandler(qr_cmd_gen72, cb_cmd_gen))
+	application.add_handler(CommandHandler(qr_cmd_old, cb_cmd_gen))
 	application.add_handler(CommandHandler("start", cb_user_message))
 	application.add_handler(MessageHandler(filters.TEXT, cb_user_message))
 	application.add_handler(MessageHandler(filters.PHOTO, cb_user_photo))
