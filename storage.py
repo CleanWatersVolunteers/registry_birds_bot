@@ -300,6 +300,33 @@ class storage:
 		data = (place_id, location_id)
 		return cls.execute_query(query, data, fetch=True)
 
+	# Создаёт новую смену
+	@classmethod
+	def create_duty(cls, arm_id, start_date, end_date, password):
+		start_date_str = start_date.strftime(cls.capture_datetime_db_format)
+		end_date_str = end_date.strftime(cls.capture_datetime_db_format)
+		query = """INSERT INTO arm_access (arm_id, start_date, end_date, password) VALUES (%s, %s, %s, %s)"""
+		data = (arm_id, start_date_str, end_date_str, password)
+		result = cls.execute_query(query, data)
+		return result is not None
+
+	# Проверяет попадает ли дата внутрь смены
+	@classmethod
+	def check_duty_date(cls, arm_id, date):
+		date_str = date.strftime(cls.capture_datetime_db_format)
+		query = """SELECT id FROM arm_access WHERE arm_id = %s AND (%s BETWEEN start_date AND end_date)"""
+		data = (arm_id, date_str)
+		results = cls.execute_query(query, data, fetch=True)
+		return results is None or len(results) == 0
+
+	# Удаляет смену
+	@classmethod
+	def delete_duty(cls, access_id):
+		query = """DELETE FROM arm_access WHERE id = %s"""
+		data = (access_id,)
+		result = cls.execute_query(query, data)
+		return result is not None
+
 	# Возвращает информацию для авторизации
 	@classmethod
 	def get_arm_access(cls, datetime_now, password):
