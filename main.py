@@ -89,6 +89,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 			return None
 	except Exception as e:
 		print(f'[!!] {e}')
+		# todo Local variable 'username' might be referenced before assignment
 		await update.message.reply_text(f'Здравствуйте {username}!\n⚠ Введите пароль')
 		return None
 
@@ -149,6 +150,7 @@ async def main() -> None:
 	while True:
 		await asyncio.sleep(5*60)
 
+	# todo This code is unreachable
 	await application.updater.stop()
 	log.logi("Bot disabled")
 

@@ -19,6 +19,7 @@ def show_mpls(user, mpls):
 	text += f'{const.text_manipulation_done}'
 	return text, kbd
 
+
 ##################################
 # Global API
 ##################################
@@ -49,10 +50,10 @@ def apm4_start(username, text, key=None):
 
 def apm4_entry(username, text, key):
 	user = db.get_user(username)
-	id = key.split('_')[-1]
-	user["mpl_list"].append(id)
+	key_id = key.split('_')[-1]
+	user["mpl_list"].append(key_id)
 	storage.insert_history(
-		manipulation_id=id,
+		manipulation_id=key_id,
 		animal_id=user["animal_id"],
 		arms_id=user["apm"]["arm_id"],
 		tg_nickname=username

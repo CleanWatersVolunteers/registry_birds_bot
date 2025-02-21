@@ -130,4 +130,5 @@ def apm6_entry(username, text, key):
 			)
 			mpls = storage.get_manipulations(apm6_place_id)
 			text, kbd = show_mpls(user, mpls)
+	# todo Local variable 'kbd' might be referenced before assignment
 	return text, kbd, None
