@@ -117,6 +117,7 @@ def entry_photo(username, data):
 					if valid is False:
 						db.clear_user(username)
 						return text, kbd
+                    # todo Local variable 'code' might be referenced before assignment
 					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{text}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
