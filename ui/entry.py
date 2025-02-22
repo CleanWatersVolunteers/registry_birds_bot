@@ -34,6 +34,13 @@ apm_button_list = {
 }
 
 
+def get_arm_name(user):
+	if 'location_name' in user['apm']:
+		return f'{user["apm"]["arm_name"]} - {user["apm"]["location_name"]}\n'
+	else: # todo У разработчика пока нет location_name
+		return f'{user["apm"]["arm_name"]}\n'
+
+
 def show_apm(user, arm_list, username):
 	kbd = {}
 	user["apm_list"] = arm_list
@@ -59,7 +66,7 @@ def show_apm(user, arm_list, username):
 		if valid is False:
 			db.clear_user(username)
 			return text, kbd
-		return f'{user["apm"]["arm_name"]}\n{text}', kbd
+		return f'{get_arm_name(user)}{text}', kbd
 	else:
 		kbd[const.text_exit] = 'entry_exit'
 		return 'APM не найдены!', kbd
@@ -97,9 +104,9 @@ def entry_start(username, text, key=None):
 					if valid is False:
 						db.clear_user(username)
 						return text, kbd
-					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{text}', kbd
+					return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, text, user["key"])
-			return f'{user["apm"]["arm_name"]}\n{text}', kbd
+			return f'{get_arm_name(user)}{text}', kbd
 		return show_apm(user, arm_list, username)
 
 
@@ -117,9 +124,9 @@ def entry_photo(username, data):
 						db.clear_user(username)
 						return text, kbd
 					# todo Local variable 'code' might be referenced before assignment
-					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{text}', kbd
+					return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
-			return f'{user["apm"]["arm_name"]}\n{text}', kbd
+			return f'{get_arm_name(user)}{text}', kbd
 		return show_apm(user, user["apm_list"], username)
 
 
@@ -137,7 +144,7 @@ def entry_button(username, text, key):
 		if valid is False:
 			db.clear_user(username)
 			return text, kbd
-		return f'{user["apm"]["arm_name"]}\n{text}', kbd
+		return f'{get_arm_name(user)}{text}', kbd
 
 	if key == 'entry_menu':
 		return show_apm(user, user["apm_list"], username)
@@ -159,7 +166,7 @@ def entry_button(username, text, key):
 				if valid is False:
 					db.clear_user(username)
 					return text, kbd
-				return f'{user["apm"]["arm_name"]}\n{text}', kbd
+				return f'{get_arm_name(user)}{text}', kbd
 	if keys[0] in apm_button_list:
 		text, kbd, user["key"] = apm_button_list[keys[0]](username, text, key)
 		if not text:
@@ -169,6 +176,6 @@ def entry_button(username, text, key):
 			if valid is False:
 				db.clear_user(username)
 				return text, kbd
-		return f'{user["apm"]["arm_name"]}\n{text}', kbd
+		return f'{get_arm_name(user)}{text}', kbd
 	print("[!!] Error key", key)
 	return text, None
