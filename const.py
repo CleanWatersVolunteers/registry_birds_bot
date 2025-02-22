@@ -1,4 +1,9 @@
 # Константы
+from datetime import datetime
+
+import pytz
+
+
 class const:
 	text_done = 'Готово'
 	text_cancel = 'Отмена'
@@ -16,3 +21,4 @@ class const:
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
+	NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")

@@ -1,10 +1,12 @@
 import cv2 as cv
 import numpy as np
-from pyzbar.pyzbar import decode 
+from pyzbar.pyzbar import decode
 
 from const import const
+from storage import storage
 
 code_animal_text = 'Введите код животного'
+duty_is_end = 'Смена закончена, введите новый пароль'
 
 
 def code_reader(image) -> []:
@@ -23,14 +25,17 @@ def code_reader(image) -> []:
 ##################################
 
 def code_request(user):
-	try:
-		arm_list = storage.get_arm_access(NOW(), password=user['pass'])
-		if len(arm_list) > 1:
-			return code_animal_text, {const.text_cancel:'entry_menu'}
-	finally:
-		return None, {}
+	if user['pass'] is not None:
+		arm_list = storage.get_arm_access(const.NOW(), password=user['pass'])
+		if len(arm_list) > 0:
+			return code_animal_text, {const.text_exit: 'entry_exit'}, True
+		else:
+			return duty_is_end, None, False
+	else:
+		return code_animal_text, {const.text_cancel: 'entry_menu'}, True
 
-def code_parse(code)->int:
+
+def code_parse(code) -> int:
 	# code from text
 	if isinstance(code, str):
 		if code.isdigit():
@@ -43,4 +48,3 @@ def code_parse(code)->int:
 		if codes[0].isdigit():
 			return int(codes[0])
 	return 0
-	
