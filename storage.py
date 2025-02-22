@@ -1,7 +1,9 @@
+from datetime import datetime
+
 import mysql.connector
 from mysql.connector import pooling
+
 from config import Config
-from datetime import datetime
 
 
 class storage:
@@ -336,12 +338,14 @@ class storage:
 			a.place_id,
 			a.location_id,
 			p.name AS arm_name,
+			l.name AS location_name,
 			aa.start_date,
 			aa.end_date,
 			aa.password
 		FROM arms a
 		JOIN arm_access aa ON a.id = aa.arm_id
 		JOIN places p ON p.id = a.place_id
+		JOIN locations l ON l.id = a.location_id
 		WHERE %s BETWEEN aa.start_date AND aa.end_date
 	"""
 		if password is not None:
