@@ -1,5 +1,4 @@
 from database import Database as db
-from storage import storage
 from ui.apm1 import apm1_start, apm1_entry
 from ui.apm2 import apm2_start, apm2_entry
 from ui.apm3 import apm3_start, apm3_entry
@@ -117,7 +116,7 @@ def entry_photo(username, data):
 					if valid is False:
 						db.clear_user(username)
 						return text, kbd
-                    # todo Local variable 'code' might be referenced before assignment
+					# todo Local variable 'code' might be referenced before assignment
 					return f'{user["apm"]["arm_name"]}\n❌ Неверный ввод: {code}\n{text}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{user["apm"]["arm_name"]}\n{text}', kbd
