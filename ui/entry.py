@@ -37,7 +37,7 @@ apm_button_list = {
 def get_arm_name(user):
 	if 'location_name' in user['apm']:
 		return f'{user["apm"]["arm_name"]} - {user["apm"]["location_name"]}\n'
-	else: # todo У разработчика пока нет location_name
+	else:  # todo У разработчика пока нет location_name
 		return f'{user["apm"]["arm_name"]}\n'
 
 
@@ -77,6 +77,7 @@ def show_apm(user, arm_list, username):
 ##################################
 
 def entry_start(username, text, key=None):
+	print(f'entry_start key: {key}')
 	arm_list = {}
 	user = db.get_user(username)
 	if not user:
@@ -88,7 +89,7 @@ def entry_start(username, text, key=None):
 			arm_list = storage.get_arms(location_id)
 			user = db.create_user(username, location_id)
 		else:
-			arm_list = storage.get_arm_access(const.NOW(), password=text)
+			arm_list = storage.get_arm_access(const.now(), password=text)
 			if len(arm_list) > 0:
 				user = db.create_user(username, arm_list[0]["location_id"], password=text)
 			else:
@@ -123,14 +124,15 @@ def entry_photo(username, data):
 					if valid is False:
 						db.clear_user(username)
 						return text, kbd
-					# todo Local variable 'code' might be referenced before assignment
 					return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
+			# todo Local variable 'code' might be referenced before assignment
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{get_arm_name(user)}{text}', kbd
 		return show_apm(user, user["apm_list"], username)
 
 
 def entry_button(username, text, key):
+	print(f'entry_button key: {key}')
 	if key == 'entry_exit':
 		db.clear_user(username)
 
@@ -151,7 +153,7 @@ def entry_button(username, text, key):
 
 	if key == 'entry_apm7':  # Старший смены
 		if user["apm"] is None:
-			user["apm"] = dict({"arm_name": "Старший смены"})
+			user["apm"] = dict({"arm_name": "Старший смены", "place_id": 7})
 		text, kbd, user["key"] = apm8_entry(user, None, key)
 		return text, kbd
 

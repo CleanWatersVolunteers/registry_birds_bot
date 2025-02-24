@@ -1,5 +1,5 @@
 # Константы
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 
@@ -16,9 +16,12 @@ class const:
 	text_data_check = "Проверьте, что данные введены верно и нажмите 'Готово'\n"
 	text_capture_time = "Время отлова"
 	text_capture_place = "Место отлова"
+	text_today = 'Сегодня'
 
 	datetime_short_format = "%d.%m.%y %H:%M"
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
-	NOW = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
+	now = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
+	today = datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime(date_format)
+	tomorrow = (datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')) + timedelta(days=1)).strftime(date_format)

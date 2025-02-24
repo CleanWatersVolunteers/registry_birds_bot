@@ -200,9 +200,9 @@ class storage:
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 		query = """
-	INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
-	VALUES (NOW(), %s, %s, %s, %s)
-	"""
+			INSERT INTO animals (registration_datetime, bar_code, place_capture, capture_datetime, degree_pollution)
+			VALUES (NOW(), %s, %s, %s, %s)
+		"""
 		data = (code, place, capture_datetime_formatted, pollution)
 		return cls.execute_query(query, data)
 

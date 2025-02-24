@@ -1,10 +1,11 @@
 import asyncio
+import re
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
-from logs import log
 
-import re
 from database import Database as db
+from logs import log
 from storage import QRCodeStorage
 from ui.entry import entry_start, entry_button, entry_photo, SUPERVISOR_ARM
 from ui.gen import (
@@ -42,7 +43,7 @@ async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 		else:
 			await update.message.reply_text(text)
 	except Exception as e:
-		print('[!!] Exception ', e)
+		print('[!!] Exception cb_user_message ', e)
 
 async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	query = update.callback_query
@@ -59,7 +60,7 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 			await query.message.reply_text(text=text)
 		
 	except Exception as e:
-		print('[!!] Exception ', e)
+		print('[!!] Exception cb_user_button ', e)
 
 async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	username = update["message"]["from"]["username"]
@@ -76,7 +77,7 @@ async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 			await update.message.reply_text(text=text)
 		
 	except Exception as e:
-		print('[!!] Exception ', e)
+		print('[!!] Exception cb_user_photo ', e)
 
 async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	cmd = update.message.text
@@ -88,7 +89,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 			await update.message.reply_text("❌ Команда запрещена")
 			return None
 	except Exception as e:
-		print(f'[!!] {e}')
+		print('[!!] Exception cb_cmd_gen ', e)
 		# todo Local variable 'username' might be referenced before assignment
 		await update.message.reply_text(f'Здравствуйте {username}!\n⚠ Введите пароль')
 		return None
@@ -119,7 +120,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 		await msg.delete()
 		await update.message.reply_document(document=pdf_data, filename=pdf_name, caption=TEXT_QR_CODES_READY)
 	except Exception as e:
-		print(f'[!!] {e}')
+		print(f'[!!] Exception cb_cmd_gen {e}')
 		text = f"❌ Неправильный ввод: {cmd}\n"
 		text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
 		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
