@@ -22,18 +22,28 @@ apm8_text_end_time = 'Введите время окончания смены'
 apm8_text_invalid_start_time = 'Время начала новой смены не может быть внутри существующей.'
 apm8_text_invalid_end_time = 'Время окончания новой смены не может быть внутри существующей.'
 apm8_wrong_start_after_end = 'Время окончания новой смены не может быть раньше времени начала или совпадать с ним'
+apm8_text_duty_title = 'Смена № {number}'
+apm8_text_delete_duty = 'Удалить смену № {number}'
+apm8_text_no_duty = 'Нет смен'
 
 
-def get_duty_info(item):
-	return f'\nПароль: {item["password"]}\nНачало: {item["start_date"].strftime(const.datetime_short_format)}\nОкончание: {item["end_date"].strftime(const.datetime_short_format)}'
+def get_duty_info(item, duty_number):
+	return f'\n{apm8_text_duty_title.format(number=duty_number)}\nПароль: {item["password"]}\nНачало: {item["start_date"].strftime(const.datetime_short_format)}\nОкончание: {item["end_date"].strftime(const.datetime_short_format)}'
 
 
 def get_new_duty_info(start_date, end_date):
 	return f'\nНачало: {TimeTools.getDateTime(start_date).strftime(const.datetime_short_format)}\nОкончание: {TimeTools.getDateTime(end_date).strftime(const.datetime_short_format)}'
 
 
+def delete_duty(user, access_id):
+	storage.delete_duty(access_id)
+	return get_first_screen(user)
+
+
 def create_duty(user, place_id):
 	arm_id = storage.get_arm_id(place_id, user["location_id"])
+	if 'place_name' not in user:
+		user['place_name'] = storage.get_place_name(place_id)
 	user['duty_arm_id'] = arm_id
 	return (
 		f'{user['place_name']}\n{apm8_text_start_date}',
@@ -74,32 +84,30 @@ def getEndTime(user):
 	)
 
 
-def arm_info(user, place_id):
+def show_duty_list(user, place_id):
 	data = storage.access_data(place_id, user['location_id'])
+	user['place_id'] = place_id
+	text = ''
+	kbd = {}
 	if data:
-		text = f'{apm8_text_line}\n'
+		text += f'{apm8_text_line}\n'
 		has_place_name = False
+		duty_number = 1
 		for item in data:
 			if not has_place_name:
-				text += f'{item["name"]}\n{apm8_text_line}{get_duty_info(item)}'
+				text += f'{item["name"]}\n{apm8_text_line}{get_duty_info(item, duty_number)}'
 				has_place_name = True
 				user['place_name'] = item["name"]
 			else:
-				text += f'{get_duty_info(item)}'
+				text += f'{get_duty_info(item, duty_number)}'
 			text += f'\n{apm8_text_line}'
-		kbd = {
-			apm8_text_create_duty: f'apm8_create_{place_id}',
-			const.text_cancel: 'entry_apm7'
-		}
-		return text, kbd, None
+			kbd[f'{apm8_text_delete_duty.format(number=duty_number)}'] = f'apm8_delete_{item['id']}'
+			duty_number += duty_number
 	else:
-		return (
-			f'Нет данных', {
-				apm8_text_create_duty: f'apm8_create_{place_id}',
-				const.text_cancel: "entry_apm7"
-			},
-			None
-		)
+		text = f'{user['place_name']}: {apm8_text_no_duty}'
+	kbd[apm8_text_create_duty] = f'apm8_create_{place_id}'
+	kbd[const.text_cancel] = 'entry_apm7'
+	return text, kbd, None
 
 
 # Проверка времени начала смены
@@ -209,9 +217,11 @@ def apm8_entry(user, text, key):
 	if isinstance(user, str):
 		user = db.get_user(user)
 	if 'place_' in key:
-		return arm_info(user, key.split('_')[2])
+		return show_duty_list(user, key.split('_')[2])
 	if 'create_' in key:
 		return create_duty(user, key.split('_')[2])
+	if 'delete_' in key:
+		return delete_duty(user, key.split('_')[2])
 	if 'apm8_start_today' in key:
 		user['start_duty_date'] = const.today
 		return getStartTime(user)
@@ -231,14 +241,6 @@ def apm8_entry(user, text, key):
 		start = TimeTools.getDateTime(user['duty_start_date_time'])
 		end = TimeTools.getDateTime(user['duty_end_date_time'])
 		storage.create_duty(user['duty_arm_id'], start, end, password)
-		user['duty_arm_id'] = ''
-		user['place_name'] = ''
-		user['duty_start_date_time'] = ''
-		user['duty_end_date_time'] = ''
-		user['duty_start_time'] = ''
-		user['duty_end_date'] = ''
-		user['start_duty_date'] = ''
-		user['end_duty_date'] = ''
 		return get_first_screen(user)
 	if key == 'entry_apm7':
 		return get_first_screen(user)

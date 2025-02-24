@@ -263,6 +263,15 @@ class storage:
 		return cls.execute_query(query, fetch=True)
 
 	@classmethod
+	def get_place_name(cls, place_id):
+		query = """SELECT name FROM places WHERE id = %s """
+		result = cls.execute_query(query, (place_id,), fetch=True)
+		if result and len(result) == 1:
+			name = result[0]["name"]
+			return name
+		return None
+
+	@classmethod
 	def get_arms(cls, location_id):
 		query = """
 	SELECT
