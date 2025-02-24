@@ -40,7 +40,6 @@ def validate_datetime(user, date_input, time_input):
 	time_now = GET_NOW_TIME()
 	user_time = TimeTools.createFullDate(date_input, time_input)
 
-	# Преобразуем строки в формат datetime
 	time1 = TimeTools.getDateTime(time_now)
 	time2 = TimeTools.getDateTime(user_time)
 	time_diff = time1 - time2

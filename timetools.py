@@ -41,6 +41,7 @@ class TimeTools:
 		except ValueError:
 			return False
 
+	# Преобразуем строки в формат datetime
 	@classmethod
 	def getDateTime(cls, value):
 		return datetime.strptime(value, const.datetime_format)
