@@ -19,6 +19,9 @@ apm8_text_start_date = 'Выберите дату начала смены'
 apm8_text_start_time = 'Введите время начала смены'
 apm8_text_end_date = 'Выберите дату окончания смены'
 apm8_text_end_time = 'Введите время окончания смены'
+apm8_text_invalid_start_time = 'Время начала новой смены не может быть внутри существующей.'
+apm8_text_invalid_end_time = 'Время окончания новой смены не может быть внутри существующей.'
+apm8_wrong_start_after_end = 'Время окончания новой смены не может быть раньше времени начала или совпадать с ним'
 
 
 def get_duty_info(item):
@@ -125,14 +128,37 @@ def apm8_end_time_validate(msg, user):
 
 def validate_start_datetime(user, date, time):
 	start_time = TimeTools.createFullDate(date, time)
-	user['duty_start_date_time'] = start_time
-	return getEndDate()
+	if storage.check_duty_date(user['duty_arm_id'], start_time):
+		user['duty_start_date_time'] = start_time
+		return getEndDate()
+	else:
+		return (
+			apm8_text_invalid_start_time,
+			{const.text_ok: "entry_apm7"},
+			None
+		)
 
 
 def validate_end_datetime(user, date, time):
 	end_time = TimeTools.createFullDate(date, time)
-	user['duty_end_date_time'] = end_time
-	return check_data(user)
+	end = TimeTools.getDateTime(end_time)
+	start = TimeTools.getDateTime(user['duty_start_date_time'])
+	if start >= end:
+		return (
+			f'{const.text_incorrect} {start.strftime(const.datetime_short_format)} -> {end.strftime(const.datetime_short_format)}\n{apm8_wrong_start_after_end}',
+			{const.text_ok: "entry_apm7"},
+			None
+		)
+
+	if storage.check_duty_date(user['duty_arm_id'], end_time):
+		user['duty_end_date_time'] = end_time
+		return check_data(user)
+	else:
+		return (
+			apm8_text_invalid_end_time,
+			{const.text_ok: "entry_apm7"},
+			None
+		)
 
 
 def check_data(user):

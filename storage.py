@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import pooling
 
 from config import Config
+from timetools import TimeTools
 
 
 class storage:
@@ -315,7 +316,8 @@ class storage:
 	# Проверяет попадает ли дата внутрь смены
 	@classmethod
 	def check_duty_date(cls, arm_id, date):
-		date_str = date.strftime(cls.capture_datetime_db_format)
+		start = TimeTools.getDateTime(date)
+		date_str = start.strftime(cls.capture_datetime_db_format)
 		query = """SELECT id FROM arm_access WHERE arm_id = %s AND (%s BETWEEN start_date AND end_date)"""
 		data = (arm_id, date_str)
 		results = cls.execute_query(query, data, fetch=True)
