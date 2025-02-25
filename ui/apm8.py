@@ -26,6 +26,7 @@ apm8_text_duty_title = 'Смена № {number}'
 apm8_text_delete_duty = 'Удалить смену № {number}'
 apm8_text_no_duty = 'Нет смен'
 apm8_text_create_duty_title = 'Создание смены:'
+apm8_text_delete_duty_confirmation = '❓ Действительно удалить смену:'
 
 
 def get_duty_info(item, duty_number):
@@ -36,15 +37,23 @@ def get_new_duty_info(start_date, end_date):
 	return f'\nНачало: {TimeTools.getDateTime(start_date).strftime(const.datetime_short_format)}\nОкончание: {TimeTools.getDateTime(end_date).strftime(const.datetime_short_format)}'
 
 
+def delete_duty_confirmation(user, access_id):
+
+	return (
+		f'{apm8_text_delete_duty_confirmation} {user['place_name']}',
+		{f'{const.text_ok}': f'apm8_delete_{access_id}', f'{const.text_cancel}': "entry_apm7"},
+		None
+	)
+
+
 def delete_duty(user, access_id):
 	storage.delete_duty(access_id)
 	return get_first_screen(user)
 
 
 def create_duty(user, place_id):
-	arm_id = storage.get_arm_id(place_id, user["location_id"])
+	user['duty_arm_id'] = storage.get_arm_id(place_id, user["location_id"])
 	user['place_name'] = storage.get_place_name(place_id)
-	user['duty_arm_id'] = arm_id
 	return (
 		f'{apm8_text_create_duty_title} {user['place_name']}\n{apm8_text_start_date}',
 		{
@@ -101,7 +110,7 @@ def show_duty_list(user, place_id):
 			else:
 				text += f'{get_duty_info(item, duty_number)}'
 			text += f'\n{apm8_text_line}'
-			kbd[f'{apm8_text_delete_duty.format(number=duty_number)}'] = f'apm8_delete_{item['id']}'
+			kbd[f'{apm8_text_delete_duty.format(number=duty_number)}'] = f'apm8_confirmdelete_{item['id']}'
 			duty_number += duty_number
 	else:
 		text = f'{user['place_name']}: {apm8_text_no_duty}'
@@ -220,6 +229,8 @@ def apm8_entry(user, text, key):
 		return show_duty_list(user, key.split('_')[2])
 	if 'create_' in key:
 		return create_duty(user, key.split('_')[2])
+	if 'confirmdelete_' in key:
+		return delete_duty_confirmation(user, key.split('_')[2])
 	if 'delete_' in key:
 		return delete_duty(user, key.split('_')[2])
 	if 'apm8_start_today' in key:
