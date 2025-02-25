@@ -1,8 +1,8 @@
 # Прием в стационар
 
+from const import const
 from database import Database as db
 from storage import storage
-from const import const
 
 apm3_text = f"Введите массу животного в граммах"
 
@@ -43,7 +43,7 @@ def apm3_start(username, text, key=None):
 	return None, None
 
 
-def apm3_entry(username, msg, key):
+def apm3_button(username, msg, key):
 	user = db.get_user(username)
 	if key == "apm3_done":
 		# todo Использовать arm_id из базы #154

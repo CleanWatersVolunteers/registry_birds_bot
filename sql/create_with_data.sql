@@ -40,19 +40,18 @@ CREATE TABLE IF NOT EXISTS `arms` (
   CONSTRAINT `fk_arms_places1` FOREIGN KEY (`place_id`) REFERENCES `places` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.arms: ~8 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.arms: ~10 rows (приблизительно)
 INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
-	(0, 0, 0),
-	(1, 1, 0),
-	(2, 2, 0),
-	(3, 3, 0),
-	(4, 4, 0),
-	(5, 0, 1),
-	(6, 1, 1),
-	(7, 2, 2),
-	(8, 5, 0),
-	(9, 5, 1),
-	(10, 7, 0);
+	(0, 1, 0),
+	(1, 2, 0),
+	(2, 3, 0),
+	(3, 4, 0),
+	(4, 5, 0),
+	(5, 6, 0),
+	(6, 7, 0),
+	(7, 8, 0),
+	(8, 1, 1),
+	(9, 2, 1);
 
 -- Дамп структуры для таблица registry_birds.arm_access
 CREATE TABLE IF NOT EXISTS `arm_access` (
@@ -90,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `locations` (
   `address` varchar(45) NOT NULL,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Дамп данных таблицы registry_birds.locations: ~2 rows (приблизительно)
 INSERT INTO `locations` (`id`, `address`, `name`) VALUES
@@ -107,14 +106,14 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
 
 -- Дамп данных таблицы registry_birds.manipulations: ~7 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
-	(0, 'Ел сам', '5'),
-	(1, 'Пил сам', '5'),
-	(2, 'Отказ от еды', '5'),
-	(3, 'Отказ от питья', '5'),
-	(4, 'Энтерофурил + физ.раствор 20мл в рот', '3,5'),
-	(5, 'Рингер 50/50 + Глюкоза 10мл', '3'),
-	(6, 'Бриллиантовые глаза', '3'),
-	(7, 'Взвешивание', '5');
+	(0, 'Ел сам', '6'),
+	(1, 'Пил сам', '6'),
+	(2, 'Отказ от еды', '6'),
+	(3, 'Отказ от питья', '6'),
+	(4, 'Энтерофурил + физ.раствор 20мл в рот', '4,6'),
+	(5, 'Рингер 50/50 + Глюкоза 10мл', '4'),
+	(6, 'Бриллиантовые глаза', '4'),
+	(7, 'Взвешивание', '6');
 
 -- Дамп структуры для таблица registry_birds.numerical_history
 CREATE TABLE IF NOT EXISTS `numerical_history` (
@@ -154,12 +153,12 @@ CREATE TABLE IF NOT EXISTS `places` (
 
 -- Дамп данных таблицы registry_birds.places: ~5 rows (приблизительно)
 INSERT INTO `places` (`id`, `name`) VALUES
-	(0, 'Поступление'),
-	(1, 'Первичка на мойке'),
-	(2, 'Прием в стационар'),
-	(3, 'Первичка в стационаре'),
-	(4, 'Медицинский прием'),
-	(5, 'Нянька'),
+	(1, 'Поступление'),
+	(2, 'Первичка на мойке'),
+	(3, 'Прием в стационар'),
+	(4, 'Первичка в стационаре'),
+	(5, 'Медицинский прием'),
+	(6, 'Нянька'),
 	(7, 'Старший смены');
 
 -- Дамп структуры для таблица registry_birds.place_history

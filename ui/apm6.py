@@ -1,11 +1,12 @@
 # Нянька
 
 import re
+
+from const import const
 from database import Database as db
 from storage import storage
-from const import const
 
-apm6_place_id = 5
+apm6_place_id = 6
 
 nanny_minimal_weight = 50
 nanny_minimal_fish = 1
@@ -102,7 +103,7 @@ def apm6_start(username, text, key=None):
 	return text, kbd, None
 
 
-def apm6_entry(username, text, key):
+def apm6_button(username, text, key):
 	user = db.get_user(username)
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)

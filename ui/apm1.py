@@ -161,10 +161,10 @@ def apm1_start(username, text, key=None):
 	return None, None
 
 
-def apm1_entry(username, msg, key):
+def apm1_button(username, msg, key):
 	user = db.get_user(username)
 	if key == 'apm1_today':
-		user['capture_datetime'] = const.today()
+		user['capture_datetime'] = const.today
 		return apm1_get_time(user["code"])
 	keys = key.split('_')
 	if keys[1] == 'pollution':

@@ -1,8 +1,8 @@
 # Первичка на мойке
 
+from const import const
 from database import Database as db
 from storage import storage
-from const import const
 
 
 ##################################
@@ -26,10 +26,10 @@ def apm2_start(username, text, key=None):
 	)
 
 
-def apm2_entry(username, text, key):
+def apm2_button(username, text, key):
 	user = db.get_user(username)
 	# todo Использовать arm_id из базы #154
-	place_id = 1
+	place_id = 2
 	arm_id = storage.get_arm_id(place_id, user["location_id"])
 	# todo Использовать arm_id из базы #154
 	storage.insert_place_history(arm_id, user["animal_id"], username)

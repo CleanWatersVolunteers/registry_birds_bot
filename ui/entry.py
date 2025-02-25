@@ -1,36 +1,33 @@
 from database import Database as db
-from ui.apm1 import apm1_start, apm1_entry
-from ui.apm2 import apm2_start, apm2_entry
-from ui.apm3 import apm3_start, apm3_entry
-from ui.apm4 import apm4_start, apm4_entry
-from ui.apm5 import apm5_start, apm5_entry
-from ui.apm6 import apm6_start, apm6_entry
-from ui.apm7 import apm7_start, apm7_entry
-from ui.apm8 import apm8_start, apm8_entry
+from ui.apm1 import apm1_start, apm1_button
+from ui.apm2 import apm2_start, apm2_button
+from ui.apm3 import apm3_start, apm3_button
+from ui.apm4 import apm4_start, apm4_button
+from ui.apm5 import apm5_start, apm5_button
+from ui.apm6 import apm6_start, apm6_button
+from ui.apm7 import apm7_start, apm7_button
 from ui.code import *
 
 WELLCOME = 'Здравствуйте {username}!\n⚠ Введите пароль'
 SUPERVISOR_ARM = 7
 
 apm_start_list = {
-	0: apm1_start,
-	1: apm2_start,
-	2: apm3_start,
-	3: apm4_start,
-	4: apm5_start,
-	5: apm6_start,
-	6: apm7_start,
-	7: apm8_start,
+	1: apm1_start,
+	2: apm2_start,
+	3: apm3_start,
+	4: apm4_start,
+	5: apm5_start,
+	6: apm6_start,
+	7: apm7_start,
 }
 apm_button_list = {
-	"apm1": apm1_entry,
-	"apm2": apm2_entry,
-	"apm3": apm3_entry,
-	"apm4": apm4_entry,
-	"apm5": apm5_entry,
-	"apm6": apm6_entry,
-	"apm7": apm7_entry,
-	"apm8": apm8_entry,
+	"apm1": apm1_button,
+	"apm2": apm2_button,
+	"apm3": apm3_button,
+	"apm4": apm4_button,
+	"apm5": apm5_button,
+	"apm6": apm6_button,
+	"apm7": apm7_button,
 }
 
 
@@ -49,7 +46,7 @@ def show_apm(user, arm_list, username):
 	user["animal_id"] = None
 	if len(arm_list) > 1:
 		#  todo Когда-нибудь История переедет в мед. приём
-		arm_list.append({'arm_id': 6, 'arm_name': 'История', 'place_id': 6})
+		arm_list.append({'arm_id': 8, 'arm_name': 'История', 'place_id': 8})
 		text = f'Выберите АРМ из списка ниже:\n'
 		if arm_list is not None:
 			for arm in arm_list:
@@ -60,7 +57,7 @@ def show_apm(user, arm_list, username):
 		user["apm"] = arm_list[0]
 		if user["apm"]["place_id"] == SUPERVISOR_ARM:
 			key = 'entry_apm7'
-			text, kbd, user["key"] = apm8_entry(user, None, key)
+			text, kbd, user["key"] = apm7_button(user, None, key)
 			return text, kbd
 		text, kbd, valid = code_request(user)
 		if valid is False:
@@ -154,7 +151,7 @@ def entry_button(username, text, key):
 	if key == 'entry_apm7':  # Старший смены
 		if user["apm"] is None:
 			user["apm"] = dict({"arm_name": "Старший смены", "place_id": 7})
-		text, kbd, user["key"] = apm8_entry(user, None, key)
+		text, kbd, user["key"] = apm7_button(user, None, key)
 		return text, kbd
 
 	# select item menu

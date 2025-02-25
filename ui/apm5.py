@@ -1,8 +1,8 @@
 # Медицинский прием
 
+from const import const
 from database import Database as db
 from storage import storage
-from const import const
 
 apm5_text_species = "Введите вид животного"
 apm5_text_clinic_state = "Введите клиническое состояние"
@@ -51,7 +51,7 @@ def apm5_start(username, text, key=None):
 	)
 
 
-def apm5_entry(username, text, key):
+def apm5_button(username, text, key):
 	user = db.get_user(username)
 	if key == 'apm5_done':
 		storage.update_animal(
