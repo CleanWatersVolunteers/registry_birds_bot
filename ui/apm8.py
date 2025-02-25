@@ -15,16 +15,17 @@ from ui.gen import (
 apm8_text_line = '------------------------'
 apm8_text_create_duty = 'Создать смену'
 apm8_text_tomorrow = 'Завтра'
-apm8_text_start_date = 'Выберите дату начала смены'
-apm8_text_start_time = 'Введите время начала смены'
-apm8_text_end_date = 'Выберите дату окончания смены'
-apm8_text_end_time = 'Введите время окончания смены'
+apm8_text_start_date = 'Выберите дату начала'
+apm8_text_start_time = 'Введите время начала'
+apm8_text_end_date = 'Выберите дату окончания'
+apm8_text_end_time = 'Введите время окончания'
 apm8_text_invalid_start_time = 'Время начала новой смены не может быть внутри существующей.'
 apm8_text_invalid_end_time = 'Время окончания новой смены не может быть внутри существующей.'
 apm8_wrong_start_after_end = 'Время окончания новой смены не может быть раньше времени начала или совпадать с ним'
 apm8_text_duty_title = 'Смена № {number}'
 apm8_text_delete_duty = 'Удалить смену № {number}'
 apm8_text_no_duty = 'Нет смен'
+apm8_text_create_duty_title = 'Создание смены:'
 
 
 def get_duty_info(item, duty_number):
@@ -42,11 +43,10 @@ def delete_duty(user, access_id):
 
 def create_duty(user, place_id):
 	arm_id = storage.get_arm_id(place_id, user["location_id"])
-	if 'place_name' not in user:
-		user['place_name'] = storage.get_place_name(place_id)
+	user['place_name'] = storage.get_place_name(place_id)
 	user['duty_arm_id'] = arm_id
 	return (
-		f'{user['place_name']}\n{apm8_text_start_date}',
+		f'{apm8_text_create_duty_title} {user['place_name']}\n{apm8_text_start_date}',
 		{
 			const.text_today: "apm8_start_today",
 			apm8_text_tomorrow: "apm8_start_tomorrow",
@@ -58,7 +58,7 @@ def create_duty(user, place_id):
 
 def getEndDate(user):
 	return (
-		f'{user['place_name']}\n{apm8_text_end_date}',
+		f'{apm8_text_create_duty_title} {user['place_name']}\n{apm8_text_end_date}',
 		{
 			const.text_today: "apm8_end_today",
 			apm8_text_tomorrow: "apm8_end_tomorrow",
@@ -70,7 +70,7 @@ def getEndDate(user):
 
 def getStartTime(user):
 	return (
-		f'{user['place_name']}\n{apm8_text_start_time}',
+		f'{apm8_text_create_duty_title} {user['place_name']}\n{apm8_text_start_time}',
 		{const.text_cancel: "entry_apm7"},
 		'apm8_start_time_validate'
 	)
@@ -78,7 +78,7 @@ def getStartTime(user):
 
 def getEndTime(user):
 	return (
-		f'{user['place_name']}\n{apm8_text_end_time}',
+		f'{apm8_text_create_duty_title} {user['place_name']}\n{apm8_text_end_time}',
 		{const.text_cancel: "entry_apm7"},
 		'apm8_end_time_validate'
 	)
@@ -87,6 +87,7 @@ def getEndTime(user):
 def show_duty_list(user, place_id):
 	data = storage.access_data(place_id, user['location_id'])
 	user['place_id'] = place_id
+	user['place_name'] = storage.get_place_name(place_id)
 	text = ''
 	kbd = {}
 	if data:
@@ -95,9 +96,8 @@ def show_duty_list(user, place_id):
 		duty_number = 1
 		for item in data:
 			if not has_place_name:
-				text += f'{item["name"]}\n{apm8_text_line}{get_duty_info(item, duty_number)}'
+				text += f'{user['place_name']}\n{apm8_text_line}{get_duty_info(item, duty_number)}'
 				has_place_name = True
-				user['place_name'] = item["name"]
 			else:
 				text += f'{get_duty_info(item, duty_number)}'
 			text += f'\n{apm8_text_line}'
@@ -171,7 +171,7 @@ def validate_end_datetime(user, date, time):
 
 def check_data(user):
 	return (
-		f'{user['place_name']}\n{get_new_duty_info(user['duty_start_date_time'], user['duty_end_date_time'])}\n{const.text_data_check}',
+		f'{apm8_text_create_duty_title} {user['place_name']}\n{get_new_duty_info(user['duty_start_date_time'], user['duty_end_date_time'])}\n{const.text_data_check}',
 		{const.text_done: "apm8_done", const.text_cancel: "entry_apm7"},
 		None
 	)
