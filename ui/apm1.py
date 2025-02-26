@@ -10,6 +10,8 @@ from database import Database as db
 from storage import storage
 from timetools import TimeTools
 
+apm1_place_id = 1
+
 GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
 GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
 GET_DATETIME = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4} \d{1,2}:\d{1,2}', text)
@@ -177,6 +179,12 @@ def apm1_button(username, msg, key):
 		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
 	if key == 'apm1_done':
-		storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"], place=user["place"],
-							  pollution=user["pollution"])
+		animal_id = storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"],
+										  place=user["place"],
+										  pollution=user["pollution"])
+		if animal_id is not None:
+			# todo Использовать arm_id из базы #154
+			arm_id = storage.get_arm_id(apm1_place_id, user["location_id"])
+			# todo Использовать arm_id из базы #154
+			storage.insert_place_history(arm_id, animal_id, username)
 	return None, None, None

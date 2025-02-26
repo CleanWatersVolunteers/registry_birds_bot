@@ -16,7 +16,6 @@ USE `registry_birds`;
 CREATE TABLE IF NOT EXISTS `animals` (
   `id` int NOT NULL AUTO_INCREMENT,
   `bar_code` int NOT NULL,
-  `registration_datetime` datetime NOT NULL,
   `place_capture` varchar(45) NOT NULL,
   `capture_datetime` datetime NOT NULL,
   `degree_pollution` varchar(45) NOT NULL,
