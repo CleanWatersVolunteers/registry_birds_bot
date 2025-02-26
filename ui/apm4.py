@@ -1,10 +1,10 @@
 # Первичка в стационаре
 
+from const import const
 from database import Database as db
 from storage import storage
-from const import const
 
-apm4_place_id = 3
+apm4_place_id = 4
 
 
 def show_mpls(user, mpls):
@@ -41,14 +41,14 @@ def apm4_start(username, text, key=None):
 	mpls = storage.get_manipulations(apm4_place_id)
 	if len(mpls) == 0:
 		return (
-			"❌ Манипуляции не найдены!",
+			const.manipulation_not_found,
 			{const.text_exit: "entry_cancel"}, None
 		)
 	text, kbd = show_mpls(user, mpls)
 	return text, kbd, None
 
 
-def apm4_entry(username, text, key):
+def apm4_button(username, text, key):
 	user = db.get_user(username)
 	key_id = key.split('_')[-1]
 	user["mpl_list"].append(key_id)
