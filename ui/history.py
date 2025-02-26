@@ -3,12 +3,12 @@
 from const import const
 from storage import storage
 
-apm7_text_pollution_degree = "Степень загрязнения"
-apm7_text_weight = "Вес"
-apm7_text_not_specified = "Не указан"
-apm7_text_species = "Вид"
-apm7_text_clinical_condition = "Клиническое состояние"
-apm7_manipulations_not_found = "Манипуляции не найдены"
+history_text_pollution_degree = "Степень загрязнения"
+history_text_weight = "Вес"
+history_text_not_specified = "Не указан"
+history_text_species = "Вид"
+history_text_clinical_condition = "Клиническое состояние"
+history_manipulations_not_found = "Манипуляции не найдены"
 
 
 def add_hdr_item(label, value):
@@ -20,18 +20,19 @@ def add_hdr_item(label, value):
 	return text
 
 
-def ui_welcome_get_card(animal_id):
+def get_animal_card(animal_id):
 	animal = storage.get_animal_by_id(animal_id)
 	if animal:
 		text = add_hdr_item(const.text_animal_number, animal["bar_code"])
 		text += add_hdr_item(const.text_capture_place, animal["place_capture"])
 		text += add_hdr_item(const.text_capture_time, animal["capture_datetime"].strftime(const.datetime_format))
-		text += add_hdr_item(apm7_text_pollution_degree, animal["degree_pollution"])
-		text += add_hdr_item(apm7_text_weight,
-							 f"{animal['weight']} гр." if animal["weight"] else apm7_text_not_specified)
-		text += add_hdr_item(apm7_text_species, animal["species"] if animal["species"] else apm7_text_not_specified)
-		text += add_hdr_item(apm7_text_clinical_condition, animal["clinical_condition_admission"] if animal[
-			"clinical_condition_admission"] else apm7_text_not_specified)
+		text += add_hdr_item(history_text_pollution_degree, animal["degree_pollution"])
+		text += add_hdr_item(history_text_weight,
+							 f"{animal['weight']} гр." if animal["weight"] else history_text_not_specified)
+		text += add_hdr_item(history_text_species,
+							 animal["species"] if animal["species"] else history_text_not_specified)
+		text += add_hdr_item(history_text_clinical_condition, animal["clinical_condition_admission"] if animal[
+			"clinical_condition_admission"] else history_text_not_specified)
 		text += '---------------\n'
 		return text
 	return None
@@ -50,7 +51,7 @@ def history_start(username, text, key=None):
 			None
 		)
 
-	text = ui_welcome_get_card(animal["animal_id"])
+	text = get_animal_card(animal["animal_id"])
 	numerical_history = storage.get_animal_numerical_history(animal["animal_id"])
 	history = storage.get_animal_history(animal["animal_id"])
 	place_history = storage.get_place_history(animal["animal_id"])
@@ -74,7 +75,7 @@ def history_start(username, text, key=None):
 		else:
 			result_string += f"{item['datetime'].strftime(const.time_format)} - {item['place_name']} - {item['location_name']}\n"
 	if result_string == "":
-		text += apm7_manipulations_not_found
+		text += history_manipulations_not_found
 	else:
 		text += result_string.strip()
 	return text, {const.text_done: "entry_cancel"}, None
