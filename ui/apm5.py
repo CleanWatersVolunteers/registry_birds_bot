@@ -3,6 +3,7 @@
 from const import const
 from database import Database as db
 from storage import storage
+from ui.history import history_get_info
 
 apm5_text_species = '⚠️ Введите вид животного'
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
@@ -28,18 +29,17 @@ def apm5_add_hdr_item(label, value):
 
 def apm5_show_mpls(user, mpls):
 	kbd = dict()
-	text = f'{get_animal_card(user['animal'])}\n'
+	text = f'{apm5_get_animal_card(user['animal'])}\n'
 	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
 		if str(mpl['id']) in user['mpl_list']:
 			text += f'✅ {mpl['name']}\n'
 		else:
 			kbd[mpl['name']] = f'apm5_mpl_{mpl["id"]}'
 	kbd['Готово'] = 'entry_cancel'
-	text += f'{const.text_manipulation_done}'
 	return text, kbd
 
 
-def get_animal_card(animal):
+def apm5_get_animal_card(animal):
 	if animal:
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
@@ -51,7 +51,7 @@ def get_animal_card(animal):
 								  animal['species'] if animal['species'] else history_text_not_specified)
 		text += apm5_add_hdr_item(history_text_clinical_condition, animal["clinical_condition_admission"] if animal[
 			'clinical_condition_admission'] else history_text_not_specified)
-		text += '---------------\n'
+		text += f'{const.text_line}\n'
 		return text
 	return None
 
@@ -73,7 +73,7 @@ def apm5_start(username, text, key=None):
 		user['animal'] = animal
 		if animal['species'] is None:
 			return (
-				f'{get_animal_card(animal)}\n{apm5_text_species}',
+				f'{apm5_get_animal_card(animal)}\n{apm5_text_species}',
 				{const.text_cancel: 'entry_cancel'},
 				'apm5_species'
 			)
@@ -85,6 +85,9 @@ def apm5_start(username, text, key=None):
 				{const.text_exit: 'entry_cancel'}, None
 			)
 		text, kbd = apm5_show_mpls(user, mpls)
+		text += history_get_info(animal)
+		text += f'\n{const.text_line}\n'
+		text += f'\n{const.text_manipulation_done}'
 		return text, kbd, None
 	if key == 'apm5_species':
 		user['species'] = text
@@ -100,7 +103,6 @@ def apm5_start(username, text, key=None):
 		text += f'❓ Вид: {user['species']}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
-
 	return (
 		apm5_text_species,
 		{const.text_cancel: 'entry_cancel'},
