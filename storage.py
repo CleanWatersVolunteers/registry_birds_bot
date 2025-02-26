@@ -47,8 +47,8 @@ class storage:
 		cls.execute_query(query, data)
 
 	@classmethod
-	def get_place_history(cls, animal_id):
-		query = """
+	def get_place_history(cls, animal_id, start_date):
+		select_query = """
                 SELECT 
                     ph.datetime, 
                     p.name AS place_name, 
@@ -64,8 +64,12 @@ class storage:
                 WHERE 
                     ph.animal_id = %s
             """
-		data = (animal_id,)
-		return cls.execute_query(query, data, fetch=True)
+		if start_date is not None:
+			select_query += " AND ph.datetime >= %s"
+			data = (animal_id, start_date)
+		else:
+			data = (animal_id,)
+		return cls.execute_query(select_query, data, fetch=True)
 
 	@classmethod
 	def get_animal_id(cls, bar_code):
@@ -117,7 +121,7 @@ class storage:
 		return []
 
 	@classmethod
-	def get_animal_numerical_history(cls, animal_id):
+	def get_animal_numerical_history(cls, animal_id, start_date=None):
 		select_query = """
 	SELECT 
 		nht.name AS type_name,
@@ -130,9 +134,13 @@ class storage:
 	JOIN 
 		numerical_history_type nht ON nh.type_id = nht.id
 	WHERE 
-		nh.animal_id = %s;
+		nh.animal_id = %s
 	"""
-		data = (animal_id,)
+		if start_date is not None:
+			select_query += " AND nh.datetime >= %s"
+			data = (animal_id, start_date)
+		else:
+			data = (animal_id,)
 		results = cls.execute_query(select_query, data, fetch=True)
 		if results is not None:
 			# Формируем список записей
@@ -156,7 +164,7 @@ class storage:
 		cls.execute_query(query, data)
 
 	@classmethod
-	def get_animal_history(cls, animal_id):
+	def get_animal_history(cls, animal_id, start_date):
 		select_query = """
 	SELECT 
 		h.datetime, 
@@ -168,9 +176,13 @@ class storage:
 	JOIN 
 		manipulations m ON h.manipulation_id = m.id 
 	WHERE 
-		h.animal_id = %s;
+		h.animal_id = %s
 	"""
-		data = (animal_id,)
+		if start_date is not None:
+			select_query += " AND h.datetime >= %s"
+			data = (animal_id, start_date)
+		else:
+			data = (animal_id,)
 		results = cls.execute_query(select_query, data, fetch=True)
 		if results is not None:
 			# Формируем список записей

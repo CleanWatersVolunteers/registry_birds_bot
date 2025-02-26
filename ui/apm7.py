@@ -12,7 +12,6 @@ from ui.gen import (
 	qr_cmd_old
 )
 
-apm7_text_line = '------------------------'
 apm7_text_create_duty = 'Создать смену'
 apm7_text_tomorrow = 'Завтра'
 apm7_text_start_date = 'Выберите дату начала'
@@ -99,16 +98,16 @@ def show_duty_list(user, place_id):
 	text = ''
 	kbd = {}
 	if data:
-		text += f'{apm7_text_line}\n'
+		text += f'{const.text_line}\n'
 		has_place_name = False
 		duty_number = 1
 		for item in data:
 			if not has_place_name:
-				text += f'{user['place_name']}\n{apm7_text_line}{get_duty_info(item, duty_number)}'
+				text += f'{user['place_name']}\n{const.text_line}{get_duty_info(item, duty_number)}'
 				has_place_name = True
 			else:
 				text += f'{get_duty_info(item, duty_number)}'
-			text += f'\n{apm7_text_line}'
+			text += f'\n{const.text_line}'
 			kbd[f'{apm7_text_delete_duty.format(number=duty_number)}'] = f'apm7_confirmdelete_{item['id']}'
 			duty_number += duty_number
 	else:
