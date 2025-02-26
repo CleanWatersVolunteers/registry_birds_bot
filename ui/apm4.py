@@ -41,7 +41,7 @@ def apm4_start(username, text, key=None):
 	mpls = storage.get_manipulations(apm4_place_id)
 	if len(mpls) == 0:
 		return (
-			"❌ Манипуляции не найдены!",
+			const.manipulation_not_found,
 			{const.text_exit: "entry_cancel"}, None
 		)
 	text, kbd = show_mpls(user, mpls)
