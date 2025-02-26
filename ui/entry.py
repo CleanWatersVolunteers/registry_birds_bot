@@ -45,8 +45,6 @@ def show_apm(user, arm_list, username):
 	user["key"] = None
 	user["animal_id"] = None
 	if len(arm_list) > 1:
-		#  todo Когда-нибудь История переедет в мед. приём
-		arm_list.append({'arm_id': 8, 'arm_name': 'История', 'place_id': 8})
 		text = f'Выберите АРМ из списка ниже:\n'
 		if arm_list is not None:
 			for arm in arm_list:
