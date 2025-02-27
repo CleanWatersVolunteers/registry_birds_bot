@@ -22,6 +22,7 @@ apm1_text_date = 'Введите дату и время отлова в форм
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
 apm1_wrong_time_input = "Ошибка, дата отлова не может быть раньше 24 часов или позже текущего времени"
 apm1_text_pollution = 'Укажите степень загрязнения'
+apm1_text_already_registered = '❌ Животное с номером {code} уже зарегистрировано!'
 
 apm1_pollution_grade = {
 	"apm1_pollution_0": "менее 25%",
@@ -138,7 +139,7 @@ def apm1_start(username, text, key=None):
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is not None:
 			return (
-				f'❌ Животное с номером {text} уже зарегистрировано!',
+				f'{apm1_text_already_registered.format(code=text)}',
 				{const.text_ok: "entry_cancel"},
 				None
 			)

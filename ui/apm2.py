@@ -3,6 +3,7 @@
 from const import const
 from database import Database as db
 from storage import storage
+from tools import Tools
 
 apm2_place_id = 2
 
@@ -13,6 +14,9 @@ apm2_place_id = 2
 
 def apm2_start(username, text, key=None):
 	user = db.get_user(username)
+	checkDead = Tools.checkDead(text)
+	if checkDead is not False:
+		return checkDead
 	animal = storage.get_animal_by_bar_code(text)
 	if animal is None:
 		return (
