@@ -7,13 +7,14 @@ from ui.history import history_get_info
 
 apm5_text_species = '⚠️ Введите вид животного'
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
+apm5_text_animal_dead = 'Гибель'
+apm5_text_animal_dead_confirmation = '⚠️ Подтвердите гибель'
 
 history_text_pollution_degree = 'Степень загрязнения'
 history_text_weight = 'Вес'
 history_text_not_specified = 'Не указан'
 history_text_species = 'Вид'
 history_text_clinical_condition = 'Клиническое состояние'
-history_manipulations_not_found = 'Манипуляции не найдены'
 
 apm5_place_id = 5
 
@@ -34,8 +35,8 @@ def apm5_show_mpls(user, mpls):
 		if str(mpl['id']) in user['mpl_list']:
 			text += f'✅ {mpl['name']}\n'
 		else:
-			kbd[mpl['name']] = f'apm5_mpl_{mpl["id"]}'
-	kbd['Готово'] = 'entry_cancel'
+			if user['animal']['is_dead'] is False:
+				kbd[mpl['name']] = f'apm5_mpl_{mpl["id"]}'
 	return text, kbd
 
 
@@ -71,6 +72,8 @@ def apm5_start(username, text, key=None):
 				None
 			)
 		user['animal'] = animal
+		dead_info = storage.get_animal_dead(animal["bar_code"])
+		user['animal']['is_dead'] = dead_info is not None
 		if animal['species'] is None:
 			return (
 				f'{apm5_get_animal_card(animal)}\n{apm5_text_species}',
@@ -85,9 +88,13 @@ def apm5_start(username, text, key=None):
 				{const.text_exit: 'entry_cancel'}, None
 			)
 		text, kbd = apm5_show_mpls(user, mpls)
-		text += history_get_info(animal)
+		if user['animal']['is_dead'] is False:
+			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
+		kbd['Готово'] = 'entry_cancel'
+		text += history_get_info(animal, dead_info)
 		text += f'\n{const.text_line}\n'
-		text += f'\n{const.text_manipulation_done}'
+		if user['animal']['is_dead'] is False:
+			text += f'\n{const.text_manipulation_done}'
 		return text, kbd, None
 	if key == 'apm5_species':
 		user['species'] = text
@@ -110,6 +117,22 @@ def apm5_start(username, text, key=None):
 	)
 
 
+def apm5_animal_dead_confirmation(user):
+	return (
+		f'{apm5_text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
+		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
+		None
+	)
+
+
+def apm5_animal_dead(user, username):
+	animal_id = user['animal']['animal_id']
+	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
+	if arm_id is not None:
+		storage.create_dead_animal(animal_id, arm_id, username)
+	return None, None, None
+
+
 def apm5_button(username, text, key):
 	user = db.get_user(username)
 	if key == 'apm5_done':
@@ -118,6 +141,10 @@ def apm5_button(username, text, key):
 			species=user['species'],
 			clinical_condition_admission=user['clinic_state']
 		)
+	if key == 'apm5_animal_dead_confirmation':
+		return apm5_animal_dead_confirmation(user)
+	if key == 'apm5_animal_dead':
+		return apm5_animal_dead(user, username)
 	if "mpl" in key:
 		user = db.get_user(username)
 		key_id = key.split('_')[-1]
@@ -130,5 +157,8 @@ def apm5_button(username, text, key):
 		)
 		mpls = storage.get_manipulations(apm5_place_id)
 		text, kbd = apm5_show_mpls(user, mpls)
+		if user['animal']['is_dead'] is False:
+			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
+		kbd['Готово'] = 'entry_cancel'
 		return text, kbd, None
 	return None, None, None

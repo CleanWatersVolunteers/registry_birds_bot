@@ -12,6 +12,7 @@ class const:
 	text_animal_number = 'Животное №:'
 	text_exit = 'Выход'
 	animal_not_found = '❌ Животное с номером {code} не найдено!'
+	animal_is_dead = '❌ Животное {code} погибло.'
 	manipulation_not_found = '❌ Манипуляции не найдены!'
 	text_manipulation_done = "⚠️Выполните необходимые манипуляции и нажмите 'Готово'"
 	text_data_check = "Проверьте, что данные введены верно и нажмите 'Готово'\n"
@@ -19,6 +20,7 @@ class const:
 	text_capture_place = "Место отлова"
 	text_today = 'Сегодня'
 	text_line = '------------------------'
+	text_manipulations_not_found = "Манипуляции не найдены"
 
 	datetime_short_format = "%d.%m.%y %H:%M"
 	datetime_format = "%d.%m.%Y %H:%M"

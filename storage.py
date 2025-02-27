@@ -380,6 +380,26 @@ class storage:
 		return cls.execute_query(query, data, fetch=True)
 
 	@classmethod
+	def create_dead_animal(cls, animal_id, arms_id, tg_nickname):
+		query = """INSERT INTO animals_dead (animal_id, arms_id, tg_nickname, datetime) VALUES (%s, %s, %s, NOW())"""
+		data = (animal_id, arms_id, tg_nickname)
+		result = cls.execute_query(query, data)
+		return result is not None
+
+	@classmethod
+	def get_animal_dead(cls, bar_code):
+		query = """
+			SELECT ad.*
+			FROM animals_dead ad
+			JOIN animals a ON ad.animal_id = a.id
+			WHERE a.bar_code = %s
+			"""
+		result = cls.execute_query(query, (bar_code,), fetch=True)
+		if result and len(result) > 0:
+			return result
+		return None
+
+	@classmethod
 	def __create_user(cls):
 		user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
 		return user

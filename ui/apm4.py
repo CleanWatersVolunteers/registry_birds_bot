@@ -3,6 +3,7 @@
 from const import const
 from database import Database as db
 from storage import storage
+from tools import Tools
 
 apm4_place_id = 4
 
@@ -27,6 +28,9 @@ def show_mpls(user, mpls):
 def apm4_start(username, text, key=None):
 	user = db.get_user(username)
 	if key is None:
+		checkDead = Tools.checkDead(text)
+		if checkDead is not False:
+			return checkDead
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is None:
 			return (

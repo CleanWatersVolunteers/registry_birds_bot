@@ -3,9 +3,11 @@
 from const import const
 from database import Database as db
 from storage import storage
+from tools import Tools
 
 apm3_text = f"Введите массу животного в граммах"
 apm3_place_id = 3
+
 
 ##################################
 # Global API
@@ -14,6 +16,9 @@ apm3_place_id = 3
 def apm3_start(username, text, key=None):
 	user = db.get_user(username)
 	if key is None:
+		checkDead = Tools.checkDead(text)
+		if checkDead is not False:
+			return checkDead
 		animal = storage.get_animal_by_bar_code(text)
 		if animal is None:
 			return (

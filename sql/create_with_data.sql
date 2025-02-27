@@ -27,6 +27,21 @@ CREATE TABLE IF NOT EXISTS `animals` (
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп структуры для таблица registry_birds.animals_dead
+CREATE TABLE IF NOT EXISTS `animals_dead` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `animal_id` int NOT NULL,
+  `datetime` datetime NOT NULL,
+  `arms_id` int NOT NULL,
+  `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `fk_animal_id` (`animal_id`),
+  KEY `fk_arms_id` (`arms_id`),
+  CONSTRAINT `fk_animal_id` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_arms_id` FOREIGN KEY (`arms_id`) REFERENCES `arms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Дамп структуры для таблица registry_birds.arms
 CREATE TABLE IF NOT EXISTS `arms` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -103,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.manipulations: ~7 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.manipulations: ~8 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(0, 'Ел сам', '6'),
 	(1, 'Пил сам', '6'),
@@ -150,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `places` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.places: ~5 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.places: ~7 rows (приблизительно)
 INSERT INTO `places` (`id`, `name`) VALUES
 	(1, 'Поступление'),
 	(2, 'Первичка на мойке'),
