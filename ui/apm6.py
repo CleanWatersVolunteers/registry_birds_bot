@@ -112,7 +112,6 @@ def apm6_button(username, text, key):
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
 		manipulation_id = match.group()
-		print(f'[..] Выбрана manipulation_id: {manipulation_id}')
 		user["mpl_list"].append(manipulation_id)
 		if int(manipulation_id) == feeding_manipulations_id:
 			return (

@@ -76,7 +76,6 @@ class storage:
 		select_query = "SELECT id FROM animals WHERE bar_code = %s"
 		result = cls.execute_query(select_query, (bar_code,), fetch=True)
 		if result is not None and len(result) > 0:  # Проверяем, что результат не пустой
-			print(result[0])  # Печатаем первый элемент результата
 			return result[0]['id']  # Возвращаем значение 'id' первого элемента
 		return None  # Возвращаем None, если ничего не найдено
 
@@ -247,7 +246,7 @@ class storage:
 			data.append(clinical_condition_admission)
 
 		if not updates:
-			print("Нет данных для обновления.")
+			print("update_animal: Нет данных для обновления.")
 			return False
 
 		query += ", ".join(updates) + " WHERE id = %s"
@@ -255,7 +254,7 @@ class storage:
 
 		result = cls.execute_query(query, data)
 		if result is None:
-			print("Ошибка обновления данных.")
+			print("update_animal: Ошибка обновления данных.")
 			return False
 		else:
 			print(f"Данные animals для id {animal_id} успешно обновлены.")

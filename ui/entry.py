@@ -72,7 +72,6 @@ def show_apm(user, arm_list, username):
 ##################################
 
 def entry_start(username, text, key=None):
-	print(f'entry_start key: {key}')
 	arm_list = {}
 	user = db.get_user(username)
 	if not user:
@@ -127,7 +126,6 @@ def entry_photo(username, data):
 
 
 def entry_button(username, text, key):
-	print(f'entry_button key: {key}')
 	if key == 'entry_exit':
 		db.clear_user(username)
 
