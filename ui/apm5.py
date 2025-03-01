@@ -15,6 +15,7 @@ history_text_weight = 'Вес'
 history_text_not_specified = 'Не указан'
 history_text_species = 'Вид'
 history_text_clinical_condition = 'Клиническое состояние'
+history_text_triage = 'Триаж'
 
 apm5_place_id = 5
 
@@ -40,6 +41,15 @@ def apm5_show_mpls(user, mpls):
 	return text, kbd
 
 
+def apm5_get_triage(triage):
+	if triage == 1:
+		return const.text_triage_green
+	elif triage == 2:
+		return const.text_triage_yellow
+	elif triage == 3:
+		return const.text_triage_red
+
+
 def apm5_get_animal_card(animal):
 	if animal:
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
@@ -52,6 +62,11 @@ def apm5_get_animal_card(animal):
 								  animal['species'] if animal['species'] else history_text_not_specified)
 		text += apm5_add_hdr_item(history_text_clinical_condition, animal["clinical_condition_admission"] if animal[
 			'clinical_condition_admission'] else history_text_not_specified)
+		if animal["triage"]:
+			animal["triage"] = apm5_get_triage(animal["triage"])
+		else:
+			animal["triage"] = history_text_not_specified
+		text += apm5_add_hdr_item(history_text_triage, animal["triage"])
 		text += f'{const.text_line}\n'
 		return text
 	return None

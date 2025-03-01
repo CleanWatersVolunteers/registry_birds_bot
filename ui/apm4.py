@@ -6,6 +6,7 @@ from storage import storage
 from tools import Tools
 
 apm4_place_id = 4
+apm4_text_triage = '⚠️ Укажите триаж животного'
 
 
 def show_mpls(user, mpls):
@@ -40,6 +41,19 @@ def apm4_start(username, text, key=None):
 			)
 		user["animal_id"] = animal['animal_id']
 		user["bar_code"] = text
+
+		if animal['triage'] is None:
+			return (
+				f'{const.text_animal_number} {user["bar_code"]}\n{apm4_text_triage}',
+				{
+					const.text_triage_green: "apm4_triage_green",
+					const.text_triage_yellow: "apm4_triage_yellow",
+					const.text_triage_red: "apm4_triage_red",
+					const.text_cancel: "entry_cancel"
+				},
+				None
+			)
+
 	user["mpl_list"] = []
 	# get manipulation list
 	mpls = storage.get_manipulations(apm4_place_id)
@@ -54,14 +68,22 @@ def apm4_start(username, text, key=None):
 
 def apm4_button(username, text, key):
 	user = db.get_user(username)
-	key_id = key.split('_')[-1]
-	user["mpl_list"].append(key_id)
-	storage.insert_history(
-		manipulation_id=key_id,
-		animal_id=user["animal_id"],
-		arms_id=user["apm"]["arm_id"],
-		tg_nickname=username
-	)
+	if key == 'apm4_triage_green':
+		storage.update_animal(user["animal_id"], triage=1)
+	elif key == 'apm4_triage_yellow':
+		storage.update_animal(user["animal_id"], triage=2)
+	elif key == 'apm4_triage_red':
+		storage.update_animal(user["animal_id"], triage=3)
+	else:
+		key_id = key.split('_')[-1]
+		user["mpl_list"].append(key_id)
+		storage.insert_history(
+			manipulation_id=key_id,
+			animal_id=user["animal_id"],
+			arms_id=user["apm"]["arm_id"],
+			tg_nickname=username
+		)
+
 	mpls = storage.get_manipulations(apm4_place_id)
 	text, kbd = show_mpls(user, mpls)
 	return text, kbd, None
