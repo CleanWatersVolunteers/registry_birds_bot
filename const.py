@@ -22,6 +22,10 @@ class const:
 	text_line = '------------------------'
 	text_manipulations_not_found = "Манипуляции не найдены"
 
+	text_triage_green = 'Зеленый'
+	text_triage_yellow = 'Желтый'
+	text_triage_red = 'Красный'
+
 	datetime_short_format = "%d.%m.%y %H:%M"
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
