@@ -5,7 +5,7 @@ from pyzbar.pyzbar import decode
 from const import const
 from storage import storage
 
-code_animal_text = 'Введите код животного'
+code_animal_text = 'Сфотографируйте QR-код нажав на `скрепку` ниже или введите номер животного вручную.'
 duty_is_end = 'Смена закончена, введите новый пароль'
 
 
