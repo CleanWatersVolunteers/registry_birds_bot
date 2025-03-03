@@ -2,12 +2,13 @@
 
 
 from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.graphics.shapes import Drawing
-from reportlab.graphics.barcode.qr import QrCodeWidget
-from reportlab.graphics import renderPDF
+
 from PyPDF2 import PdfMerger
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.graphics.shapes import Drawing
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 # Константы PDF
 CM_TO_PT = 28.35
@@ -37,8 +38,8 @@ def gen_pdf_page(qr_numbers):
 	# Константы для QR-кодов на листе
 	COLUMNS = 3
 	ROWS = 8
-	X_SPACING = int((A4[0] - COLUMNS * CELL_WIDTH) / (COLUMNS - 1))
-	Y_SPACING = int((A4[1] - ROWS * CELL_HEIGHT) / (ROWS - 1))
+	X_SPACING = int((A4[0] - COLUMNS * CELL_WIDTH) / (COLUMNS - 1) + 1)
+	Y_SPACING = int((A4[1] - ROWS * CELL_HEIGHT) / (ROWS - 1) + 3)
 
 	for index, data in enumerate(qr_numbers):
 		col = index % COLUMNS
