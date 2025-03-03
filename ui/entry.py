@@ -111,14 +111,13 @@ def entry_photo(username, data):
 		return f'{WELLCOME.format(username=username)}', None
 	else:
 		if user["apm"]:
-			if not 'animal_id' in user:
-				code = code_parse(data)
-				if code == 0:
-					text, kbd, valid = code_request(user)
-					if valid is False:
-						db.clear_user(username)
-						return text, kbd
-					return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
+			code = code_parse(data)
+			if code == 0:
+				text, kbd, valid = code_request(user)
+				if valid is False:
+					db.clear_user(username)
+					return text, kbd
+				return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
 			# todo Local variable 'code' might be referenced before assignment
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](username, str(code), user["key"])
 			return f'{get_arm_name(user)}{text}', kbd
