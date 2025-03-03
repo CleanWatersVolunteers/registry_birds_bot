@@ -1,5 +1,5 @@
 # Константы
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 import pytz
 
@@ -30,7 +30,9 @@ class const:
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
-	now = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime("%Y.%m.%d %H:%M")
-	today = datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime(date_format)
-	tomorrow = (datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')) + timedelta(days=1)).strftime(date_format)
-	yesterday_db = (datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')) - timedelta(days=1)).strftime("%Y.%m.%d")
+
+	timezone_gmt6 = pytz.timezone('Etc/GMT-6')
+	now = datetime.now(timezone.utc).astimezone(timezone_gmt6).strftime("%Y.%m.%d %H:%M")
+	today = datetime.now(timezone.utc).astimezone(timezone_gmt6).strftime(date_format)
+	tomorrow = (datetime.now(timezone.utc).astimezone(timezone_gmt6) + timedelta(days=1)).strftime(date_format)
+	yesterday_db = (datetime.now(timezone.utc).astimezone(timezone_gmt6) - timedelta(days=1)).strftime("%Y.%m.%d")
