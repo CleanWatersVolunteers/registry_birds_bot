@@ -1,9 +1,6 @@
 # Поступление
 
-import re
-from datetime import datetime
-
-import pytz
+from datetime import datetime, timezone
 
 from const import const
 from database import Database as db
@@ -12,10 +9,7 @@ from timetools import TimeTools
 
 apm1_place_id = 1
 
-GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
-GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
-GET_DATETIME = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4} \d{1,2}:\d{1,2}', text)
-GET_NOW_TIME = lambda: datetime.utcnow().astimezone(pytz.timezone('Etc/GMT-6')).strftime(const.datetime_format)
+GET_NOW_TIME = lambda: datetime.now(timezone.utc).astimezone(const.timezone_gmt6).strftime(const.datetime_format)
 
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'

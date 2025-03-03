@@ -83,7 +83,7 @@ def entry_start(username, text, key=None):
 			arm_list = storage.get_arms(location_id)
 			user = db.create_user(username, location_id)
 		else:
-			arm_list = storage.get_arm_access(const.now(), password=text)
+			arm_list = storage.get_arm_access(const.now, password=text)
 			if len(arm_list) > 0:
 				user = db.create_user(username, arm_list[0]["location_id"], password=text)
 			else:

@@ -26,7 +26,7 @@ def code_reader(image) -> []:
 
 def code_request(user):
 	if user['pass'] is not None:
-		arm_list = storage.get_arm_access(const.now(), password=user['pass'])
+		arm_list = storage.get_arm_access(const.now, password=user['pass'])
 		if len(arm_list) > 0:
 			return code_animal_text, {const.text_exit: 'entry_exit'}, True
 		else:
