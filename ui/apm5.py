@@ -29,15 +29,24 @@ def apm5_add_hdr_item(label, value):
 	return text
 
 
-def apm5_show_mpls(user, mpls):
+def apm5_show_mpls(user, dead_info=None):
 	kbd = dict()
 	text = f'{apm5_get_animal_card(user['animal'])}\n'
-	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
-		if str(mpl['id']) in user['mpl_list']:
-			text += f'✅ {mpl['name']}\n'
+	history = history_get_info(user['animal']['animal_id'], dead_info)
+	if history is not None:
+		text += f'{history}\n'
+	if user['animal']['is_dead'] is False:
+		mpls = storage.get_manipulations(apm5_place_id)
+		if len(mpls) > 0:
+			text += f'{const.text_line}\n'
+			for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
+				if ('mpl_list' in user
+						and str(mpl['id']) in user['mpl_list']):
+					text += f'✅ {mpl['name']}\n'
+				else:
+					kbd[mpl["name"]] = f'apm5_mpl_{mpl['id']}'
 		else:
-			if user['animal']['is_dead'] is False:
-				kbd[mpl['name']] = f'apm5_mpl_{mpl["id"]}'
+			text += f'{const.manipulation_not_found}\n'
 	return text, kbd
 
 
@@ -67,7 +76,7 @@ def apm5_get_animal_card(animal):
 		else:
 			animal["triage"] = history_text_not_specified
 		text += apm5_add_hdr_item(history_text_triage, animal["triage"])
-		text += f'{const.text_line}\n'
+		text += f'{const.text_line}'
 		return text
 	return None
 
@@ -96,20 +105,11 @@ def apm5_start(username, text, key=None):
 				'apm5_species'
 			)
 		user['mpl_list'] = []
-		mpls = storage.get_manipulations(apm5_place_id)
-		if len(mpls) == 0:
-			return (
-				const.manipulation_not_found,
-				{const.text_exit: 'entry_cancel'}, None
-			)
-		text, kbd = apm5_show_mpls(user, mpls)
+		text, kbd = apm5_show_mpls(user, dead_info)
 		if user['animal']['is_dead'] is False:
 			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
+			text += const.text_manipulation_done
 		kbd['Готово'] = 'entry_cancel'
-		text += history_get_info(animal, dead_info)
-		text += f'\n{const.text_line}\n'
-		if user['animal']['is_dead'] is False:
-			text += f'\n{const.text_manipulation_done}'
 		return text, kbd, None
 	if key == 'apm5_species':
 		user['species'] = text
@@ -170,8 +170,7 @@ def apm5_button(username, text, key):
 			arms_id=user['apm']['arm_id'],
 			tg_nickname=username
 		)
-		mpls = storage.get_manipulations(apm5_place_id)
-		text, kbd = apm5_show_mpls(user, mpls)
+		text, kbd = apm5_show_mpls(user)
 		if user['animal']['is_dead'] is False:
 			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
 		kbd['Готово'] = 'entry_cancel'
