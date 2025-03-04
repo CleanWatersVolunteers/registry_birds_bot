@@ -6,6 +6,7 @@ from const import const
 from database import Database as db
 from storage import storage
 from tools import Tools
+from ui.history import history_get_info
 
 apm6_place_id = 6
 
@@ -21,9 +22,9 @@ feeding_history_type_id = 1
 weighting_history_type_id = 2
 
 nanny_text_entry_fish = 'Введите количество съеденных рыб'
-nanny_text_weighing_action = "Введите массу животного в граммах"
-nanny_text_incorrect_digit = "❌ Вводите только цифры"
-nanny_text_incorrect_fish_number = "❌ Количество должно быть больше 0"
+nanny_text_weighing_action = 'Введите массу животного в граммах'
+nanny_text_incorrect_digit = '❌ Вводите только цифры'
+nanny_text_incorrect_fish_number = '❌ Количество должно быть больше 0'
 nanny_text_incorrect_weight = f"Вес должен быть от {nanny_minimal_weight} гр."
 
 
@@ -38,8 +39,7 @@ def nanny_weighing(msg, user, username) -> (str,):
 	else:
 		storage.insert_numerical_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
 										 tg_nickname=username)
-		mpls = storage.get_manipulations(apm6_place_id)
-		text, kbd = show_mpls(user, mpls)
+		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
 
@@ -54,21 +54,29 @@ def nanny_feeding(msg, user, username) -> (str,):
 	else:
 		storage.insert_numerical_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
 										 tg_nickname=username)
-		mpls = storage.get_manipulations(apm6_place_id)
-		text, kbd = show_mpls(user, mpls)
+		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
 
-def show_mpls(user, mpls):
+def apm6_show_mpls(user):
 	kbd = dict()
-	text = f'{const.text_animal_number} {user["bar_code"]}\n'
-	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
-		if str(mpl["id"]) in user["mpl_list"]:
-			text += f'✅ {mpl["name"]}\n'
-		else:
-			kbd[mpl["name"]] = f'apm6_mpl{mpl["id"]}'
-	kbd["Готово"] = "entry_cancel"
-	text += f'{const.text_manipulation_done}'
+	text = f'{const.text_animal_number} {user['bar_code']}\n{const.text_line}\n'
+	history = history_get_info(user['animal']['id'])
+	if history is not None:
+		text += f'{history}\n'
+	mpls = storage.get_manipulations(apm6_place_id)
+	if len(mpls) > 0:
+		text += f'{const.text_line}\n'
+		for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
+			if ('mpl_list' in user
+					and str(mpl['id']) in user['mpl_list']):
+				text += f'✅ {mpl['name']}\n'
+			else:
+				kbd[mpl['name']] = f'apm6_mpl{mpl['id']}'
+	else:
+		text += f'{const.manipulation_not_found}\n'
+	kbd['Готово'] = "entry_cancel"
+	text += f'{const.text_line}\n{const.text_manipulation_done}'
 	return text, kbd
 
 
@@ -97,13 +105,7 @@ def apm6_start(username, text, key=None):
 		user["animal_id"] = animal['animal_id']
 		user["bar_code"] = text
 		user["mpl_list"] = []
-	mpls = storage.get_manipulations(apm6_place_id)
-	if len(mpls) == 0:
-		return (
-			const.manipulation_not_found,
-			{const.text_exit: "entry_cancel"}, None
-		)
-	text, kbd = show_mpls(user, mpls)
+	text, kbd = apm6_show_mpls(user)
 	return text, kbd, None
 
 
@@ -132,7 +134,6 @@ def apm6_button(username, text, key):
 				arms_id=user["apm"]["arm_id"],
 				tg_nickname=username
 			)
-			mpls = storage.get_manipulations(apm6_place_id)
-			text, kbd = show_mpls(user, mpls)
+			text, kbd = apm6_show_mpls(user)
 	# todo Local variable 'kbd' might be referenced before assignment
 	return text, kbd, None
