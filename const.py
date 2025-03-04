@@ -19,6 +19,7 @@ class const:
 	text_capture_time = "Время отлова"
 	text_capture_place = "Место отлова"
 	text_today = 'Сегодня'
+	text_yesterday = 'Вчера'
 	text_line = '------------------------'
 	text_manipulations_not_found = "Манипуляции не найдены"
 
@@ -31,8 +32,10 @@ class const:
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
 
-	timezone_gmt6 = pytz.timezone('Etc/GMT-6')
-	now = datetime.now(timezone.utc).astimezone(timezone_gmt6).strftime("%Y.%m.%d %H:%M")
-	today = datetime.now(timezone.utc).astimezone(timezone_gmt6).strftime(date_format)
-	tomorrow = (datetime.now(timezone.utc).astimezone(timezone_gmt6) + timedelta(days=1)).strftime(date_format)
-	yesterday_db = (datetime.now(timezone.utc).astimezone(timezone_gmt6) - timedelta(days=1)).strftime("%Y.%m.%d")
+	timezone_gmt3 = pytz.timezone('Etc/GMT-3')
+	now = datetime.now(timezone.utc).astimezone(timezone_gmt3).strftime("%Y.%m.%d %H:%M")
+	today = datetime.now(timezone.utc).astimezone(timezone_gmt3).strftime(date_format)
+	yesterday = (datetime.now(timezone.utc).astimezone(timezone_gmt3) - timedelta(days=1)).strftime(date_format)
+	tomorrow = (datetime.now(timezone.utc).astimezone(timezone_gmt3) + timedelta(days=1)).strftime(date_format)
+
+	yesterday_db = (datetime.now(timezone.utc).astimezone(timezone_gmt3) - timedelta(days=1)).strftime("%Y.%m.%d")

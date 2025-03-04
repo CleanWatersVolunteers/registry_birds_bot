@@ -9,10 +9,10 @@ from timetools import TimeTools
 
 apm1_place_id = 1
 
-GET_NOW_TIME = lambda: datetime.now(timezone.utc).astimezone(const.timezone_gmt6).strftime(const.datetime_format)
+GET_NOW_TIME = lambda: datetime.now(timezone.utc).astimezone(const.timezone_gmt3).strftime(const.datetime_format)
 
 apm1_text_place = 'Введите место отлова'
-apm1_text_date = 'Введите дату и время отлова в формате ДД.ММ.ГГГГ ЧЧ:ММ'
+apm1_text_date = 'Выберите дату отлова'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
 apm1_wrong_time_input = "Ошибка, дата отлова не может быть раньше 24 часов или позже текущего времени"
 apm1_text_pollution = 'Укажите степень загрязнения'
@@ -44,8 +44,8 @@ def validate_datetime(user, date_input, time_input):
 	if time1 < time2 or time_diff.days > 0:
 		return (
 			f'{const.text_incorrect} {user_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
-			{const.text_today: "apm1_today", const.text_cancel: "entry_cancel"},
-			'apm1_manual_date'
+			{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
+			None
 		)
 	else:
 		user['capture_datetime'] = user_time
@@ -62,19 +62,6 @@ def apm1_time_validate(msg, user):
 			'apm1_time_validate'
 		)
 	return validate_datetime(user, user["capture_datetime"], time)
-
-
-# Проверка даты и времени
-def apm1_manual_data_validate(msg, user):
-	date = TimeTools.getDate(msg)  # '16.01.2025'
-	time = TimeTools.getTime(msg)  # '10:15'
-	if not time or not date:
-		return (
-			f'{const.text_incorrect} {msg}\n{apm1_text_date}',
-			{const.text_today: "apm1_today", const.text_cancel: "entry_cancel"},
-			'apm1_manual_date'
-		)
-	return validate_datetime(user, date, time)
 
 
 def apm1_get_place(code):
@@ -98,8 +85,8 @@ def apm1_get_time(code):
 def apm1_get_date(code):
 	return (
 		f'{const.text_animal_number} {code}\n{apm1_text_date}',
-		{const.text_today: "apm1_today", const.text_cancel: "entry_cancel"},
-		'apm1_manual_date'
+		{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
+		None
 	)
 
 
@@ -147,8 +134,6 @@ def apm1_start(username, text, key=None):
 	if key == 'apm1_date':
 		user['capture_datetime'] = text  # todo incorrect for today button
 		return apm1_get_pollution(user["code"])
-	if key == 'apm1_manual_date':
-		return apm1_manual_data_validate(text, user)
 	if key == 'apm1_time_validate':
 		return apm1_time_validate(text, user)
 	if key == 'apm1_pollution':
@@ -162,6 +147,9 @@ def apm1_button(username, msg, key):
 	user = db.get_user(username)
 	if key == 'apm1_today':
 		user['capture_datetime'] = const.today
+		return apm1_get_time(user["code"])
+	if key == 'apm1_yesterday':
+		user['capture_datetime'] = const.yesterday
 		return apm1_get_time(user["code"])
 	keys = key.split('_')
 	if keys[1] == 'pollution':
