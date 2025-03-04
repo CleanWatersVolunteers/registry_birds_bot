@@ -13,7 +13,8 @@ def show_mpls(user, mpls):
 	kbd = dict()
 	text = f'{const.text_animal_number} {user["bar_code"]}\n'
 	for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
-		if str(mpl["id"]) in user["mpl_list"]:
+		if ('mpl_list' in user
+				and str(mpl["id"]) in user["mpl_list"]):
 			text += f'✅ {mpl["name"]}\n'
 		else:
 			kbd[mpl["name"]] = f'apm4_mpl_{mpl["id"]}'
