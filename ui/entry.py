@@ -6,6 +6,7 @@ from ui.apm4 import apm4_start, apm4_button
 from ui.apm5 import apm5_start, apm5_button
 from ui.apm6 import apm6_start, apm6_button
 from ui.apm7 import apm7_start, apm7_button
+from ui.apm8 import apm8_start, apm8_button
 from ui.code import *
 
 WELLCOME = 'Здравствуйте {username}!\n⚠ Введите пароль'
@@ -19,6 +20,7 @@ apm_start_list = {
 	5: apm5_start,
 	6: apm6_start,
 	7: apm7_start,
+	8: apm8_start,
 }
 apm_button_list = {
 	"apm1": apm1_button,
@@ -27,7 +29,7 @@ apm_button_list = {
 	"apm4": apm4_button,
 	"apm5": apm5_button,
 	"apm6": apm6_button,
-	"apm7": apm7_button,
+	"apm8": apm8_button,
 }
 
 

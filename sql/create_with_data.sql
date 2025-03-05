@@ -64,8 +64,8 @@ INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES
 	(5, 5, 0),
 	(6, 6, 0),
 	(7, 7, 0),
-	(8, 1, 1),
-	(9, 2, 1);
+	(8, 8, 0),
+	(9, 8, 1);
 
 -- Дамп структуры для таблица registry_birds.arm_access
 CREATE TABLE IF NOT EXISTS `arm_access` (
@@ -173,7 +173,8 @@ INSERT INTO `places` (`id`, `name`) VALUES
 	(4, 'Первичка в стационаре'),
 	(5, 'Медицинский прием'),
 	(6, 'Нянька'),
-	(7, 'Старший смены');
+	(7, 'Старший смены'),
+	(8, 'Реабилитационный центр');
 
 -- Дамп структуры для таблица registry_birds.place_history
 CREATE TABLE IF NOT EXISTS `place_history` (
