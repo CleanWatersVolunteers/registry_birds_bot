@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import os
 import mysql.connector
 from mysql.connector import pooling
 
