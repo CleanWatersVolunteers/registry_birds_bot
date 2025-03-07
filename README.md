@@ -51,7 +51,7 @@ sudo apt install git
 ## Устанавливаем супервизор(опционально, нужен для удаленного запуска бота)
 
 ```sh
-sudo apt-get install supervisor
+sudo apt install supervisor
 ```
 После установки проверяем что в файле /etc/supervisor/supervisord.conf есть строчки 
 ```
@@ -113,7 +113,7 @@ mysql>exit; # выход
 mkdir registry_birds_bot
 mkdir registry_birds_bot/production
 mkdir registry_birds_bot/testing
-cd registry_birds_bot/testing
+cd registry_birds_bot/testing # для production дальнейшие действия повторяются
 
 # качаем исходники с гита
 git clone https://github.com/CleanWatersVolunteers/registry_birds_bot.git
@@ -142,79 +142,41 @@ DB_HOST=localhost
 DB_PORT=3306
 ```
 
+## Настройка супервизора
 
+1. Создать файл конфигурации в директории /etc/supervisor/conf.d с названием registry_birds_bot_testing.conf и следующим содержимым
+```
+[program:registry_birds_bot_testing]
 
+user = root 
 
+stdout_logfile = /var/log/registry_birds_bot_testing.out
+stdout_logfile_maxbytes = 100MB
+stderr_logfile = /var/log/registry_birds_bot_testing.err
+stderr_logfile_maxbytes = 100MB
 
+autorestart = true
+startsecs = 5
+startretries = 50
+stopwaitsecs = 30
 
-
-
-
-
-
-
-
-
-
-
-
-## Зависимости
-Для успешного запуска проекта необходимо установить следующие зависимости 
+environment = PYTHONUNBUFFERED=1
+directory = /root/registry_birds_bot/testing/registry_birds_bot               
+command =  /root/venv/bin/python main.py
+```
+2. Обновить супервизор
 ```sh
-pip install -r requirements.txt
-apt-get install libzbar0
+sudo supervisorctl reload
+sudo supervisorctl status # проверка успешности запуска
 ```
-и настроить базу данных
-
-## База данных
-### Установка mysql-сервера и зависимостей
-Для разворачивания локальной базы данных необходимо сделать следующее:
-1. установить зависимости
+Все ошибки и логи смотреть командой
 ```sh
-pip install mysql-connector-python
-sudo apt install mysql-server
-```
-после установки mysql сервер запустится автоматически
-
-### Создание базы
-1. Запуск mysql (требуется если сервис еще не запущен)
-```sh
-sudo mkdir /var/log/mysql && sudo chmod a+rw /var/log/mysql # команда для создания логов (обычно создаются автоматом при установке mysql)
-sudo systemctl restart mysql # перезапуск сервиса
-
-sudo mysql 	# запуск консоли mysql
-```
-2. Создание новой базы 'registry_birds' из скрипта
-Запустить скрипт sql/create_with_data.sql командой
-```sh
-cat sql/create_with_data.sql | mysql -u newuser -p
-```
-3. Проверить наличие базы командой
-```sql
-SHOW DATABASES;     # список баз
-USE registry_birds; 
-SHOW TABLES;		# список таблиц в базе
-```
-### Создание пользователя
-1. Создать нового пользователя с доступом к базе 'registry_birds'
-```sql
-CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON registry_birds.* TO 'newuser'@'localhost';
-SELECT user FROM mysql.user;  # вывод списка пользователей
-```
-2. Авторизация пользователя в базе
-```sh
-mysql -h localhost -u newuser -p
+nano /var/log/registry_birds_bot_testing.err
+nano /var/log/registry_birds_bot_testing.out
+# Ctrl+End переход в конец файла
 ```
 
-## Структура проекта
-- main.py - точка входа в приложение
-- взаимодействие с пользователем происходит в модуле ui. Точка входа это подмодуль ui.entry, он взаимодействует со всеми apm. Подмодули ui.apmX имеют две API-функции: 
-```python
-def apmX_start(username, text, key=None):
-		return msg, keyboard, key
-def apmX_entry(username, msg, key):
-		return text, keyboard
+3. Для перезапуска бота использовать команду
+```sh
+sudo supervisorctl restart registry_birds_bot_testing
 ```
-- Функция apmX_start() вызывается, когда был введен текст. Аргументы: username - ник в тг, text - введенный текст, key - ключ, при первом вызове равен None, потом равен возвращаемому значению. Возвращает msg - текст выводимого сообщения, keyboard - набор кнопок в формате {'name1':'apmX_name1', 'name2':'apmX_name2'} где nameX это выводимые названия кнопок, apmX_nameY это ключи для функции apmX_entry()
-- Функция apmX_entry() вызывается, когда была нажата кнопка. Аргументы: username - ник в тг, text - текст сообщения которое было выведено, key - ключ кнопки. Возвращает text - текст сообщения, если None, возврат в главное меню. keyboard - набор кнопок, если None, кнопки не отобразятся
