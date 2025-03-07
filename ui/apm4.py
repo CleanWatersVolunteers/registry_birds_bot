@@ -7,6 +7,16 @@ from tools import Tools
 
 apm4_place_id = 4
 apm4_text_triage = '⚠️ Укажите триаж животного'
+apm4_body_condition = 'Укажите степень упитанности'
+apm4_body_condition_list = ['1', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+
+
+def get_body_condition_list():
+	kbd = dict()
+	for i in range(len(apm4_body_condition_list)):
+		kbd[apm4_body_condition_list[i]] = f'apm4_condition_{i}'
+	text = f'{apm4_body_condition}'
+	return text, kbd, None
 
 
 def show_mpls(user, mpls):
@@ -72,6 +82,9 @@ def apm4_button(username, text, key):
 		storage.update_animal(user["animal_id"], triage=2)
 	elif key == 'apm4_triage_red':
 		storage.update_animal(user["animal_id"], triage=3)
+	elif 'apm4_condition_' in key:
+		body_condition = apm4_body_condition_list[int(key.split('_')[-1])]
+		storage.update_animal(user["animal_id"], body_condition=body_condition)
 	else:
 		key_id = key.split('_')[-1]
 		user['mpl_list'].append(key_id)

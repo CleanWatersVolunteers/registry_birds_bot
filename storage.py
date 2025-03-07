@@ -230,7 +230,7 @@ class storage:
 	# Обновление таблицы animals
 	@classmethod
 	def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None,
-					  triage=None) -> bool:
+					  triage=None, body_condition=None) -> bool:
 		query = "UPDATE animals SET "
 		updates = []
 		data = []
@@ -248,6 +248,9 @@ class storage:
 		if triage is not None:
 			updates.append("triage = %s")
 			data.append(triage)
+		if body_condition is not None:
+			updates.append("body_condition = %s")
+			data.append(body_condition)
 		if not updates:
 			print("update_animal: Нет данных для обновления.")
 			return False
