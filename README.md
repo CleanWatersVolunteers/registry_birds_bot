@@ -131,6 +131,7 @@ cat sql/create_with_data.sql | mysql -u newuser -p
 ```sh
 ~/venv/bin/pip install -r requirements.txt
 sudo apt-get install libzbar0
+sudo apt-get install libgl1
 ```
 4. Создаем файл .env с содержимым
 ```
