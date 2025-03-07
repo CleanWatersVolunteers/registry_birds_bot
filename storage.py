@@ -6,16 +6,28 @@ from mysql.connector import pooling
 from config import Config
 from timetools import TimeTools
 
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_USER=os.getenv("DB_USER")
+DB_PASSWORD=os.getenv("DB_PASSWORD")
+DB_NAME=os.getenv("DB_NAME")
+
 
 class storage:
 	capture_datetime_string_format = "%d.%m.%Y %H:%M"
 	capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
 
-	dbconfig = Config.load_config_from_json()
+	DB_CONFIG = {
+		"host": DB_HOST,
+		"port": int(DB_PORT),
+		"user": DB_USER,
+		"password": DB_PASSWORD,
+		"database": DB_NAME
+	}
 	connection_pool = pooling.MySQLConnectionPool(
 		pool_name="mypool",
 		pool_size=5,
-		**dbconfig
+		**DB_CONFIG
 	)
 
 	@classmethod

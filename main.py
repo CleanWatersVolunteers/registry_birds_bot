@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import asyncio
 import re
 
@@ -17,9 +20,8 @@ from ui.gen import (
 	gen_pdf
 )
 
-f = open('token', 'r')
-TELEGRAM_BOT_TOKEN = f.read()
-f.close()
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
 
 
 TEXT_QR_CODES_READY = "📄 Ваши QR-коды"
