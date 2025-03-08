@@ -16,7 +16,6 @@ history_text_not_specified = 'Не указан'
 history_text_species = 'Вид'
 history_text_clinical_condition = 'Клиническое состояние'
 history_text_triage = 'Триаж'
-history_text_body_condition = 'Степень упитанности'
 
 apm5_place_id = 5
 
@@ -77,9 +76,6 @@ def apm5_get_animal_card(animal):
 		else:
 			animal["triage"] = history_text_not_specified
 		text += apm5_add_hdr_item(history_text_triage, animal["triage"])
-		text += apm5_add_hdr_item(history_text_body_condition,
-								  f"{animal['body_condition']}" if animal[
-									  'body_condition'] else history_text_not_specified)
 		text += f'{const.text_line}'
 		return text
 	return None

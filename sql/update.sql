@@ -33,3 +33,7 @@ INSERT INTO `arm_access` (`id`, `arm_id`, `start_date`, `end_date`, `password`) 
 alter table `numerical_history` CHANGE COLUMN `value` `value` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `type_id`;
 rename TABLE `numerical_history` to `values_history`;
 rename TABLE `numerical_history_type` to `values_history_type`;
+
+-- Добавить ввод степени упитанности #271
+INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (8, 'Степень упитанности', '4');
+ALTER TABLE `values_history_type` CHANGE COLUMN `units` `units` VARCHAR(45) NULL COLLATE 'utf8mb4_0900_ai_ci';
