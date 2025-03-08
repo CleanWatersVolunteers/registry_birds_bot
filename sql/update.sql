@@ -1,5 +1,3 @@
-USE `registry_birds`;
--- Лишний столбец animals.female #102
 alter table `animals` drop COLUMN `female`;
 
 -- Исправить записи в таблице manipulations #107
@@ -30,3 +28,8 @@ INSERT INTO `places` (`id`, `name`) VALUES(7, 'Старший смены');
 INSERT INTO `arms` (`id`, `place_id`, `location_id`) VALUES (10, 7, 0);
 INSERT INTO `arm_access` (`id`, `arm_id`, `start_date`, `end_date`, `password`) VALUES
     (8, 10, '2025-02-20 12:32:32', '2026-02-21 12:32:40', '1010');
+
+-- Переделка таблиц хранения исторических данных #272
+alter table `numerical_history` CHANGE COLUMN `value` `value` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci' AFTER `type_id`;
+rename TABLE `numerical_history` to `values_history`;
+rename TABLE `numerical_history_type` to `values_history_type`;

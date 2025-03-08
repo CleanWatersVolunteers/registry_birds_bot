@@ -9,7 +9,7 @@ from storage import storage
 ##################################
 
 def history_get_info(animal_id, dead_info=None):
-	numerical_history = storage.get_animal_numerical_history(animal_id, const.yesterday_db)
+	numerical_history = storage.get_animal_values_history(animal_id, const.yesterday_db)
 	history = storage.get_animal_history(animal_id, const.yesterday_db)
 	place_history = storage.get_place_history(animal_id, const.yesterday_db)
 
