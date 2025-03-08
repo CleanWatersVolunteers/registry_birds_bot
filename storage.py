@@ -1,17 +1,16 @@
+import os
 from datetime import datetime
 
-import os
 import mysql.connector
 from mysql.connector import pooling
 
-from config import Config
 from timetools import TimeTools
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_USER=os.getenv("DB_USER")
-DB_PASSWORD=os.getenv("DB_PASSWORD")
-DB_NAME=os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
 
 
 class storage:
@@ -243,7 +242,7 @@ class storage:
 	# Обновление таблицы animals
 	@classmethod
 	def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None,
-					  triage=None, body_condition=None) -> bool:
+					  triage=None) -> bool:
 		query = "UPDATE animals SET "
 		updates = []
 		data = []
@@ -261,9 +260,6 @@ class storage:
 		if triage is not None:
 			updates.append("triage = %s")
 			data.append(triage)
-		if body_condition is not None:
-			updates.append("body_condition = %s")
-			data.append(body_condition)
 		if not updates:
 			print("update_animal: Нет данных для обновления.")
 			return False
