@@ -17,7 +17,7 @@ nanny_minimal_fish = 1
 feeding_manipulations_id = 0
 weighting_manipulations_id = 7
 
-# БД numerical_history_type.id
+# БД values_history_type.id
 feeding_history_type_id = 1
 weighting_history_type_id = 2
 
@@ -37,8 +37,8 @@ def nanny_weighing(msg, user, username) -> (str,):
 			'apm6_weighing'
 		)
 	else:
-		storage.insert_numerical_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
-										 tg_nickname=username)
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
+									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
@@ -52,8 +52,8 @@ def nanny_feeding(msg, user, username) -> (str,):
 			'apm6_feeding'
 		)
 	else:
-		storage.insert_numerical_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
-										 tg_nickname=username)
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
+									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
