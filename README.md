@@ -104,6 +104,31 @@ mysql> SELECT user FROM mysql.user;  # вывод списка пользова�
 mysql>exit; # выход
 ```
 
+## Удаленный доступ к базе MySQL
+
+1. Разрешаем внешний доступ для mysql
+```sh
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# меняем  bind-address = 127.0.0.1 на bind-address = 0.0.0.0
+
+sudo systemctl restart mysql 
+```
+
+2. Настравиваем sql
+запускаем консоль mysql:
+```sh
+sudo mysql 
+```
+```sql
+# создаем пользователя для локального доступа (если еще не создан)
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
+GRANT ALL PRIVILEGES ON *.* TO 'anapa'@'localhost' WITH GRANT OPTION;
+# создаем пользователя с таким же названием для удаленного доступа
+CREATE USER 'user'@'%' IDENTIFIED BY 'pass';
+GRANT ALL PRIVILEGES ON *.* TO 'anapa'@'%' WITH GRANT OPTION;
+```
+
 # Запуск и обновление бота
 
 ## Разворачивание бота на сервере

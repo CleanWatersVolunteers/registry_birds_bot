@@ -1,17 +1,16 @@
+import os
 from datetime import datetime
 
-import os
 import mysql.connector
 from mysql.connector import pooling
 
-from config import Config
 from timetools import TimeTools
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_USER=os.getenv("DB_USER")
-DB_PASSWORD=os.getenv("DB_PASSWORD")
-DB_NAME=os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
 
 
 class storage:
@@ -115,17 +114,17 @@ class storage:
 			return None
 
 	@classmethod
-	def insert_numerical_history(cls, animal_id, type_id, value, tg_nickname):
+	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
 		query = """
-        INSERT INTO numerical_history (datetime, animal_id, type_id, value, tg_nickname)
+        INSERT INTO values_history (datetime, animal_id, type_id, value, tg_nickname)
         VALUES (NOW(), %s, %s, %s, %s)
         """
 		data = (animal_id, type_id, value, tg_nickname)
 		cls.execute_query(query, data)
 
 	@classmethod
-	def get_numerical_history_type(cls):
-		select_query = "SELECT id, name, units FROM numerical_history_type"
+	def get_values_history_type(cls):
+		select_query = "SELECT id, name, units FROM values_history_type"
 		results = cls.execute_query(select_query, fetch=True)
 		if results is not None:
 			items = [{"id": row["id"], "name": row["name"], "units": row["units"]} for row in results]
@@ -133,23 +132,23 @@ class storage:
 		return []
 
 	@classmethod
-	def get_animal_numerical_history(cls, animal_id, start_date=None):
+	def get_animal_values_history(cls, animal_id, start_date=None):
 		select_query = """
 	SELECT 
-		nht.name AS type_name,
-		nht.units AS type_units,
-		nh.value,
-		nh.tg_nickname,
-		nh.datetime
+		vht.name AS type_name,
+		vht.units AS type_units,
+		vh.value,
+		vh.tg_nickname,
+		vh.datetime
 	FROM 
-		numerical_history nh
+		values_history vh
 	JOIN 
-		numerical_history_type nht ON nh.type_id = nht.id
+		values_history_type vht ON vh.type_id = vht.id
 	WHERE 
-		nh.animal_id = %s
+		vh.animal_id = %s
 	"""
 		if start_date is not None:
-			select_query += " AND nh.datetime >= %s"
+			select_query += " AND vh.datetime >= %s"
 			data = (animal_id, start_date)
 		else:
 			data = (animal_id,)

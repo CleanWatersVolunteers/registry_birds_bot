@@ -9,7 +9,7 @@ from storage import storage
 ##################################
 
 def history_get_info(animal_id, dead_info=None):
-	numerical_history = storage.get_animal_numerical_history(animal_id, const.yesterday_db)
+	numerical_history = storage.get_animal_values_history(animal_id, const.yesterday_db)
 	history = storage.get_animal_history(animal_id, const.yesterday_db)
 	place_history = storage.get_place_history(animal_id, const.yesterday_db)
 
@@ -28,8 +28,11 @@ def history_get_info(animal_id, dead_info=None):
 				result_string += "\n"
 			result_string += f"{formatted_date}\n"
 			current_date = formatted_date
-		if 'type_name' in item:  # Элемент из numerical_history
-			result_string += f"{item['datetime'].strftime(const.time_format)} - {item['type_name']}: {item['value']} {item['type_units']} - {item['tg_nickname']}\n"
+		if 'type_name' in item:  # Элемент из values_history
+			if item['type_units'] is None:
+				result_string += f"{item['datetime'].strftime(const.time_format)} - {item['type_name']}: {item['value']} - {item['tg_nickname']}\n"
+			else:
+				result_string += f"{item['datetime'].strftime(const.time_format)} - {item['type_name']}: {item['value']} {item['type_units']} - {item['tg_nickname']}\n"
 		elif 'manipulation_name' in item:  # Элемент из history
 			result_string += f"{item['datetime'].strftime(const.time_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
 		elif 'animal_id' in item:  # dead_info
