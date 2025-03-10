@@ -227,7 +227,7 @@ class storage:
 	@classmethod
 	def insert_animal(cls, code, capture_datetime, place, pollution):
 		print(
-			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place:{place}, pollution: {pollution}')
+			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, pollution: {pollution}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 		query = """
@@ -423,6 +423,22 @@ class storage:
 			return result
 		return None
 
+	# Вставка записей бумажного журнала первичной регистрации
+	@classmethod
+	def import_place_history(cls, code, registration_datetime, tg_nickname, arm_id):
+		print(
+			f'import_place_history. code: {code}, arm_id: {arm_id}, registration_datetime: {registration_datetime}, tg_nickname: {tg_nickname}')
+		registration_datetime = datetime.strptime(registration_datetime, cls.capture_datetime_string_format)
+		capture_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
+		query = """
+				INSERT INTO place_history (animal_id, datetime, tg_nickname, arm_id)
+				VALUES (
+					(SELECT id FROM animals WHERE bar_code = %s), %s, %s, %s);
+				"""
+		data = (code, capture_datetime_formatted, tg_nickname, arm_id)
+		result = cls.execute_query(query, data)
+		return result
+
 	@classmethod
 	def __create_user(cls):
 		user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
@@ -445,6 +461,7 @@ class storage:
 		if username in cls.__users:
 			return cls.__users[username]
 		return None
+
 
 class QRCodeStorage:
 	@staticmethod
