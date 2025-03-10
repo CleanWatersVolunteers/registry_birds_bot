@@ -40,7 +40,8 @@ def validate_datetime(user, date_input, time_input):
 	time1 = TimeTools.getDateTime(time_now)
 	time2 = TimeTools.getDateTime(user_time)
 	time_diff = time1 - time2
-
+	# todo Убрать после проверки
+	print(f'time_now: {time_now}. user_time: {user_time}')
 	if time1 < time2 or time_diff.days > 0:
 		return (
 			f'{const.text_incorrect} {user_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',

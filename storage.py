@@ -51,6 +51,7 @@ class storage:
 
 	@classmethod
 	def insert_place_history(cls, arm_id, animal_id, tg_nickname):
+		print(f'insert_place_history. arm_id: {arm_id}, animal_id: {animal_id}, tg_nickname: {tg_nickname}')
 		query = """
             INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
             VALUES (NOW(), %s, %s, %s)
@@ -115,6 +116,8 @@ class storage:
 
 	@classmethod
 	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
+		print(
+			f'insert_value_history. arm_id: {animal_id}, type_id: {type_id}, value: {value}, tg_nickname: {tg_nickname}')
 		query = """
         INSERT INTO values_history (datetime, animal_id, type_id, value, tg_nickname)
         VALUES (NOW(), %s, %s, %s, %s)
@@ -167,6 +170,8 @@ class storage:
 
 	@classmethod
 	def insert_history(cls, manipulation_id, animal_id, arms_id, tg_nickname):
+		print(
+			f'insert_value_history. manipulation_id: {manipulation_id}, animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		query = """
 	INSERT INTO history (datetime, animal_id, manipulation_id, arm_id, tg_nickname)
 	VALUES (NOW(), %s, %s, %s, %s)
@@ -221,6 +226,8 @@ class storage:
 
 	@classmethod
 	def insert_animal(cls, code, capture_datetime, place, pollution):
+		print(
+			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place:{place}, pollution: {pollution}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 		query = """
@@ -243,6 +250,8 @@ class storage:
 	@classmethod
 	def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None,
 					  triage=None) -> bool:
+		print(
+			f'insert_value_history. animal_id: {animal_id}, weight: {weight}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
 		query = "UPDATE animals SET "
 		updates = []
 		data = []
@@ -395,6 +404,7 @@ class storage:
 
 	@classmethod
 	def create_dead_animal(cls, animal_id, arms_id, tg_nickname):
+		print(f'create_dead_animal. animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		query = """INSERT INTO animals_dead (animal_id, arms_id, tg_nickname, datetime) VALUES (%s, %s, %s, NOW())"""
 		data = (animal_id, arms_id, tg_nickname)
 		result = cls.execute_query(query, data)
@@ -435,7 +445,6 @@ class storage:
 		if username in cls.__users:
 			return cls.__users[username]
 		return None
-
 
 class QRCodeStorage:
 	@staticmethod

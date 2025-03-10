@@ -53,6 +53,7 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	await query.answer()
 
 	username = query.from_user.username
+	print(f'cb_user_button username: {username}')
 	text, keyboard = entry_button(username, query.message.text, query.data)
 	try:
 		if keyboard:
@@ -103,11 +104,11 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 		start_number = QRCodeStorage.get_qr_start_value()
 		end_number = start_number
 		if cmds[0] == f'/{qr_cmd_gen24}':
-			end_number = start_number + 24	
+			end_number = start_number + 24
 		elif cmds[0] == f'/{qr_cmd_gen48}':
-			end_number = start_number + 48	
+			end_number = start_number + 48
 		elif cmds[0] == f'/{qr_cmd_gen72}':
-			end_number = start_number + 72	
+			end_number = start_number + 72
 		elif cmds[0] != f'/{qr_cmd_old}' or len(cmds) != 2:
 			raise Exception("Unknown command")
 
