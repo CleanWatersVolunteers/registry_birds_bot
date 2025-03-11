@@ -1,7 +1,5 @@
 # Константы
-from datetime import datetime, timezone, timedelta
-
-import pytz
+from datetime import datetime, timedelta
 
 
 class const:
@@ -32,10 +30,8 @@ class const:
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
 
-	timezone_gmt3 = pytz.timezone('Etc/GMT-3')
-	now = datetime.now(timezone.utc).astimezone(timezone_gmt3).strftime("%Y.%m.%d %H:%M")
-	today = datetime.now(timezone.utc).astimezone(timezone_gmt3).strftime(date_format)
-	yesterday = (datetime.now(timezone.utc).astimezone(timezone_gmt3) - timedelta(days=1)).strftime(date_format)
-	tomorrow = (datetime.now(timezone.utc).astimezone(timezone_gmt3) + timedelta(days=1)).strftime(date_format)
-
-	yesterday_db = (datetime.now(timezone.utc).astimezone(timezone_gmt3) - timedelta(days=1)).strftime("%Y.%m.%d")
+	now = datetime.now().strftime("%Y.%m.%d %H:%M")
+	today = datetime.now().strftime(date_format)
+	yesterday = (datetime.now().date() - timedelta(days=1)).strftime(date_format)
+	tomorrow = (datetime.now().date() + timedelta(days=1)).strftime(date_format)
+	yesterday_db = (datetime.now().date() - timedelta(days=1)).strftime("%Y.%m.%d")

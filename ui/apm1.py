@@ -1,6 +1,6 @@
 # Поступление
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from const import const
 from database import Database as db
@@ -10,7 +10,7 @@ from timetools import TimeTools
 
 apm1_place_id = 1
 
-GET_NOW_TIME = lambda: datetime.now(timezone.utc).astimezone(const.timezone_gmt3).strftime(const.datetime_format)
+GET_NOW_TIME = lambda: datetime.now().strftime(const.datetime_format)
 
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Выберите дату отлова'
@@ -36,21 +36,21 @@ def validate_datetime(user, date_input, time_input):
 		2 - Текущее время не позже 24 часов, чем указанное время
 	"""
 	time_now = GET_NOW_TIME()
-	user_time = TimeTools.createFullDate(date_input, time_input)
+	user_input_time = TimeTools.createFullDate(date_input, time_input)
 
 	time1 = TimeTools.getDateTime(time_now)
-	time2 = TimeTools.getDateTime(user_time)
+	time2 = TimeTools.getDateTime(user_input_time)
 	time_diff = time1 - time2
 	# todo Убрать после проверки
-	log.info(f'time_now: {time_now}. user_time: {user_time}')
+	log.info(f'time_now: {time_now}, user_input_time: {user_input_time}, time_diff: {time_diff}')
 	if time1 < time2 or time_diff.days > 0:
 		return (
-			f'{const.text_incorrect} {user_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
+			f'{const.text_incorrect} {user_input_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
 			{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
 			None
 		)
 	else:
-		user['capture_datetime'] = user_time
+		user['capture_datetime'] = user_input_time
 		return apm1_get_pollution(user["code"])
 
 
@@ -149,9 +149,11 @@ def apm1_button(username, msg, key):
 	user = db.get_user(username)
 	if key == 'apm1_today':
 		user['capture_datetime'] = const.today
+		print(f'capture_datetime today: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	if key == 'apm1_yesterday':
 		user['capture_datetime'] = const.yesterday
+		print(f'capture_datetime yesterday: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	keys = key.split('_')
 	if keys[1] == 'pollution':
