@@ -6,6 +6,7 @@ from const import const
 from database import Database as db
 from storage import storage
 from tools import Tools
+from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
 apm6_place_id = 6
@@ -64,6 +65,9 @@ def apm6_show_mpls(user):
 	history = history_get_info(user['animal_id'], const.week_db)
 	if history is not None:
 		text += f'{history}\n'
+	weight_change = get_diff_values_history(user['animal_id'], const.history_type_weight)
+	if weight_change is not None:
+		text += weight_change
 	mpls = storage.get_manipulations(apm6_place_id)
 	if len(mpls) > 0:
 		text += f'{const.text_line}\n'

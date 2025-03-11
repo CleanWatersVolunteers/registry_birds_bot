@@ -35,3 +35,5 @@ class const:
 	yesterday = (datetime.now().date() - timedelta(days=1)).strftime(date_format)
 	tomorrow = (datetime.now().date() + timedelta(days=1)).strftime(date_format)
 	week_db = (datetime.now().date() - timedelta(days=7)).strftime("%Y.%m.%d")
+
+	history_type_weight = 2
