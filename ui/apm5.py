@@ -3,6 +3,7 @@
 from const import const
 from database import Database as db
 from storage import storage
+from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
 apm5_text_species = '⚠️ Введите вид животного'
@@ -76,6 +77,9 @@ def apm5_get_animal_card(animal):
 		else:
 			animal["triage"] = history_text_not_specified
 		text += apm5_add_hdr_item(history_text_triage, animal["triage"])
+		weight_change = get_diff_values_history(animal['animal_id'], const.history_type_weight)
+		if weight_change is not None:
+			text += weight_change
 		text += f'{const.text_line}'
 		return text
 	return None

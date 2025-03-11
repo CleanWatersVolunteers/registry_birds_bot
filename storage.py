@@ -445,6 +445,28 @@ class storage:
 		return results
 
 	@classmethod
+	def get_diff_values_history(cls, animal_id, type_id):
+		query = """
+			(SELECT `value` AS `first_value` FROM values_history 
+			WHERE animal_id = %s AND type_id = %s 
+			ORDER BY datetime DESC LIMIT 1)
+			UNION ALL
+			(SELECT `value` AS `second_value` FROM values_history 
+			WHERE animal_id = %s AND type_id = %s 
+			ORDER BY datetime DESC LIMIT 1 OFFSET 1)
+			"""
+		data = (animal_id, type_id, animal_id, type_id)
+		results = cls.execute_query(query, data, fetch=True)
+
+		if results and len(results) == 2:
+			first_value = int(results[0]['first_value'])
+			second_value = int(results[1]['first_value'])
+			difference = first_value - second_value
+			return difference
+		else:
+			return None
+
+	@classmethod
 	def __create_user(cls):
 		user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
 		return user

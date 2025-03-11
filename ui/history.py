@@ -4,6 +4,8 @@ from const import const
 from logs import log
 from storage import storage
 
+text_weight_change = 'Изменение веса'
+
 
 ##################################
 # Global API
@@ -46,3 +48,14 @@ def history_get_info(animal_id, start_date, dead_info=None):
 	else:
 		text += result_string.strip()
 	return text
+
+
+def get_diff_values_history(animal_id, type_id):
+	diff = storage.get_diff_values_history(animal_id, type_id)
+	if diff is not None:
+		if diff > 0:
+			return f'{text_weight_change}: + {diff}\n'
+		else:
+			return f'{text_weight_change}: {diff}\n'
+	else:
+		return None
