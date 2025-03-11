@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.manipulations: ~9 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.manipulations: ~10 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(0, 'Ел сам', '6'),
 	(1, 'Пил сам', '6'),
@@ -128,7 +128,8 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(5, 'Рингер 50/50 + Глюкоза 10мл', '4,5'),
 	(6, 'Бриллиантовые глаза', '4'),
 	(7, 'Взвешивание', '6'),
-	(8, 'Степень упитанности', '4');
+	(8, 'Степень упитанности', '4'),
+	(9, 'Слизистая', '4');
 
 -- Дамп структуры для таблица registry_birds.places
 CREATE TABLE IF NOT EXISTS `places` (
@@ -195,12 +196,13 @@ CREATE TABLE IF NOT EXISTS `values_history_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.values_history_type: ~4 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.values_history_type: ~5 rows (приблизительно)
 INSERT INTO `values_history_type` (`id`, `name`, `units`) VALUES
 	(1, 'Съедено рыбы', 'шт.'),
 	(2, 'Вес', 'гр.'),
 	(3, 'Температура', '°C'),
-	(4, 'Степень упитанности', NULL);
+	(4, 'Степень упитанности', NULL),
+	(5, 'Слизистая', NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

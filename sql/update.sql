@@ -37,3 +37,7 @@ rename TABLE `numerical_history_type` to `values_history_type`;
 -- Добавить ввод степени упитанности #271
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (8, 'Степень упитанности', '4');
 ALTER TABLE `values_history_type` CHANGE COLUMN `units` `units` VARCHAR(45) NULL COLLATE 'utf8mb4_0900_ai_ci';
+
+-- Состояние слизистой #275
+INSERT INTO `values_history_type` (`id`,`name`) VALUES (5, 'Слизистая');
+INSERT INTO `manipulations` (`name`, `place_list`) VALUES ('Слизистая', '4');

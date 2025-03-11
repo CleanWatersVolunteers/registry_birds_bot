@@ -7,13 +7,17 @@ from tools import Tools
 
 # БД manipulations.id
 body_condition_manipulations_id = 8
+mucous_manipulations_id = 9
 
 # БД values_history_type.id
 body_condition_history_type_id = 4
+mucous_history_type_id = 5
 
 apm4_place_id = 4
 apm4_text_triage = '⚠️ Укажите триаж животного'
 apm4_body_condition = 'Укажите степень упитанности'
+apm4_text_mucous = 'Укажите состояние слизистой'
+
 apm4_body_condition_list = ['1', '2', '2.5', '3', '3.5', '4', '4.5', '5']
 
 
@@ -40,12 +44,23 @@ def show_mpls(user, mpls):
 	return text, kbd
 
 
+def get_mucous(user):
+	return (
+		f'{const.text_animal_number} {user["bar_code"]}\n{apm4_text_mucous}',
+		{const.text_cancel: "entry_cancel"},
+		'apm4_mucous'
+	)
+
+
 ##################################
 # Global API
 ##################################
 
 def apm4_start(username, text, key=None):
 	user = db.get_user(username)
+	if key == 'apm4_mucous':
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=mucous_history_type_id, value=text,
+									 tg_nickname=username)
 	if key is None:
 		checkDead = Tools.checkDead(text)
 		if checkDead is not False:
@@ -99,6 +114,8 @@ def apm4_button(username, text, key):
 		user['mpl_list'].append(key_id)
 		if int(key_id) == body_condition_manipulations_id:
 			return get_body_condition_list()
+		elif int(key_id) == mucous_manipulations_id:
+			return get_mucous(user)
 		storage.insert_history(
 			manipulation_id=key_id,
 			animal_id=user["animal_id"],
