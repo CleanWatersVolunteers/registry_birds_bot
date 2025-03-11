@@ -106,7 +106,7 @@ class storage:
 	@classmethod
 	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
 		log.info(
-			f'insert_value_history. arm_id: {animal_id}, type_id: {type_id}, value: {value}, tg_nickname: {tg_nickname}')
+			f'insert_value_history. animal_id: {animal_id}, type_id: {type_id}, value: {value}, tg_nickname: {tg_nickname}')
 		query = """
         INSERT INTO values_history (datetime, animal_id, type_id, value, tg_nickname)
         VALUES (NOW(), %s, %s, %s, %s)
@@ -160,7 +160,7 @@ class storage:
 	@classmethod
 	def insert_history(cls, manipulation_id, animal_id, arms_id, tg_nickname):
 		log.info(
-			f'insert_value_history. manipulation_id: {manipulation_id}, animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
+			f'insert_history. manipulation_id: {manipulation_id}, animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		query = """
 	INSERT INTO history (datetime, animal_id, manipulation_id, arm_id, tg_nickname)
 	VALUES (NOW(), %s, %s, %s, %s)
@@ -240,7 +240,7 @@ class storage:
 	def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None,
 					  triage=None) -> bool:
 		log.info(
-			f'insert_value_history. animal_id: {animal_id}, weight: {weight}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
+			f'update_animal. animal_id: {animal_id}, weight: {weight}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
 		query = "UPDATE animals SET "
 		updates = []
 		data = []
