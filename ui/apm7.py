@@ -190,7 +190,13 @@ def get_first_screen(user):
 	text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
 	text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
 	text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n\n'
-	text += 'Рабочие смены:'
+
+	text += f'{const.text_line}\nЖивотные:\n'
+	place_counts = storage.get_place_count(0)
+	for item in place_counts:
+		text += f'{item['name']} - {item['count']}\n'
+
+	text += f'{const.text_line}\nРабочие смены:'
 	arm_list = storage.get_arms(user['location_id'])
 	if arm_list is not None:
 		for arm in arm_list:
