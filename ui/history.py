@@ -12,12 +12,13 @@ def history_get_info(animal_id, dead_info=None):
 	numerical_history = storage.get_animal_values_history(animal_id, const.yesterday_db)
 	history = storage.get_animal_history(animal_id, const.yesterday_db)
 	place_history = storage.get_place_history(animal_id, const.yesterday_db)
+	print(f'history_get_info: {const.yesterday_db}')
 
 	combined_history = (numerical_history + history + place_history)
 	if dead_info is not None:
 		combined_history += dead_info
 	# todo Shadows name 'item' from outer scope
-	sorted_history = sorted(combined_history, key=lambda item: item['datetime'])
+	sorted_history = sorted(combined_history, key=lambda history_item: history_item['datetime'])
 	result_string = ""
 	current_date = None
 	text = ''
