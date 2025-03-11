@@ -39,5 +39,5 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (8, 'Степе�
 ALTER TABLE `values_history_type` CHANGE COLUMN `units` `units` VARCHAR(45) NULL COLLATE 'utf8mb4_0900_ai_ci';
 
 -- Состояние слизистой #275
-INSERT INTO `registry_birds`.`values_history_type` (`id`,`name`) VALUES (`5`, 'Слизистая');
-INSERT INTO `registry_birds`.`manipulations` (`name`, `place_list`) VALUES ('Слизистая', '4');
+INSERT INTO `values_history_type` (`id`,`name`) VALUES (5, 'Слизистая');
+INSERT INTO `manipulations` (`name`, `place_list`) VALUES ('Слизистая', '4');
