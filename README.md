@@ -232,3 +232,17 @@ GRANT ALL PRIVILEGES ON *.* TO 'anapa'@'localhost' WITH GRANT OPTION;
 CREATE USER 'user'@'%' IDENTIFIED BY 'pass';
 GRANT ALL PRIVILEGES ON *.* TO 'anapa'@'%' WITH GRANT OPTION;
 ```
+
+# Инструменты импорта
+Импорт журнала регистрации
+
+Формат файла:
+```
+code,date,capture,registration,type,place
+703,05.03,10:00,10:30,Чомга,Джемете
+```
+
+Запуск скрипта (телеграмм_ник имя_файла)
+```
+/root/venv/bin/python register.py Palmman 03.06.csv
+```
