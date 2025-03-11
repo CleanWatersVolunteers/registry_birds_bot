@@ -32,7 +32,7 @@ def apm5_add_hdr_item(label, value):
 def apm5_show_mpls(user, dead_info=None):
 	kbd = dict()
 	text = f'{apm5_get_animal_card(user['animal'])}\n'
-	history = history_get_info(user['animal']['animal_id'], dead_info)
+	history = history_get_info(user['animal']['animal_id'], const.week_db, dead_info)
 	if history is not None:
 		text += f'{history}\n'
 	if user['animal']['is_dead'] is False:

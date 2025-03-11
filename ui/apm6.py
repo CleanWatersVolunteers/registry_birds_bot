@@ -61,7 +61,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 def apm6_show_mpls(user):
 	kbd = dict()
 	text = f'{const.text_animal_number} {user['bar_code']}\n{const.text_line}\n'
-	history = history_get_info(user['animal_id'])
+	history = history_get_info(user['animal_id'], const.week_db)
 	if history is not None:
 		text += f'{history}\n'
 	mpls = storage.get_manipulations(apm6_place_id)
