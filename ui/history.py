@@ -9,11 +9,11 @@ from storage import storage
 # Global API
 ##################################
 
-def history_get_info(animal_id, dead_info=None):
-	numerical_history = storage.get_animal_values_history(animal_id, const.yesterday_db)
-	history = storage.get_animal_history(animal_id, const.yesterday_db)
-	place_history = storage.get_place_history(animal_id, const.yesterday_db)
-	log.info(f'history_get_info: {const.yesterday_db}')
+def history_get_info(animal_id, start_date, dead_info=None):
+	numerical_history = storage.get_animal_values_history(animal_id, start_date)
+	history = storage.get_animal_history(animal_id, start_date)
+	place_history = storage.get_place_history(animal_id, start_date)
+	log.info(f'history_get_info: {start_date}')
 
 	combined_history = (numerical_history + history + place_history)
 	if dead_info is not None:

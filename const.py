@@ -34,4 +34,4 @@ class const:
 	today = datetime.now().strftime(date_format)
 	yesterday = (datetime.now().date() - timedelta(days=1)).strftime(date_format)
 	tomorrow = (datetime.now().date() + timedelta(days=1)).strftime(date_format)
-	yesterday_db = (datetime.now().date() - timedelta(days=1)).strftime("%Y.%m.%d")
+	week_db = (datetime.now().date() - timedelta(days=7)).strftime("%Y.%m.%d")
