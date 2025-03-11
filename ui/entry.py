@@ -1,4 +1,5 @@
 from database import Database as db
+from logs import log
 from ui.apm1 import apm1_start, apm1_button
 from ui.apm2 import apm2_start, apm2_button
 from ui.apm3 import apm3_start, apm3_button
@@ -173,5 +174,5 @@ def entry_button(username, text, key):
 				db.clear_user(username)
 				return text, kbd
 		return f'{get_arm_name(user)}{text}', kbd
-	print("[!!] Error key", key)
+	log.error("Error key", key)
 	return text, None

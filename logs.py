@@ -1,24 +1,14 @@
+import logging as log
 
-from datetime import datetime
-import pytz
-curr_time = lambda: datetime.now().isoformat()
+log.basicConfig(
+	level=log.INFO,
+	format="%(asctime)s - %(levelname)s - %(message)s",
+	datefmt="%Y-%m-%d %H:%M:%S"
+)
 
-
-class log:
-    @classmethod
-    def init(cls, name):
-        cls.__name = name
-
-    @classmethod
-    def logi(cls, log):
-        text = f'[..] {log}'
-        # with open(cls.__name, 'a') as f:
-        #     f.write(text)
-        print(text)
-
-    @classmethod
-    def loge(cls, log):
-        text = f'[!!] {log}'
-        # with open(cls.__name, 'a') as f:
-        #     f.write(text)
-        print(text)
+# Запись сообщений в лог
+# log.debug("Отладочная информация")
+# log.info("Информационное сообщение")
+# log.warning("Предупреждение")
+# log.error("Ошибка")
+# log.critical("Критическая ошибка")
