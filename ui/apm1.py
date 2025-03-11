@@ -120,7 +120,7 @@ def apm1_start(username, text, key=None):
 	user = db.get_user(username)
 	if key is None:
 		animal = storage.get_animal_by_bar_code(text)
-		if animal is not None:
+		if animal != {}:
 			return (
 				f'{apm1_text_already_registered.format(code=text)}',
 				{const.text_ok: "entry_cancel"},

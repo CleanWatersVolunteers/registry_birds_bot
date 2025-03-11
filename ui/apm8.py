@@ -18,7 +18,7 @@ def apm8_start(username, text, key=None):
 	if check_dead is not False:
 		return check_dead
 	animal = storage.get_animal_by_bar_code(text)
-	if animal is None:
+	if animal == {}:
 		return (
 			const.animal_not_found.format(code=text),
 			{const.text_ok: "entry_cancel"},
