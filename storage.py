@@ -94,16 +94,6 @@ class storage:
 		return None  # Возвращаем None, если ничего не найдено
 
 	@classmethod
-	def get_animal_by_id(cls, animal_id) -> dict:
-		query = "SELECT * FROM animals WHERE id = %s"
-		data = (animal_id,)
-		result = cls.execute_query(query, data, fetch=True)
-		if result:
-			return result[0]  # Возвращаем первый (и единственный) объект
-		else:
-			return None
-
-	@classmethod
 	def get_animal_by_bar_code(cls, bar_code) -> dict:
 		query = "SELECT *, id AS animal_id FROM animals WHERE bar_code = %s"
 		data = (bar_code,)
@@ -111,7 +101,7 @@ class storage:
 		if result:
 			return result[0]  # Возвращаем первый (и единственный) объект
 		else:
-			return None
+			return {}
 
 	@classmethod
 	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
