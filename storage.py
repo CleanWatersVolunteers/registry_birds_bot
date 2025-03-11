@@ -440,6 +440,22 @@ class storage:
 		return result
 
 	@classmethod
+	def get_place_count(cls, location_id):
+		query = """
+			SELECT p.id, p.name, COUNT(DISTINCT ph.animal_id) AS count
+			FROM place_history ph
+			JOIN arms a ON ph.arm_id = a.id
+			JOIN places p ON a.place_id = p.id
+			WHERE a.location_id = %s
+			GROUP BY p.id, p.name
+			ORDER BY p.id;
+			"""
+
+		# Выполнение запроса, передавая location_id
+		results = cls.execute_query(query, (location_id,), fetch=True)
+		return results
+
+	@classmethod
 	def __create_user(cls):
 		user = {"location_id": None, "location_name": None, "mode": None, "code": None, "id": None}
 		return user
