@@ -4,6 +4,7 @@ from datetime import datetime
 import mysql.connector
 from mysql.connector import pooling
 
+from logs import log
 from timetools import TimeTools
 
 DB_HOST = os.getenv("DB_HOST")
@@ -43,7 +44,7 @@ class storage:
 				connection.commit()  # Подтверждаем изменения
 				return cursor.lastrowid
 		except mysql.connector.Error as err:
-			print(f"Ошибка при выполнении запроса: {err}\n{query}")
+			log.error(f"Ошибка при выполнении запроса: {err}\n{query}")
 			return None
 		finally:
 			cursor.close()
@@ -51,7 +52,7 @@ class storage:
 
 	@classmethod
 	def insert_place_history(cls, arm_id, animal_id, tg_nickname):
-		print(f'insert_place_history. arm_id: {arm_id}, animal_id: {animal_id}, tg_nickname: {tg_nickname}')
+		log.info(f'insert_place_history. arm_id: {arm_id}, animal_id: {animal_id}, tg_nickname: {tg_nickname}')
 		query = """
             INSERT INTO place_history (datetime, animal_id, tg_nickname, arm_id)
             VALUES (NOW(), %s, %s, %s)
@@ -100,7 +101,6 @@ class storage:
 		if result:
 			return result[0]  # Возвращаем первый (и единственный) объект
 		else:
-			print("Животное не найдено.")
 			return None
 
 	@classmethod
@@ -111,12 +111,11 @@ class storage:
 		if result:
 			return result[0]  # Возвращаем первый (и единственный) объект
 		else:
-			print("Животное не найдено.")
 			return None
 
 	@classmethod
 	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
-		print(
+		log.info(
 			f'insert_value_history. arm_id: {animal_id}, type_id: {type_id}, value: {value}, tg_nickname: {tg_nickname}')
 		query = """
         INSERT INTO values_history (datetime, animal_id, type_id, value, tg_nickname)
@@ -170,7 +169,7 @@ class storage:
 
 	@classmethod
 	def insert_history(cls, manipulation_id, animal_id, arms_id, tg_nickname):
-		print(
+		log.info(
 			f'insert_value_history. manipulation_id: {manipulation_id}, animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		query = """
 	INSERT INTO history (datetime, animal_id, manipulation_id, arm_id, tg_nickname)
@@ -226,7 +225,7 @@ class storage:
 
 	@classmethod
 	def insert_animal(cls, code, capture_datetime, place, pollution):
-		print(
+		log.info(
 			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, pollution: {pollution}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
@@ -250,7 +249,7 @@ class storage:
 	@classmethod
 	def update_animal(cls, animal_id, weight=None, species=None, clinical_condition_admission=None,
 					  triage=None) -> bool:
-		print(
+		log.info(
 			f'insert_value_history. animal_id: {animal_id}, weight: {weight}, species: {species}, clinical_condition_admission: {clinical_condition_admission}')
 		query = "UPDATE animals SET "
 		updates = []
@@ -270,7 +269,7 @@ class storage:
 			updates.append("triage = %s")
 			data.append(triage)
 		if not updates:
-			print("update_animal: Нет данных для обновления.")
+			log.error("update_animal: Нет данных для обновления.")
 			return False
 
 		query += ", ".join(updates) + " WHERE id = %s"
@@ -278,10 +277,10 @@ class storage:
 
 		result = cls.execute_query(query, data)
 		if result is None:
-			print("update_animal: Ошибка обновления данных.")
+			log.error("update_animal: Ошибка обновления данных.")
 			return False
 		else:
-			print(f"Данные animals для id {animal_id} успешно обновлены.")
+			log.info(f"Данные animals для id {animal_id} успешно обновлены.")
 			return True
 
 	@classmethod
@@ -404,7 +403,7 @@ class storage:
 
 	@classmethod
 	def create_dead_animal(cls, animal_id, arms_id, tg_nickname):
-		print(f'create_dead_animal. animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
+		log.info(f'create_dead_animal. animal_id: {animal_id}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		query = """INSERT INTO animals_dead (animal_id, arms_id, tg_nickname, datetime) VALUES (%s, %s, %s, NOW())"""
 		data = (animal_id, arms_id, tg_nickname)
 		result = cls.execute_query(query, data)
@@ -426,7 +425,7 @@ class storage:
 	# Вставка записей бумажного журнала первичной регистрации
 	@classmethod
 	def import_place_history(cls, code, registration_datetime, tg_nickname, arm_id):
-		print(
+		log.info(
 			f'import_place_history. code: {code}, arm_id: {arm_id}, registration_datetime: {registration_datetime}, tg_nickname: {tg_nickname}')
 		registration_datetime = datetime.strptime(registration_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
