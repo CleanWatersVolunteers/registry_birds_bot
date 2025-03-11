@@ -239,9 +239,11 @@ def apm7_button(user, text, key):
 		return delete_duty(user, key.split('_')[2])
 	if 'apm7_start_today' in key:
 		user['start_duty_date'] = const.today
+		print(f'start_duty_date today: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_start_tomorrow' in key:
 		user['start_duty_date'] = const.tomorrow
+		print(f'start_duty_date tomorrow: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_end_today' in key:
 		user['end_duty_date'] = const.today
