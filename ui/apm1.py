@@ -4,7 +4,7 @@ from datetime import datetime
 
 from const import const
 from database import Database as db
-from logs import log
+from logs import my_logger
 from storage import storage
 from timetools import TimeTools
 
@@ -42,7 +42,7 @@ def validate_datetime(user, date_input, time_input):
 	time2 = TimeTools.getDateTime(user_input_time)
 	time_diff = time1 - time2
 	# todo Убрать после проверки
-	log.info(f'time_now: {time_now}, user_input_time: {user_input_time}, time_diff: {time_diff}')
+	my_logger.info(f'time_now: {time_now}, user_input_time: {user_input_time}, time_diff: {time_diff}')
 	if time1 < time2 or time_diff.days > 0:
 		return (
 			f'{const.text_incorrect} {user_input_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
@@ -149,11 +149,11 @@ def apm1_button(username, msg, key):
 	user = db.get_user(username)
 	if key == 'apm1_today':
 		user['capture_datetime'] = const.today
-		log.info(f'capture_datetime today: {user['capture_datetime']}')
+		my_logger.info(f'capture_datetime today: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	if key == 'apm1_yesterday':
 		user['capture_datetime'] = const.yesterday
-		log.info(f'capture_datetime yesterday: {user['capture_datetime']}')
+		my_logger.info(f'capture_datetime yesterday: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	keys = key.split('_')
 	if keys[1] == 'pollution':

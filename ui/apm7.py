@@ -3,7 +3,7 @@ import random
 
 from const import const
 from database import Database as db
-from logs import log
+from logs import my_logger
 from storage import storage
 from timetools import TimeTools
 from ui.gen import (
@@ -240,11 +240,11 @@ def apm7_button(user, text, key):
 		return delete_duty(user, key.split('_')[2])
 	if 'apm7_start_today' in key:
 		user['start_duty_date'] = const.today
-		log.info(f'start_duty_date today: {user['start_duty_date']}')
+		my_logger.info(f'start_duty_date today: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_start_tomorrow' in key:
 		user['start_duty_date'] = const.tomorrow
-		log.info(f'start_duty_date tomorrow: {user['start_duty_date']}')
+		my_logger.info(f'start_duty_date tomorrow: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_end_today' in key:
 		user['end_duty_date'] = const.today

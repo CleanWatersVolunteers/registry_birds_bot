@@ -1,18 +1,29 @@
 import logging as log
+from logging.handlers import TimedRotatingFileHandler
 
 log.basicConfig(
-	level=log.INFO,
+	level=log.WARNING,
 	format="%(asctime)s - %(levelname)s - %(message)s",
 	datefmt="%Y-%m-%d %H:%M:%S",
 	handlers=[
 		log.StreamHandler(),  # Вывод в консоль
-		log.FileHandler("app.log")  # Вывод в файл
+		TimedRotatingFileHandler(
+			filename="app.log",  # Базовое имя файла
+			when="midnight",  # Интервал: каждый день в полночь
+			interval=1,  # Каждый 1 день
+			# backupCount=7,  # Сохранять последние 7 файлов
+			encoding="utf-8"  # Кодировка файла
+		)
 	]
 )
 
+# Создание нашего логгера
+my_logger = log.getLogger('my_script_logger')
+my_logger.setLevel(log.INFO)
+
 # Запись сообщений в лог
-# log.debug("Отладочная информация")
-# log.info("Информационное сообщение")
-# log.warning("Предупреждение")
-# log.error("Ошибка")
-# log.critical("Критическая ошибка")
+# my_logger.debug("Отладочная информация")
+# my_logger.info("Информационное сообщение")
+# my_logger.warning("Предупреждение")
+# my_logger.error("Ошибка")
+# my_logger.critical("Критическая ошибка")
