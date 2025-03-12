@@ -5,7 +5,7 @@ load_dotenv()
 import os
 import asyncio
 import re
-from logs import log
+from logs import my_logger
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
@@ -49,7 +49,7 @@ async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 		else:
 			await update.message.reply_text(text)
 	except Exception as e:
-		log.error('Exception cb_user_message ', e)
+		my_logger.error('Exception cb_user_message ', e)
 
 
 async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -57,7 +57,7 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	await query.answer()
 
 	username = query.from_user.username
-	log.debug(f'cb_user_button username: {username}')
+	my_logger.debug(f'cb_user_button username: {username}')
 	text, keyboard = entry_button(username, query.message.text, query.data)
 	try:
 		if keyboard:
@@ -68,7 +68,7 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 			await query.message.reply_text(text=text)
 
 	except Exception as e:
-		log.error('Exception cb_user_button ', e)
+		my_logger.error('Exception cb_user_button ', e)
 
 
 async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -86,7 +86,7 @@ async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 			await update.message.reply_text(text=text)
 
 	except Exception as e:
-		log.error('Exception cb_user_photo ', e)
+		my_logger.error('Exception cb_user_photo ', e)
 
 
 async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -99,7 +99,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 			await update.message.reply_text("❌ Команда запрещена")
 			return None
 	except Exception as e:
-		log.error('Exception cb_cmd_gen ', e)
+		my_logger.error('Exception cb_cmd_gen ', e)
 		# todo Local variable 'username' might be referenced before assignment
 		await update.message.reply_text(f'Здравствуйте {username}!\n⚠ Введите пароль')
 		return None
@@ -130,7 +130,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 		await msg.delete()
 		await update.message.reply_document(document=pdf_data, filename=pdf_name, caption=TEXT_QR_CODES_READY)
 	except Exception as e:
-		log.error(f'Exception cb_cmd_gen {e}')
+		my_logger.error(f'Exception cb_cmd_gen {e}')
 		text = f"❌ Неправильный ввод: {cmd}\n"
 		text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
 		text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
@@ -156,14 +156,14 @@ async def main() -> None:
 	await application.start()
 	await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
-	log.info("Bot 'Registry Birds v1.0.0' enabled")
+	my_logger.info("Bot 'Registry Birds v1.0.0' enabled")
 
 	while True:
 		await asyncio.sleep(SLEEP)
 
 	# todo This code is unreachable
 	await application.updater.stop()
-	log.info("Bot disabled")
+	my_logger.info("Bot disabled")
 
 	await application.shutdown()
 

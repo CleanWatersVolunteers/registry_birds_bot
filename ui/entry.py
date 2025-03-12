@@ -86,7 +86,7 @@ def entry_start(username, text, key=None):
 			user = db.create_user(username, location_id)
 		else:
 			arm_list = storage.get_arm_access(const.now, password=text)
-			log.info(f'get_arm_access {const.now}')
+			my_logger.info(f'get_arm_access {const.now}')
 			if len(arm_list) > 0:
 				user = db.create_user(username, arm_list[0]["location_id"], password=text)
 			else:
@@ -174,5 +174,5 @@ def entry_button(username, text, key):
 				db.clear_user(username)
 				return text, kbd
 		return f'{get_arm_name(user)}{text}', kbd
-	log.error("Error key", key)
+	my_logger.error("Error key", key)
 	return text, None
