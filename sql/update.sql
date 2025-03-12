@@ -41,3 +41,6 @@ ALTER TABLE `values_history_type` CHANGE COLUMN `units` `units` VARCHAR(45) NULL
 -- Состояние слизистой #275
 INSERT INTO `values_history_type` (`id`,`name`) VALUES (5, 'Слизистая');
 INSERT INTO `manipulations` (`name`, `place_list`) VALUES ('Слизистая', '4');
+
+-- Запись в таблицу animals_dead должна быть уникальной #309
+ALTER TABLE `animals_dead` ADD UNIQUE INDEX unique_animal_id (animal_id);
