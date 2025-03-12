@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `animals_dead` (
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `unique_animal_id` (`animal_id`),
   KEY `fk_animal_id` (`animal_id`),
   KEY `fk_arms_id` (`arms_id`),
   CONSTRAINT `fk_animal_id` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
