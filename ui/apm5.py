@@ -8,8 +8,6 @@ from ui.history import history_get_info
 
 apm5_text_species = '⚠️ Введите вид животного'
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
-apm5_text_animal_dead = 'Гибель'
-apm5_text_animal_dead_confirmation = '⚠️ Подтвердите гибель'
 
 history_text_pollution_degree = 'Степень загрязнения'
 history_text_weight = 'Вес'
@@ -111,7 +109,7 @@ def apm5_start(username, text, key=None):
 		user['mpl_list'] = []
 		text, kbd = apm5_show_mpls(user, dead_info)
 		if user['animal']['is_dead'] is False:
-			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
+			kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
 			text += const.text_manipulation_done
 		kbd['Готово'] = 'entry_cancel'
 		return text, kbd, None
@@ -138,7 +136,7 @@ def apm5_start(username, text, key=None):
 
 def apm5_animal_dead_confirmation(user):
 	return (
-		f'{apm5_text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
+		f'{const.animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
 		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
 		None
 	)
@@ -176,7 +174,7 @@ def apm5_button(username, text, key):
 		)
 		text, kbd = apm5_show_mpls(user)
 		if user['animal']['is_dead'] is False:
-			kbd[apm5_text_animal_dead] = 'apm5_animal_dead_confirmation'
+			kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
 		kbd['Готово'] = 'entry_cancel'
 		return text, kbd, None
 	return None, None, None
