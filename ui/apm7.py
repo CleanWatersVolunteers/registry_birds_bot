@@ -185,28 +185,26 @@ def check_data(user):
 	)
 
 
-def get_state_item(user, arm_id, start_datetime=None, end_datetime=None):
+def get_state_item(user, location_id, start_datetime=None, end_datetime=None):
 	text = f'\n'
 	place_counts = storage.get_place_count(user["location_id"], start_datetime, end_datetime)
 	if place_counts is not None:
 		for item in place_counts:
 			text += f'{item['name']}: {item['count']}\n'
-	dead_count = storage.count_animals_dead(arm_id, start_datetime, end_datetime)
+	dead_count = storage.count_animals_dead(location_id, start_datetime, end_datetime)
 	text += f'Погибло: {dead_count}'
 	return text
 
 
 def get_stat(user):
-	medic_place_id = 5
-	arm_id = storage.get_arm_id(medic_place_id, user["location_id"])
-	text = f'\nВсего\n{const.text_line}\n'
-	text = get_state_item(user, arm_id)
+	text = f'\n{const.text_line}\nВсего'
+	text += get_state_item(user, user["location_id"])
 	# --------------------
 	text += f'\n{const.text_line}\nВчера'
-	text += get_state_item(user, arm_id, const.yesterday_db, const.today_db)
+	text += get_state_item(user, user["location_id"], const.yesterday_db, const.today_db)
 	# --------------------
 	text += f'\n{const.text_line}\nСегодня'
-	text += get_state_item(user, arm_id, const.today_db)
+	text += get_state_item(user, user["location_id"], const.today_db)
 	return text
 
 
