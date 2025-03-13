@@ -1,7 +1,5 @@
 # Поступление
 
-from datetime import datetime
-
 from const import const
 from database import Database as db
 from logs import my_logger
@@ -9,8 +7,6 @@ from storage import storage
 from timetools import TimeTools
 
 apm1_place_id = 1
-
-GET_NOW_TIME = lambda: datetime.now().strftime(const.datetime_format)
 
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Выберите дату отлова'
@@ -35,7 +31,7 @@ def validate_datetime(user, date_input, time_input):
 		1 - Текущее время не раньше, чем указанное время
 		2 - Текущее время не позже 24 часов, чем указанное время
 	"""
-	time_now = GET_NOW_TIME()
+	time_now = const.now
 	user_input_time = TimeTools.createFullDate(date_input, time_input)
 
 	time1 = TimeTools.getDateTime(time_now)

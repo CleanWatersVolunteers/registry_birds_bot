@@ -31,7 +31,7 @@ class const:
 	date_format = "%d.%m.%Y"
 	date_db_format = "%Y.%m.%d"
 
-	now = datetime.now().strftime("%Y.%m.%d %H:%M")
+	now = datetime.now().strftime(datetime_format)
 	today = datetime.now().strftime(date_format)
 	yesterday = (datetime.now().date() - timedelta(days=1)).strftime(date_format)
 	tomorrow = (datetime.now().date() + timedelta(days=1)).strftime(date_format)
@@ -39,5 +39,6 @@ class const:
 
 	yesterday_db = (datetime.now().date() - timedelta(days=1)).strftime(date_db_format)
 	today_db = (datetime.now().date()).strftime(date_db_format)
+	now_db = datetime.now().strftime("%Y.%m.%d %H:%M")
 
 	history_type_weight = 2
