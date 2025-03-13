@@ -400,6 +400,25 @@ class storage:
 		return result is not None
 
 	@classmethod
+	def count_animals_dead(cls, arms_id, start_datetime=None, end_datetime=None):
+		"""
+		Возвращает количество записей в таблице animals_dead для указанного arms_id
+		и временного диапазона [start_datetime, end_datetime]."""
+		query = "SELECT COUNT(*) AS count FROM animals_dead "
+		where = " WHERE arms_id = %s"
+		params = [arms_id]
+		if start_datetime is not None:
+			where += " AND datetime >= %s"
+			params.append(start_datetime)
+		if end_datetime is not None:
+			where += " AND datetime <= %s"
+			params.append(end_datetime)
+		results = cls.execute_query(query + where, tuple(params), fetch=True)
+		if results and len(results) > 0:
+			return results[0]["count"]
+		return 0
+
+	@classmethod
 	def get_animal_dead(cls, bar_code):
 		query = """
 			SELECT ad.*
@@ -429,19 +448,26 @@ class storage:
 		return result
 
 	@classmethod
-	def get_place_count(cls, location_id):
+	def get_place_count(cls, location_id, start_datetime=None, end_datetime=None):
 		query = """
 			SELECT p.id, p.name, COUNT(DISTINCT ph.animal_id) AS count
 			FROM place_history ph
 			JOIN arms a ON ph.arm_id = a.id
 			JOIN places p ON a.place_id = p.id
-			WHERE a.location_id = %s
+			"""
+		where = " WHERE a.location_id = %s"
+		group_order = """
 			GROUP BY p.id, p.name
 			ORDER BY p.id;
-			"""
-
-		# Выполнение запроса, передавая location_id
-		results = cls.execute_query(query, (location_id,), fetch=True)
+		"""
+		params = [location_id]
+		if start_datetime is not None:
+			where += " AND datetime >= %s"
+			params.append(start_datetime)
+		if end_datetime is not None:
+			where += " AND datetime <= %s"
+			params.append(end_datetime)
+		results = cls.execute_query(query + where + group_order, tuple(params), fetch=True)
 		return results
 
 	@classmethod

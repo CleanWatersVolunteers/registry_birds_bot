@@ -29,11 +29,15 @@ class const:
 	datetime_format = "%d.%m.%Y %H:%M"
 	time_format = "%H:%M"
 	date_format = "%d.%m.%Y"
+	date_db_format = "%Y.%m.%d"
 
 	now = datetime.now().strftime("%Y.%m.%d %H:%M")
 	today = datetime.now().strftime(date_format)
 	yesterday = (datetime.now().date() - timedelta(days=1)).strftime(date_format)
 	tomorrow = (datetime.now().date() + timedelta(days=1)).strftime(date_format)
 	week_db = (datetime.now().date() - timedelta(days=7)).strftime("%Y.%m.%d")
+
+	yesterday_db = (datetime.now().date() - timedelta(days=1)).strftime(date_db_format)
+	today_db = (datetime.now().date()).strftime(date_db_format)
 
 	history_type_weight = 2
