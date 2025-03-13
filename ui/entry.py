@@ -86,8 +86,8 @@ def entry_start(username, text, key=None):
 			user = db.create_user(username, location_id)
 		else:
 			if text is not None and text != "":
-				arm_list = storage.get_arm_access(const.now, password=text)
-				my_logger.info(f'get_arm_access {const.now}')
+				arm_list = storage.get_arm_access(const.now_db, password=text)
+				my_logger.info(f'get_arm_access {const.now_db}')
 				if len(arm_list) > 0:
 					user = db.create_user(username, arm_list[0]["location_id"], password=text)
 					my_logger.info(f'Вход: {username}')
