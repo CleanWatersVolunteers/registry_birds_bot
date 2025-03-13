@@ -185,19 +185,39 @@ def check_data(user):
 	)
 
 
+def get_state_item(user, arm_id, start_datetime=None, end_datetime=None):
+	text = f'\n'
+	place_counts = storage.get_place_count(user["location_id"], start_datetime, end_datetime)
+	if place_counts is not None:
+		for item in place_counts:
+			text += f'{item['name']}: {item['count']}\n'
+	dead_count = storage.count_animals_dead(arm_id, start_datetime, end_datetime)
+	text += f'Погибло: {dead_count}'
+	return text
+
+
+def get_stat(user):
+	medic_place_id = 5
+	arm_id = storage.get_arm_id(medic_place_id, user["location_id"])
+	text = f'\nВсего\n{const.text_line}\n'
+	text = get_state_item(user, arm_id)
+	# --------------------
+	text += f'\n{const.text_line}\nВчера'
+	text += get_state_item(user, arm_id, const.yesterday_db, const.today_db)
+	# --------------------
+	text += f'\n{const.text_line}\nСегодня'
+	text += get_state_item(user, arm_id, const.today_db)
+	return text
+
+
 def get_first_screen(user):
 	kbd = {}
 	text = f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
 	text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
 	text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
-	text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n\n'
-
-	text += f'{const.text_line}\nЖивотные:\n'
-	place_counts = storage.get_place_count(0)
-	for item in place_counts:
-		text += f'{item['name']} - {item['count']}\n'
-
-	text += f'{const.text_line}\nРабочие смены:'
+	text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
+	text += get_stat(user)
+	text += f'\n{const.text_line}\nРабочие смены:'
 	arm_list = storage.get_arms(user['location_id'])
 	if arm_list is not None:
 		for arm in arm_list:
