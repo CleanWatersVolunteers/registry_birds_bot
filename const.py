@@ -20,6 +20,8 @@ class const:
 	text_yesterday = 'Вчера'
 	text_line = '------------------------'
 	text_manipulations_not_found = "Манипуляции не найдены"
+	text_animal_dead = 'Гибель'
+	text_animal_dead_confirmation = '⚠️ Подтвердите гибель'
 
 	text_triage_green = 'Зеленый'
 	text_triage_yellow = 'Желтый'
