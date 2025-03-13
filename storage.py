@@ -400,18 +400,22 @@ class storage:
 		return result is not None
 
 	@classmethod
-	def count_animals_dead(cls, arms_id, start_datetime=None, end_datetime=None):
+	def count_animals_dead(cls, location_id, start_datetime=None, end_datetime=None):
 		"""
-		Возвращает количество записей в таблице animals_dead для указанного arms_id
+		Возвращает количество записей в таблице animals_dead для указанного location_id
 		и временного диапазона [start_datetime, end_datetime]."""
-		query = "SELECT COUNT(*) AS count FROM animals_dead "
-		where = " WHERE arms_id = %s"
-		params = [arms_id]
+		query = """
+		SELECT COUNT(*) AS count
+		FROM animals_dead ad 
+		JOIN arms a ON ad.arms_id = a.id
+		"""
+		where = " WHERE a.location_id = %s"
+		params = [location_id]
 		if start_datetime is not None:
-			where += " AND datetime >= %s"
+			where += " AND ad.datetime >= %s"
 			params.append(start_datetime)
 		if end_datetime is not None:
-			where += " AND datetime <= %s"
+			where += " AND ad.datetime <= %s"
 			params.append(end_datetime)
 		results = cls.execute_query(query + where, tuple(params), fetch=True)
 		if results and len(results) > 0:
