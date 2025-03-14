@@ -32,8 +32,7 @@ def apm2_start(user_id, text, key=None):
 	)
 
 
-def apm2_button(user_id, text, key):
-	user = db.get_user(user_id)
+def apm2_button(user, text, key):
 	# todo Использовать arm_id из базы #154
 	arm_id = storage.get_arm_id(apm2_place_id, user["location_id"])
 	# todo Использовать arm_id из базы #154

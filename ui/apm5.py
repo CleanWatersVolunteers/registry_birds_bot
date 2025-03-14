@@ -150,8 +150,7 @@ def apm5_animal_dead(user):
 	return None, None, None
 
 
-def apm5_button(user_id, text, key):
-	user = db.get_user(user_id)
+def apm5_button(user, text, key):
 	if key == 'apm5_done':
 		storage.update_animal(
 			animal_id=user['animal']['animal_id'],
@@ -163,7 +162,6 @@ def apm5_button(user_id, text, key):
 	if key == 'apm5_animal_dead':
 		return apm5_animal_dead(user)
 	if "mpl" in key:
-		user = db.get_user(user_id)
 		key_id = key.split('_')[-1]
 		user["mpl_list"].append(key_id)
 		storage.insert_history(
