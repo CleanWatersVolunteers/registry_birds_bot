@@ -87,8 +87,8 @@ def apm5_get_animal_card(animal):
 # Global API
 ##################################
 
-def apm5_start(username, text, key=None):
-	user = db.get_user(username)
+def apm5_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key is None:
 		animal = storage.get_animal_by_bar_code(text)
 		if animal == {}:
@@ -136,22 +136,22 @@ def apm5_start(username, text, key=None):
 
 def apm5_animal_dead_confirmation(user):
 	return (
-		f'{const.animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
+		f'{const.text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
 		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
 		None
 	)
 
 
-def apm5_animal_dead(user, username):
+def apm5_animal_dead(user):
 	animal_id = user['animal']['animal_id']
 	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
 	if arm_id is not None:
-		storage.create_dead_animal(animal_id, arm_id, username)
+		storage.create_dead_animal(animal_id, arm_id, user['name'])
 	return None, None, None
 
 
-def apm5_button(username, text, key):
-	user = db.get_user(username)
+def apm5_button(user_id, text, key):
+	user = db.get_user(user_id)
 	if key == 'apm5_done':
 		storage.update_animal(
 			animal_id=user['animal']['animal_id'],
@@ -161,16 +161,16 @@ def apm5_button(username, text, key):
 	if key == 'apm5_animal_dead_confirmation':
 		return apm5_animal_dead_confirmation(user)
 	if key == 'apm5_animal_dead':
-		return apm5_animal_dead(user, username)
+		return apm5_animal_dead(user)
 	if "mpl" in key:
-		user = db.get_user(username)
+		user = db.get_user(user_id)
 		key_id = key.split('_')[-1]
 		user["mpl_list"].append(key_id)
 		storage.insert_history(
 			manipulation_id=key_id,
 			animal_id=user['animal']['animal_id'],
 			arms_id=user['apm']['arm_id'],
-			tg_nickname=username
+			tg_nickname=user['name']
 		)
 		text, kbd = apm5_show_mpls(user)
 		if user['animal']['is_dead'] is False:

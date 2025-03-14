@@ -12,8 +12,8 @@ apm8_text_confirm = 'Подтвердите поступление'
 # Global API
 ##################################
 
-def apm8_start(username, text, key=None):
-	user = db.get_user(username)
+def apm8_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	check_dead = Tools.checkDead(text)
 	if check_dead is not False:
 		return check_dead
@@ -32,10 +32,10 @@ def apm8_start(username, text, key=None):
 	)
 
 
-def apm8_button(username, text, key):
-	user = db.get_user(username)
+def apm8_button(user_id, text, key):
+	user = db.get_user(user_id)
 	# todo Использовать arm_id из базы #154
 	arm_id = storage.get_arm_id(apm8_place_id, user["location_id"])
 	# todo Использовать arm_id из базы #154
-	storage.insert_place_history(arm_id, user["animal_id"], username)
+	storage.insert_place_history(arm_id, user["animal_id"], user['name'])
 	return None, None, None

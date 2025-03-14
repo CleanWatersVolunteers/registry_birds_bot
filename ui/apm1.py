@@ -112,8 +112,8 @@ def show_result(user):
 ##################################
 
 
-def apm1_start(username, text, key=None):
-	user = db.get_user(username)
+def apm1_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key is None:
 		animal = storage.get_animal_by_bar_code(text)
 		if animal != {}:
@@ -141,8 +141,8 @@ def apm1_start(username, text, key=None):
 	return None, None
 
 
-def apm1_button(username, msg, key):
-	user = db.get_user(username)
+def apm1_button(user_id, msg, key):
+	user = db.get_user(user_id)
 	if key == 'apm1_today':
 		user['capture_datetime'] = const.today
 		my_logger.info(f'capture_datetime today: {user['capture_datetime']}')
@@ -169,5 +169,5 @@ def apm1_button(username, msg, key):
 			# todo Использовать arm_id из базы #154
 			arm_id = storage.get_arm_id(apm1_place_id, user["location_id"])
 			# todo Использовать arm_id из базы #154
-			storage.insert_place_history(arm_id, animal_id, username)
+			storage.insert_place_history(arm_id, animal_id, user['name'])
 	return None, None, None

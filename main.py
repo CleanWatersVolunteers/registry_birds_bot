@@ -40,7 +40,8 @@ def kbd_to_inline(text_list):
 
 
 async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	text, keyboard = entry_start(update['message']['from']['username'], update['message']['text'])
+	text, keyboard = entry_start(update['message']['from']['username'], update['message']['from']['id'],
+								 update['message']['text'])
 	try:
 		if keyboard:
 			await update.message.reply_text(text,
@@ -57,8 +58,9 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	await query.answer()
 
 	username = query.from_user.username
-	my_logger.debug(f'cb_user_button username: {username}')
-	text, keyboard = entry_button(username, query.message.text, query.data)
+	user_id = query.from_user.id
+	my_logger.debug(f'cb_user_button username: {username}, user_id: {user_id}')
+	text, keyboard = entry_button(username, user_id, query.message.text, query.data)
 	try:
 		if keyboard:
 			await query.edit_message_text(text=text,
@@ -72,11 +74,10 @@ async def cb_user_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def cb_user_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	username = update["message"]["from"]["username"]
-
+	user_id = update["message"]["from"]["id"]
 	new_file = await update.message.effective_attachment[-1].get_file()
 	data = await new_file.download_as_bytearray()
-	text, keyboard = entry_photo(username, data)
+	text, keyboard = entry_photo(user_id, data)
 	try:
 		if keyboard:
 			await update.message.reply_text(text=text,
@@ -93,15 +94,15 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 	cmd = update.message.text
 
 	try:
-		username = update['message']['from']['username']
-		user = db.get_user(username)
+		user_id = update['message']['from']['id']
+		user = db.get_user(user_id)
 		if user["apm"]["place_id"] != SUPERVISOR_ARM:
 			await update.message.reply_text("❌ Команда запрещена")
 			return None
 	except Exception as e:
 		my_logger.error('Exception cb_cmd_gen ', e)
-		# todo Local variable 'username' might be referenced before assignment
-		await update.message.reply_text(f'Здравствуйте {username}!\n⚠ Введите пароль')
+		# todo Local variable 'user_id' might be referenced before assignment
+		await update.message.reply_text(f'Здравствуйте {user['name']}!\n⚠ Введите пароль')
 		return None
 
 	try:

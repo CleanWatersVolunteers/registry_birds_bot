@@ -401,6 +401,8 @@ class storage:
 
 	@classmethod
 	def count_animals_dead(cls, location_id, start_datetime=None, end_datetime=None):
+		my_logger.info(
+			f'count_animals_dead location_id: {location_id}, start_datetime: {start_datetime}, end_datetime: {end_datetime}')
 		"""
 		Возвращает количество записей в таблице animals_dead для указанного location_id
 		и временного диапазона [start_datetime, end_datetime]."""
@@ -453,6 +455,8 @@ class storage:
 
 	@classmethod
 	def get_place_count(cls, location_id, start_datetime=None, end_datetime=None):
+		my_logger.info(
+			f'get_place_count location_id: {location_id}, start_datetime: {start_datetime}, end_datetime: {end_datetime}')
 		query = """
 			SELECT p.id, p.name, COUNT(DISTINCT ph.animal_id) AS count
 			FROM place_history ph
@@ -502,7 +506,7 @@ class storage:
 		return user
 
 	@classmethod
-	def init(cls, users, birds):
+	def init(cls, users):
 		cls.__users = {}
 
 	@classmethod
