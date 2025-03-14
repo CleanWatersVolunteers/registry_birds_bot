@@ -29,6 +29,7 @@ apm_button_list = {
 	"apm4": apm4_button,
 	"apm5": apm5_button,
 	"apm6": apm6_button,
+	"apm7": apm7_button,
 	"apm8": apm8_button,
 }
 
@@ -170,7 +171,7 @@ def entry_button(username, user_id, text, key):
 					return text, kbd
 				return f'{get_arm_name(user)}{text}', kbd
 	if keys[0] in apm_button_list:
-		text, kbd, user["key"] = apm_button_list[keys[0]](user_id, text, key)
+		text, kbd, user["key"] = apm_button_list[keys[0]](user, text, key)
 		if not text:
 			user["key"] = None
 			user["animal_id"] = None
