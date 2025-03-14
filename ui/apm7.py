@@ -228,8 +228,8 @@ def get_first_screen(user):
 # Global API
 ##################################
 
-def apm7_start(username, text, key=None):
-	user = db.get_user(username)
+def apm7_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key == 'apm7_start_time':
 		user['duty_start_time'] = text
 		return getEndDate(user)

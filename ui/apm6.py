@@ -88,12 +88,12 @@ def apm6_show_mpls(user):
 # Global API
 ##################################
 
-def apm6_start(username, text, key=None):
-	user = db.get_user(username)
+def apm6_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key == 'apm6_feeding':
-		return nanny_feeding(text, user, username)
+		return nanny_feeding(text, user, user['name'])
 	elif key == 'apm6_weighing':
-		return nanny_weighing(text, user, username)
+		return nanny_weighing(text, user, user['name'])
 
 	if key is None:
 		checkDead = Tools.checkDead(text)
@@ -113,8 +113,8 @@ def apm6_start(username, text, key=None):
 	return text, kbd, None
 
 
-def apm6_button(username, text, key):
-	user = db.get_user(username)
+def apm6_button(user_id, text, key):
+	user = db.get_user(user_id)
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
 		manipulation_id = match.group()
@@ -136,7 +136,7 @@ def apm6_button(username, text, key):
 				manipulation_id=manipulation_id,
 				animal_id=user["animal_id"],
 				arms_id=user["apm"]["arm_id"],
-				tg_nickname=username
+				tg_nickname=user['name']
 			)
 			text, kbd = apm6_show_mpls(user)
 	# todo Local variable 'kbd' might be referenced before assignment

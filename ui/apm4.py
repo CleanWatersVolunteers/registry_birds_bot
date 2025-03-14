@@ -56,11 +56,11 @@ def get_mucous(user):
 # Global API
 ##################################
 
-def apm4_start(username, text, key=None):
-	user = db.get_user(username)
+def apm4_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key == 'apm4_mucous':
 		storage.insert_value_history(animal_id=user["animal_id"], type_id=mucous_history_type_id, value=text,
-									 tg_nickname=username)
+									 tg_nickname=user['name'])
 	if key is None:
 		checkDead = Tools.checkDead(text)
 		if checkDead is not False:
@@ -96,8 +96,8 @@ def apm4_start(username, text, key=None):
 	return text, kbd, None
 
 
-def apm4_button(username, text, key):
-	user = db.get_user(username)
+def apm4_button(user_id, text, key):
+	user = db.get_user(user_id)
 	if key == 'apm4_triage_green':
 		storage.update_animal(user["animal_id"], triage=1)
 	elif key == 'apm4_triage_yellow':
@@ -108,7 +108,7 @@ def apm4_button(username, text, key):
 		body_condition = apm4_body_condition_list[int(key.split('_')[-1])]
 		storage.insert_value_history(animal_id=user["animal_id"], type_id=body_condition_history_type_id,
 									 value=body_condition,
-									 tg_nickname=username)
+									 tg_nickname=user['name'])
 	else:
 		key_id = key.split('_')[-1]
 		user['mpl_list'].append(key_id)
@@ -120,7 +120,7 @@ def apm4_button(username, text, key):
 			manipulation_id=key_id,
 			animal_id=user["animal_id"],
 			arms_id=user["apm"]["arm_id"],
-			tg_nickname=username
+			tg_nickname=user['name']
 		)
 
 	mpls = storage.get_manipulations(apm4_place_id)

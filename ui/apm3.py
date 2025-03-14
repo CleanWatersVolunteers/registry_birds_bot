@@ -13,8 +13,8 @@ apm3_place_id = 3
 # Global API
 ##################################
 
-def apm3_start(username, text, key=None):
-	user = db.get_user(username)
+def apm3_start(user_id, text, key=None):
+	user = db.get_user(user_id)
 	if key is None:
 		checkDead = Tools.checkDead(text)
 		if checkDead is not False:
@@ -66,25 +66,25 @@ def apm3_animal_dead_confirmation(user):
 	)
 
 
-def apm3_animal_dead(user, username):
+def apm3_animal_dead(user):
 	animal_id = user['animal']['animal_id']
 	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
 	if arm_id is not None:
-		storage.create_dead_animal(animal_id, arm_id, username)
+		storage.create_dead_animal(animal_id, arm_id, user['name'])
 	return None, None, None
 
 
-def apm3_button(username, msg, key):
-	user = db.get_user(username)
+def apm3_button(user_id, msg, key):
+	user = db.get_user(user_id)
 	if key == "apm3_done":
 		# todo Использовать arm_id из базы #154
 		arm_id = storage.get_arm_id(apm3_place_id, user["location_id"])
 		# todo Использовать arm_id из базы #154
-		storage.insert_place_history(arm_id, user['animal']['animal_id'], username)
+		storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
 		storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
 		user['weight'] = None  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
 	elif key == 'apm3_animal_dead_confirmation':
 		return apm3_animal_dead_confirmation(user)
 	elif key == 'apm3_animal_dead':
-		return apm3_animal_dead(user, username)
+		return apm3_animal_dead(user)
 	return None, None, None
