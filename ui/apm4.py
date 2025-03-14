@@ -96,8 +96,7 @@ def apm4_start(user_id, text, key=None):
 	return text, kbd, None
 
 
-def apm4_button(user_id, text, key):
-	user = db.get_user(user_id)
+def apm4_button(user, text, key):
 	if key == 'apm4_triage_green':
 		storage.update_animal(user["animal_id"], triage=1)
 	elif key == 'apm4_triage_yellow':

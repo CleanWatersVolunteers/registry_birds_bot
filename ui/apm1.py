@@ -141,8 +141,7 @@ def apm1_start(user_id, text, key=None):
 	return None, None
 
 
-def apm1_button(user_id, msg, key):
-	user = db.get_user(user_id)
+def apm1_button(user, msg, key):
 	if key == 'apm1_today':
 		user['capture_datetime'] = const.today
 		my_logger.info(f'capture_datetime today: {user['capture_datetime']}')

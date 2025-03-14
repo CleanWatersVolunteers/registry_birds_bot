@@ -74,8 +74,7 @@ def apm3_animal_dead(user):
 	return None, None, None
 
 
-def apm3_button(user_id, msg, key):
-	user = db.get_user(user_id)
+def apm3_button(user, msg, key):
 	if key == "apm3_done":
 		# todo Использовать arm_id из базы #154
 		arm_id = storage.get_arm_id(apm3_place_id, user["location_id"])
