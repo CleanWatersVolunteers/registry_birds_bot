@@ -6,6 +6,10 @@ from database import Database as db
 from logs import my_logger
 from storage import storage
 from timetools import TimeTools
+from timetools import today
+from timetools import today_db
+from timetools import tomorrow
+from timetools import yesterday_db
 from ui.gen import (
 	qr_cmd_gen24,
 	qr_cmd_gen48,
@@ -201,10 +205,10 @@ def get_stat(user):
 	text += get_state_item(user, user["location_id"])
 	# --------------------
 	text += f'\n{const.text_line}\nВчера'
-	text += get_state_item(user, user["location_id"], const.yesterday_db, const.today_db)
+	text += get_state_item(user, user["location_id"], yesterday_db(), today_db())
 	# --------------------
 	text += f'\n{const.text_line}\nСегодня'
-	text += get_state_item(user, user["location_id"], const.today_db)
+	text += get_state_item(user, user["location_id"], today_db())
 	return text
 
 
@@ -257,18 +261,18 @@ def apm7_button(user, text, key):
 	if 'delete_' in key:
 		return delete_duty(user, key.split('_')[2])
 	if 'apm7_start_today' in key:
-		user['start_duty_date'] = const.today
+		user['start_duty_date'] = today()
 		my_logger.info(f'start_duty_date today: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_start_tomorrow' in key:
-		user['start_duty_date'] = const.tomorrow
+		user['start_duty_date'] = tomorrow()
 		my_logger.info(f'start_duty_date tomorrow: {user['start_duty_date']}')
 		return getStartTime(user)
 	if 'apm7_end_today' in key:
-		user['end_duty_date'] = const.today
+		user['end_duty_date'] = today()
 		return getEndTime(user)
 	if 'apm7_end_tomorrow' in key:
-		user['end_duty_date'] = const.tomorrow
+		user['end_duty_date'] = tomorrow()
 		return getEndTime(user)
 	if 'apm7_done' in key:
 		# random.seed(42)

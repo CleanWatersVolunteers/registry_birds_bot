@@ -473,7 +473,7 @@ class storage:
 			where += " AND datetime >= %s"
 			params.append(start_datetime)
 		if end_datetime is not None:
-			where += " AND datetime <= %s"
+			where += " AND datetime < %s"
 			params.append(end_datetime)
 		results = cls.execute_query(query + where + group_order, tuple(params), fetch=True)
 		return results

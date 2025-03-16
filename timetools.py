@@ -1,11 +1,43 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from const import const
 
 GET_DATE = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4}', text)
 GET_TIME = lambda text: re.search(r'\d{1,2}:\d{1,2}', text)
 GET_DATETIME = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4} \d{1,2}:\d{1,2}', text)
+
+
+def tomorrow():
+	return (datetime.now().date() + timedelta(days=1)).strftime(const.date_format)
+
+
+def today():
+	return datetime.now().strftime(const.date_format)
+
+
+def now():
+	return datetime.now().strftime(const.datetime_format)
+
+
+def yesterday():
+	return (datetime.now().date() - timedelta(days=1)).strftime(const.date_format)
+
+
+def week_db():
+	return (datetime.now().date() - timedelta(days=7)).strftime("%Y.%m.%d")
+
+
+def yesterday_db():
+	return (datetime.now().date() - timedelta(days=1)).strftime(const.date_db_format)
+
+
+def today_db():
+	return (datetime.now().date()).strftime(const.date_db_format)
+
+
+def now_db():
+	return datetime.now().strftime("%Y.%m.%d %H:%M")
 
 
 class TimeTools:
