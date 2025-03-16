@@ -5,6 +5,7 @@ import re
 from const import const
 from database import Database as db
 from storage import storage
+from timetools import week_db
 from tools import Tools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
@@ -62,7 +63,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 def apm6_show_mpls(user):
 	kbd = dict()
 	text = f'{const.text_animal_number} {user['bar_code']}\n{const.text_line}\n'
-	history = history_get_info(user['animal_id'], const.week_db)
+	history = history_get_info(user['animal_id'], week_db())
 	if history is not None:
 		text += f'{history}\n'
 	weight_change = get_diff_values_history(user['animal_id'], const.history_type_weight)

@@ -5,6 +5,9 @@ from database import Database as db
 from logs import my_logger
 from storage import storage
 from timetools import TimeTools
+from timetools import now
+from timetools import today
+from timetools import yesterday
 
 apm1_place_id = 1
 
@@ -31,7 +34,7 @@ def validate_datetime(user, date_input, time_input):
 		1 - Текущее время не раньше, чем указанное время
 		2 - Текущее время не позже 24 часов, чем указанное время
 	"""
-	time_now = const.now
+	time_now = now()
 	user_input_time = TimeTools.createFullDate(date_input, time_input)
 
 	time1 = TimeTools.getDateTime(time_now)
@@ -143,11 +146,11 @@ def apm1_start(user_id, text, key=None):
 
 def apm1_button(user, msg, key):
 	if key == 'apm1_today':
-		user['capture_datetime'] = const.today
+		user['capture_datetime'] = today()
 		my_logger.info(f'capture_datetime today: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	if key == 'apm1_yesterday':
-		user['capture_datetime'] = const.yesterday
+		user['capture_datetime'] = yesterday()
 		my_logger.info(f'capture_datetime yesterday: {user['capture_datetime']}')
 		return apm1_get_time(user["code"])
 	keys = key.split('_')

@@ -1,4 +1,5 @@
 from database import Database as db
+from timetools import now_db
 from ui.apm1 import apm1_start, apm1_button
 from ui.apm2 import apm2_start, apm2_button
 from ui.apm3 import apm3_start, apm3_button
@@ -87,8 +88,8 @@ def entry_start(username, user_id, text, key=None):
 			user = db.create_user(user_id, username, location_id)
 		else:
 			if text is not None and text != "":
-				arm_list = storage.get_arm_access(const.now_db, password=text)
-				my_logger.info(f'get_arm_access {const.now_db}')
+				arm_list = storage.get_arm_access(now_db(), password=text)
+				my_logger.info(f'get_arm_access {now_db()}')
 				if len(arm_list) > 0:
 					user = db.create_user(user_id, username, arm_list[0]["location_id"], password=text)
 					my_logger.info(f'Вход: {username}')
