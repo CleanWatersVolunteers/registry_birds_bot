@@ -119,18 +119,22 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.manipulations: ~10 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.manipulations: ~15 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(0, 'Ел сам', '6'),
 	(1, 'Пил сам', '6'),
 	(2, 'Отказ от еды', '6'),
 	(3, 'Отказ от питья', '6'),
-	(4, 'Энтерофурил + физ.раствор 20мл в рот', '4,5,6'),
+	(4, 'Энтерофурил', '4,5,6'),
 	(5, 'Рингер 50/50 + Глюкоза 10мл', '4,5'),
 	(6, 'Бриллиантовые глаза', '4'),
 	(7, 'Взвешивание', '6'),
 	(8, 'Степень упитанности', '4'),
-	(9, 'Слизистая', '4');
+	(9, 'Слизистая', '4'),
+	(11, 'ОАК', '5'),
+	(12, 'Биохимия крови', '5'),
+	(13, 'Переливание крови', '5'),
+	(14, 'Раствор электролитов перорально', '4,5,6');
 
 -- Дамп структуры для таблица registry_birds.places
 CREATE TABLE IF NOT EXISTS `places` (

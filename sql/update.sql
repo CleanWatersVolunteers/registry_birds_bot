@@ -44,3 +44,11 @@ INSERT INTO `manipulations` (`name`, `place_list`) VALUES ('Слизистая',
 
 -- Запись в таблицу animals_dead должна быть уникальной #309
 ALTER TABLE `animals_dead` ADD UNIQUE INDEX unique_animal_id (animal_id);
+
+-- Изменить список манипуляций #329
+UPDATE `registry_birds`.`manipulations` SET `name`='Энтерофурил' WHERE  `id`=4;
+INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
+	(11, 'ОАК', '5'),
+	(12, 'Биохимия крови', '5'),
+	(13, 'Переливание крови', '5'),
+	(14, 'Раствор электролитов перорально', '4,5,6'),
