@@ -3,6 +3,7 @@
 from const import const
 from logs import my_logger
 from storage import storage
+from timetools import TimeTools
 
 text_weight_change = 'Изменение веса'
 
@@ -40,7 +41,7 @@ def history_get_info(animal_id, start_date, dead_info=None):
 		elif 'manipulation_name' in item:  # Элемент из history
 			result_string += f"{item['datetime'].strftime(const.time_format)} - {item['manipulation_name']} - {item['tg_nickname']}\n"
 		elif 'animal_id' in item:  # dead_info
-			result_string += f"{item['datetime'].strftime(const.time_format)} - Гибель - {item['tg_nickname']}\n"
+			result_string += f"{item['datetime'].strftime(const.time_format)} - Гибель ({TimeTools.formatTimeInterval(item['datetime'])}) - {item['tg_nickname']}\n"
 		else:
 			result_string += f"{item['datetime'].strftime(const.time_format)} - {item['place_name']} - {item['location_name']}\n"
 	if result_string == "":
