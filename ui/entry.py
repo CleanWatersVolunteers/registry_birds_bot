@@ -1,5 +1,5 @@
+from const import const
 from database import Database as db
-from timetools import now_db
 from ui.apm1 import apm1_start, apm1_button
 from ui.apm2 import apm2_start, apm2_button
 from ui.apm3 import apm3_start, apm3_button
