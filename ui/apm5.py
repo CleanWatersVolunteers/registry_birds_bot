@@ -1,4 +1,5 @@
 # Медицинский прием
+import re
 
 from const import const
 from database import Database as db
@@ -84,6 +85,22 @@ def apm5_get_animal_card(animal):
 	return None
 
 
+def apm5_animal_dead_confirmation(user):
+	return (
+		f'{const.text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
+		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
+		None
+	)
+
+
+def apm5_animal_dead(user):
+	animal_id = user['animal']['animal_id']
+	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
+	if arm_id is not None:
+		storage.create_dead_animal(animal_id, arm_id, user['name'])
+	return None, None, None
+
+
 ##################################
 # Global API
 ##################################
@@ -128,27 +145,23 @@ def apm5_start(user_id, text, key=None):
 		text += f'❓ Вид: {user['species']}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
+	if key == 'apm5_diarrhea_yes':
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_yes,
+									 tg_nickname=user['name'])
+		text, kbd = apm5_show_mpls(user)
+		return text, kbd, None
+	if key == 'apm5_diarrhea_no':
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_no,
+									 tg_nickname=user['name'])
+		text, kbd = apm5_show_mpls(user)
+		return text, kbd, None
 	return (
 		apm5_text_species,
 		{const.text_cancel: 'entry_cancel'},
 		'apm5_species'
 	)
-
-
-def apm5_animal_dead_confirmation(user):
-	return (
-		f'{const.text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
-		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
-		None
-	)
-
-
-def apm5_animal_dead(user):
-	animal_id = user['animal']['animal_id']
-	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
-	if arm_id is not None:
-		storage.create_dead_animal(animal_id, arm_id, user['name'])
-	return None, None, None
 
 
 def apm5_button(user, text, key):
@@ -163,17 +176,32 @@ def apm5_button(user, text, key):
 	if key == 'apm5_animal_dead':
 		return apm5_animal_dead(user)
 	if "mpl" in key:
-		key_id = key.split('_')[-1]
-		user["mpl_list"].append(key_id)
-		storage.insert_history(
-			manipulation_id=key_id,
-			animal_id=user['animal']['animal_id'],
-			arms_id=user['apm']['arm_id'],
-			tg_nickname=user['name']
-		)
-		text, kbd = apm5_show_mpls(user)
-		if user['animal']['is_dead'] is False:
-			kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
-		kbd['Готово'] = 'entry_cancel'
-		return text, kbd, None
-	return None, None, None
+		match = re.search(r'\d+$', key)
+		manipulation_id = match.group()
+		if int(manipulation_id) == const.diarrhea_manipulations_id:
+			return (
+				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{const.text_diarrhea}',
+				{const.text_yes: "apm5_diarrhea_yes", const.text_no: "apm5_diarrhea_no",
+				 const.text_cancel: "entry_cancel"},
+				None
+			)
+		else:
+			key_id = key.split('_')[-1]
+			user["mpl_list"].append(key_id)
+			storage.insert_history(manipulation_id=key_id, animal_id=user['animal']['animal_id'],
+								   arms_id=user['apm']['arm_id'], tg_nickname=user['name'])
+	elif key == 'apm5_diarrhea_yes':
+		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
+		storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_yes,
+									 tg_nickname=user['name'])
+	elif key == 'apm5_diarrhea_no':
+		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
+		storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_no,
+									 tg_nickname=user['name'])
+	text, kbd = apm5_show_mpls(user)
+	if user['animal']['is_dead'] is False:
+		kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
+	kbd['Готово'] = 'entry_cancel'
+	return text, kbd, None
