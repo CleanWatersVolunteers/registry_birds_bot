@@ -21,6 +21,9 @@ class const:
 	text_manipulations_not_found = "Манипуляции не найдены"
 	text_animal_dead = 'Гибель'
 	text_animal_dead_confirmation = '⚠️ Подтвердите гибель'
+	text_diarrhea = f'Есть ли диарея?'
+	text_yes = 'Да'
+	text_no = 'Нет'
 
 	text_triage_green = 'Зеленый'
 	text_triage_yellow = 'Желтый'
@@ -33,3 +36,9 @@ class const:
 	date_db_format = "%Y.%m.%d"
 
 	history_type_weight = 2
+
+	# БД values_history_type.id
+	diarrhea_history_type_id = 6
+
+	# БД manipulations.id
+	diarrhea_manipulations_id = 15

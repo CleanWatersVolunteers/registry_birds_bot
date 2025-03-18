@@ -52,3 +52,7 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(12, 'Биохимия крови', '5'),
 	(13, 'Переливание крови', '5'),
 	(14, 'Раствор электролитов перорально', '4,5,6'),
+
+-- Диарея: да / нет #276 (забытое
+INSERT INTO `values_history_type` (`id`, `name`, `units`) VALUES (6, 'Диарея', NULL);
+INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES	(15, 'Диарея', '5,6');

@@ -131,6 +131,13 @@ def apm6_button(user, text, key):
 				{const.text_cancel: "entry_cancel"},
 				'apm6_weighing'
 			)
+		elif int(manipulation_id) == const.diarrhea_manipulations_id:
+			return (
+				f'{const.text_animal_number} {user["bar_code"]}\n{const.text_diarrhea}',
+				{const.text_yes: "apm6_diarrhea_yes", const.text_no: "apm6_diarrhea_no",
+				 const.text_cancel: "entry_cancel"},
+				None
+			)
 		else:
 			storage.insert_history(
 				manipulation_id=manipulation_id,
@@ -139,5 +146,15 @@ def apm6_button(user, text, key):
 				tg_nickname=user['name']
 			)
 			text, kbd = apm6_show_mpls(user)
+	elif key == 'apm6_diarrhea_yes':
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_yes,
+									 tg_nickname=user['name'])
+		text, kbd = apm6_show_mpls(user)
+	elif key == 'apm6_diarrhea_no':
+		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_no,
+									 tg_nickname=user['name'])
+		text, kbd = apm6_show_mpls(user)
 	# todo Local variable 'kbd' might be referenced before assignment
 	return text, kbd, None
