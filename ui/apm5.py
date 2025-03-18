@@ -4,7 +4,7 @@ import re
 from const import const
 from database import Database as db
 from storage import storage
-from timetools import week_db
+from timetools import week_db, TimeTools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
@@ -65,6 +65,7 @@ def apm5_get_animal_card(animal):
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
 		text += apm5_add_hdr_item(const.text_capture_time, animal['capture_datetime'].strftime(const.datetime_format))
+		text += f'({TimeTools.formatTimeInterval(animal['capture_datetime'])})\n'
 		text += apm5_add_hdr_item(history_text_pollution_degree, animal['degree_pollution'])
 		text += apm5_add_hdr_item(history_text_weight,
 								  f"{animal['weight']} гр." if animal['weight'] else history_text_not_specified)

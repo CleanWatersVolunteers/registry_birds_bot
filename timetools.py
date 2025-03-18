@@ -6,6 +6,9 @@ from const import const
 GET_TIME = lambda text: re.search(r'(\d{1,2})[.:,\s](\d{1,2})', text)
 GET_DATETIME = lambda text: re.search(r'\d{2}\.\d{2}\.\d{4} \d{1,2}:\d{1,2}', text)
 
+SECONDS_IN_DAY = 24 * 60 * 60
+SECONDS_IN_HOUR = 3600
+
 
 def tomorrow():
 	return (datetime.now().date() + timedelta(days=1)).strftime(const.date_format)
@@ -60,3 +63,16 @@ class TimeTools:
 	@classmethod
 	def getDateTime(cls, value):
 		return datetime.strptime(value, const.datetime_format)
+
+	@classmethod
+	def formatTimeInterval(cls, capture_datetime):
+		delta = datetime.now() - capture_datetime
+		total_seconds = int(delta.total_seconds())
+
+		if total_seconds < SECONDS_IN_DAY:  # Менее 24 часов
+			hours = total_seconds // SECONDS_IN_HOUR
+			return f"{hours} ч."
+		else:  # 24 часа и более
+			days = delta.days
+			remaining_hours = (total_seconds % (SECONDS_IN_DAY)) // SECONDS_IN_HOUR
+			return f"{days} дн. {remaining_hours} ч."
