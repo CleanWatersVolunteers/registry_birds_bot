@@ -112,7 +112,7 @@ class storage:
         VALUES (NOW(), %s, %s, %s, %s)
         """
 		data = (animal_id, type_id, value, tg_nickname)
-		cls.execute_query(query, data)
+		return cls.execute_query(query, data)
 
 	@classmethod
 	def get_values_history_type(cls):
