@@ -10,6 +10,7 @@ from ui.history import history_get_info
 
 apm5_text_species = '⚠️ Введите вид животного'
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
+apm5_text_other = 'Введите описание'
 
 history_text_pollution_degree = 'Степень загрязнения'
 history_text_weight = 'Вес'
@@ -48,6 +49,9 @@ def apm5_show_mpls(user, dead_info=None):
 					kbd[mpl["name"]] = f'apm5_mpl_{mpl['id']}'
 		else:
 			text += f'{const.manipulation_not_found}\n'
+		kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
+	kbd['Готово'] = 'entry_cancel'
+	text += const.text_manipulation_done
 	return text, kbd
 
 
@@ -127,10 +131,6 @@ def apm5_start(user_id, text, key=None):
 			)
 		user['mpl_list'] = []
 		text, kbd = apm5_show_mpls(user, dead_info)
-		if user['animal']['is_dead'] is False:
-			kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
-			text += const.text_manipulation_done
-		kbd['Готово'] = 'entry_cancel'
 		return text, kbd, None
 	if key == 'apm5_species':
 		user['species'] = text
@@ -147,14 +147,20 @@ def apm5_start(user_id, text, key=None):
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
 	if key == 'apm5_diarrhea_yes':
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
 		return text, kbd, None
 	if key == 'apm5_diarrhea_no':
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
+									 tg_nickname=user['name'])
+		text, kbd = apm5_show_mpls(user)
+		return text, kbd, None
+	if key == 'apm5_other':
+		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.other_history_type_id,
+									 value=text,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
 		return text, kbd, None
@@ -186,6 +192,12 @@ def apm5_button(user, text, key):
 				 const.text_cancel: "entry_cancel"},
 				None
 			)
+		elif int(manipulation_id) == const.other_manipulations_id:
+			return (
+				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_other}',
+				{const.text_cancel: "entry_cancel"},
+				'apm5_other'
+			)
 		else:
 			key_id = key.split('_')[-1]
 			user["mpl_list"].append(key_id)
@@ -202,7 +214,4 @@ def apm5_button(user, text, key):
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 	text, kbd = apm5_show_mpls(user)
-	if user['animal']['is_dead'] is False:
-		kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
-	kbd['Готово'] = 'entry_cancel'
 	return text, kbd, None
