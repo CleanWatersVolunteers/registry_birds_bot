@@ -60,3 +60,6 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES	(15, 'Диаре
 -- Врач: добавить текстовое поле "Другое" #334
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (16, 'Другое', 5);
 INSERT INTO `values_history_type` (`id`, `name`) VALUES (7, 'Другое');
+
+-- В приёмку добавить ввод информации о ловце. #339
+ALTER TABLE `animals` ADD COLUMN `catcher` VARCHAR(45) NOT NULL COLLATE 'utf8mb4_0900_ai_ci';

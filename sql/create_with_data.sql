@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `species` varchar(45) DEFAULT NULL,
   `clinical_condition_admission` varchar(45) DEFAULT NULL,
   `triage` int DEFAULT NULL,
+  `catcher` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `bar_code` (`bar_code`),
   UNIQUE KEY `id_UNIQUE` (`id`)

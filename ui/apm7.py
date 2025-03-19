@@ -2,9 +2,9 @@
 import random
 
 from const import const
-from database import Database as db
+from database import Database as Db
 from logs import my_logger
-from storage import storage
+from storage import Storage
 from timetools import TimeTools
 from timetools import today
 from timetools import today_db
@@ -50,13 +50,13 @@ def delete_duty_confirmation(user, access_id):
 
 
 def delete_duty(user, access_id):
-	storage.delete_duty(access_id)
+	Storage.delete_duty(access_id)
 	return get_first_screen(user)
 
 
 def create_duty(user, place_id):
-	user['duty_arm_id'] = storage.get_arm_id(place_id, user["location_id"])
-	user['place_name'] = storage.get_place_name(place_id)
+	user['duty_arm_id'] = Storage.get_arm_id(place_id, user["location_id"])
+	user['place_name'] = Storage.get_place_name(place_id)
 	return (
 		f'{apm7_text_create_duty_title} {user['place_name']}\n{apm7_text_start_date}',
 		{
@@ -97,9 +97,9 @@ def getEndTime(user):
 
 
 def show_duty_list(user, place_id):
-	data = storage.access_data(place_id, user['location_id'])
+	data = Storage.access_data(place_id, user['location_id'])
 	user['place_id'] = place_id
-	user['place_name'] = storage.get_place_name(place_id)
+	user['place_name'] = Storage.get_place_name(place_id)
 	text = ''
 	kbd = {}
 	if data:
@@ -148,7 +148,7 @@ def apm7_end_time_validate(msg, user):
 
 def validate_start_datetime(user, date, time):
 	start_time = TimeTools.createFullDate(date, time)
-	if storage.check_duty_date(user['duty_arm_id'], start_time):
+	if Storage.check_duty_date(user['duty_arm_id'], start_time):
 		user['duty_start_date_time'] = start_time
 		return getEndDate(user)
 	else:
@@ -170,7 +170,7 @@ def validate_end_datetime(user, date, time):
 			None
 		)
 
-	if storage.check_duty_date(user['duty_arm_id'], end_time):
+	if Storage.check_duty_date(user['duty_arm_id'], end_time):
 		user['duty_end_date_time'] = end_time
 		return check_data(user)
 	else:
@@ -191,11 +191,11 @@ def check_data(user):
 
 def get_state_item(user, location_id, start_datetime=None, end_datetime=None):
 	text = f'\n'
-	place_counts = storage.get_place_count(user["location_id"], start_datetime, end_datetime)
+	place_counts = Storage.get_place_count(user["location_id"], start_datetime, end_datetime)
 	if place_counts is not None:
 		for item in place_counts:
 			text += f'{item['name']}: {item['count']}\n'
-	dead_count = storage.count_animals_dead(location_id, start_datetime, end_datetime)
+	dead_count = Storage.count_animals_dead(location_id, start_datetime, end_datetime)
 	text += f'Погибло: {dead_count}'
 	return text
 
@@ -220,7 +220,7 @@ def get_first_screen(user):
 	text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
 	text += get_stat(user)
 	text += f'\n{const.text_line}\nРабочие смены:'
-	arm_list = storage.get_arms(user['location_id'])
+	arm_list = Storage.get_arms(user['location_id'])
 	if arm_list is not None:
 		for arm in arm_list:
 			kbd[arm["arm_name"]] = f'apm7_place_{arm["place_id"]}'
@@ -233,7 +233,7 @@ def get_first_screen(user):
 ##################################
 
 def apm7_start(user_id, text, key=None):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if key == 'apm7_start_time':
 		user['duty_start_time'] = text
 		return getEndDate(user)
@@ -251,7 +251,7 @@ def apm7_start(user_id, text, key=None):
 
 def apm7_button(user, text, key):
 	if isinstance(user, str):
-		user = db.get_user(user)
+		user = Db.get_user(user)
 	if 'place_' in key:
 		return show_duty_list(user, key.split('_')[2])
 	if 'create_' in key:
@@ -280,7 +280,7 @@ def apm7_button(user, text, key):
 		# todo проверить наличие такого пароля в базе и выдать другой если он существует.
 		start = TimeTools.getDateTime(user['duty_start_date_time'])
 		end = TimeTools.getDateTime(user['duty_end_date_time'])
-		storage.create_duty(user['duty_arm_id'], start, end, password)
+		Storage.create_duty(user['duty_arm_id'], start, end, password)
 		return get_first_screen(user)
 	if key == 'entry_apm7':
 		return get_first_screen(user)

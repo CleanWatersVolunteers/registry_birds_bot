@@ -1,5 +1,4 @@
-from const import const
-from database import Database as db
+from database import Database as Db
 from ui.apm1 import apm1_start, apm1_button
 from ui.apm2 import apm2_start, apm2_button
 from ui.apm3 import apm3_start, apm3_button
@@ -63,7 +62,7 @@ def show_apm(user, arm_list, user_id):
 			return text, kbd
 		text, kbd, valid = code_request(user)
 		if valid is False:
-			db.clear_user(user_id)
+			Db.clear_user(user_id)
 			return text, kbd
 		return f'{get_arm_name(user)}{text}', kbd
 	else:
@@ -77,21 +76,21 @@ def show_apm(user, arm_list, user_id):
 
 def entry_start(username, user_id, text, key=None):
 	arm_list = {}
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if not user:
 		file = open('developer.txt', 'r')
 		developer_name = file.read()
 		file.close()
 		if developer_name == username:
 			location_id = 0  # Пока хардкод, можно потом вынести в developer.txt
-			arm_list = storage.get_arms(location_id)
-			user = db.create_user(user_id, username, location_id)
+			arm_list = Storage.get_arms(location_id)
+			user = Db.create_user(user_id, username, location_id)
 		else:
 			if text is not None and text != "":
-				arm_list = storage.get_arm_access(now_db(), password=text)
+				arm_list = Storage.get_arm_access(now_db(), password=text)
 				my_logger.info(f'get_arm_access {now_db()}')
 				if len(arm_list) > 0:
-					user = db.create_user(user_id, username, arm_list[0]["location_id"], password=text)
+					user = Db.create_user(user_id, username, arm_list[0]["location_id"], password=text)
 					my_logger.info(f'Вход: {username}')
 				else:
 					my_logger.info(f'Пароль не верный: {username}')
@@ -107,7 +106,7 @@ def entry_start(username, user_id, text, key=None):
 				if code == 0:
 					text, kbd, valid = code_request(user)
 					if valid is False:
-						db.clear_user(user_id)
+						Db.clear_user(user_id)
 						return text, kbd
 					return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
 			text, kbd, user["key"] = apm_start_list[user["apm"]["place_id"]](user_id, text, user["key"])
@@ -116,7 +115,7 @@ def entry_start(username, user_id, text, key=None):
 
 
 def entry_photo(username, user_id, data):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if not user:
 		return f'{WELLCOME.format(username=username)}', None
 	else:
@@ -125,7 +124,7 @@ def entry_photo(username, user_id, data):
 			if code == 0:
 				text, kbd, valid = code_request(user)
 				if valid is False:
-					db.clear_user(user_id)
+					Db.clear_user(user_id)
 					return text, kbd
 				return f'{get_arm_name(user)}❌ Неверный ввод: {code}\n{text}', kbd
 			# todo Local variable 'code' might be referenced before assignment
@@ -136,9 +135,9 @@ def entry_photo(username, user_id, data):
 
 def entry_button(username, user_id, text, key):
 	if key == 'entry_exit':
-		db.clear_user(user_id)
+		Db.clear_user(user_id)
 
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if not user:
 		return f'{WELLCOME.format(username=username)}', None
 	if key == 'entry_cancel':
@@ -146,7 +145,7 @@ def entry_button(username, user_id, text, key):
 		user["animal_id"] = None
 		text, kbd, valid = code_request(user)
 		if valid is False:
-			db.clear_user(user_id)
+			Db.clear_user(user_id)
 			return text, kbd
 		return f'{get_arm_name(user)}{text}', kbd
 
@@ -168,7 +167,7 @@ def entry_button(username, user_id, text, key):
 				user["apm"] = dict(apm)
 				text, kbd, valid = code_request(user)
 				if valid is False:
-					db.clear_user(user_id)
+					Db.clear_user(user_id)
 					return text, kbd
 				return f'{get_arm_name(user)}{text}', kbd
 	if keys[0] in apm_button_list:
@@ -178,7 +177,7 @@ def entry_button(username, user_id, text, key):
 			user["animal_id"] = None
 			text, kbd, valid = code_request(user)
 			if valid is False:
-				db.clear_user(user_id)
+				Db.clear_user(user_id)
 				return text, kbd
 		return f'{get_arm_name(user)}{text}', kbd
 	my_logger.error("Error key", key)

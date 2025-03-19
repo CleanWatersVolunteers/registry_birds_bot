@@ -1,8 +1,8 @@
 # Прием в стационар
 
 from const import const
-from database import Database as db
-from storage import storage
+from database import Database as Db
+from storage import Storage
 from tools import Tools
 
 apm3_text = f"Введите массу животного в граммах"
@@ -14,12 +14,12 @@ apm3_place_id = 3
 ##################################
 
 def apm3_start(user_id, text, key=None):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if key is None:
 		checkDead = Tools.checkDead(text)
 		if checkDead is not False:
 			return checkDead
-		animal = storage.get_animal_by_bar_code(text)
+		animal = Storage.get_animal_by_bar_code(text)
 		if animal == {}:
 			return (
 				const.animal_not_found.format(code=text),
@@ -34,7 +34,7 @@ def apm3_start(user_id, text, key=None):
 				'apm3_weight'
 			)
 		else:
-			dead_info = storage.get_animal_dead(animal['bar_code'])
+			dead_info = Storage.get_animal_dead(animal['bar_code'])
 			if dead_info is None:
 				return (
 					f'{const.text_animal_number} {animal['bar_code']}',
@@ -68,19 +68,19 @@ def apm3_animal_dead_confirmation(user):
 
 def apm3_animal_dead(user):
 	animal_id = user['animal']['animal_id']
-	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
+	arm_id = Storage.get_arm_id(user['apm']['place_id'], user['location_id'])
 	if arm_id is not None:
-		storage.create_dead_animal(animal_id, arm_id, user['name'])
+		Storage.create_dead_animal(animal_id, arm_id, user['name'])
 	return None, None, None
 
 
 def apm3_button(user, msg, key):
 	if key == "apm3_done":
 		# todo Использовать arm_id из базы #154
-		arm_id = storage.get_arm_id(apm3_place_id, user["location_id"])
+		arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
 		# todo Использовать arm_id из базы #154
-		storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
-		storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
+		Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+		Storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
 		user['weight'] = None  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
 	elif key == 'apm3_animal_dead_confirmation':
 		return apm3_animal_dead_confirmation(user)

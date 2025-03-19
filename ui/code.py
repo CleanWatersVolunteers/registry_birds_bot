@@ -4,7 +4,7 @@ from pyzbar.pyzbar import decode
 
 from const import const
 from logs import my_logger
-from storage import storage
+from storage import Storage
 from timetools import now_db
 
 code_animal_text = 'Сфотографируйте QR-код нажав на `скрепку` ниже или введите номер животного вручную.'
@@ -28,7 +28,7 @@ def code_reader(image) -> []:
 
 def code_request(user):
 	if user['pass'] is not None:
-		arm_list = storage.get_arm_access(now_db(), password=user['pass'])
+		arm_list = Storage.get_arm_access(now_db(), password=user['pass'])
 		my_logger.info(f'get_arm_access {now_db()}')
 		if len(arm_list) > 0:
 			return code_animal_text, {const.text_exit: 'entry_exit'}, True

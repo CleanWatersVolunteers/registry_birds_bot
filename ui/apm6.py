@@ -3,8 +3,8 @@
 import re
 
 from const import const
-from database import Database as db
-from storage import storage
+from database import Database as Db
+from storage import Storage
 from timetools import week_db
 from tools import Tools
 from ui.history import get_diff_values_history
@@ -39,7 +39,7 @@ def nanny_weighing(msg, user, username) -> (str,):
 			'apm6_weighing'
 		)
 	else:
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
+		Storage.insert_value_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
 									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
@@ -54,7 +54,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 			'apm6_feeding'
 		)
 	else:
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
+		Storage.insert_value_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
 									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
@@ -69,7 +69,7 @@ def apm6_show_mpls(user):
 	weight_change = get_diff_values_history(user['animal_id'], const.history_type_weight)
 	if weight_change is not None:
 		text += weight_change
-	mpls = storage.get_manipulations(apm6_place_id)
+	mpls = Storage.get_manipulations(apm6_place_id)
 	if len(mpls) > 0:
 		text += f'{const.text_line}\n'
 		for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
@@ -90,7 +90,7 @@ def apm6_show_mpls(user):
 ##################################
 
 def apm6_start(user_id, text, key=None):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if key == 'apm6_feeding':
 		return nanny_feeding(text, user, user['name'])
 	elif key == 'apm6_weighing':
@@ -100,7 +100,7 @@ def apm6_start(user_id, text, key=None):
 		checkDead = Tools.checkDead(text)
 		if checkDead is not False:
 			return checkDead
-		animal = storage.get_animal_by_bar_code(text)
+		animal = Storage.get_animal_by_bar_code(text)
 		if animal == {}:
 			return (
 				const.animal_not_found.format(code=text),
@@ -139,7 +139,7 @@ def apm6_button(user, text, key):
 				None
 			)
 		else:
-			storage.insert_history(
+			Storage.insert_history(
 				manipulation_id=manipulation_id,
 				animal_id=user["animal_id"],
 				arms_id=user["apm"]["arm_id"],
@@ -147,12 +147,12 @@ def apm6_button(user, text, key):
 			)
 			text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_diarrhea_yes':
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
 		text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_diarrhea_no':
-		storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 		text, kbd = apm6_show_mpls(user)
