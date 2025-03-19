@@ -27,19 +27,19 @@ nanny_text_entry_fish = 'Введите количество съеденных 
 nanny_text_weighing_action = 'Введите массу животного в граммах'
 nanny_text_incorrect_digit = '❌ Вводите только цифры'
 nanny_text_incorrect_fish_number = '❌ Количество должно быть больше 0'
-nanny_text_incorrect_weight = f"Вес должен быть от {nanny_minimal_weight} гр."
+nanny_text_incorrect_weight = f'Вес должен быть от {nanny_minimal_weight} гр.'
 
 
 def nanny_weighing(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_weight:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_weight
 		return (
-			f'{const.text_animal_number} {user["bar_code"]}\n{error_text}\n{nanny_text_weighing_action}',
-			{const.text_cancel: "entry_cancel"},
+			f'{const.text_animal_number} {user['bar_code']}\n{error_text}\n{nanny_text_weighing_action}',
+			{const.text_cancel: 'entry_cancel'},
 			'apm6_weighing'
 		)
 	else:
-		Storage.insert_value_history(animal_id=user["animal_id"], type_id=weighting_history_type_id, value=int(msg),
+		Storage.insert_value_history(animal_id=user['animal_id'], type_id=weighting_history_type_id, value=int(msg),
 									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
@@ -49,12 +49,12 @@ def nanny_feeding(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_fish:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_fish_number
 		return (
-			f'{const.text_animal_number} {user["bar_code"]}\n{error_text}\n{nanny_text_entry_fish}',
-			{const.text_cancel: "entry_cancel"},
+			f'{const.text_animal_number} {user['bar_code']}\n{error_text}\n{nanny_text_entry_fish}',
+			{const.text_cancel: 'entry_cancel'},
 			'apm6_feeding'
 		)
 	else:
-		Storage.insert_value_history(animal_id=user["animal_id"], type_id=feeding_history_type_id, value=int(msg),
+		Storage.insert_value_history(animal_id=user['animal_id'], type_id=feeding_history_type_id, value=int(msg),
 									 tg_nickname=username)
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
@@ -80,7 +80,7 @@ def apm6_show_mpls(user):
 				kbd[mpl['name']] = f'apm6_mpl{mpl['id']}'
 	else:
 		text += f'{const.manipulation_not_found}\n'
-	kbd['Готово'] = "entry_cancel"
+	kbd[const.text_done] = 'apm6_done'
 	text += f'{const.text_line}\n{const.text_manipulation_done}'
 	return text, kbd
 
@@ -107,52 +107,58 @@ def apm6_start(user_id, text, key=None):
 				{const.text_ok: "entry_cancel"},
 				None
 			)
-		user["animal_id"] = animal['animal_id']
-		user["bar_code"] = text
-		user["mpl_list"] = []
+		user['animal_id'] = animal['animal_id']
+		user['bar_code'] = text
+		user['mpl_list'] = []
 	text, kbd = apm6_show_mpls(user)
 	return text, kbd, None
 
 
 def apm6_button(user, text, key):
-	if "mpl" in key:
+	if 'mpl' in key:
 		match = re.search(r'\d+$', key)
 		manipulation_id = match.group()
-		user["mpl_list"].append(manipulation_id)
+		user['mpl_list'].append(manipulation_id)
 		if int(manipulation_id) == feeding_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user["bar_code"]}\n{nanny_text_entry_fish}',
+				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_entry_fish}',
 				{const.text_cancel: "entry_cancel"},
 				'apm6_feeding'
 			)
 		elif int(manipulation_id) == weighting_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user["bar_code"]}\n{nanny_text_weighing_action}',
-				{const.text_cancel: "entry_cancel"},
+				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_weighing_action}',
+				{const.text_cancel: 'entry_cancel'},
 				'apm6_weighing'
 			)
 		elif int(manipulation_id) == const.diarrhea_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user["bar_code"]}\n{const.text_diarrhea}',
-				{const.text_yes: "apm6_diarrhea_yes", const.text_no: "apm6_diarrhea_no",
-				 const.text_cancel: "entry_cancel"},
+				f'{const.text_animal_number} {user['bar_code']}\n{const.text_diarrhea}',
+				{const.text_yes: 'apm6_diarrhea_yes', const.text_no: 'apm6_diarrhea_no',
+				 const.text_cancel: 'entry_cancel'},
 				None
 			)
 		else:
 			Storage.insert_history(
 				manipulation_id=manipulation_id,
-				animal_id=user["animal_id"],
-				arms_id=user["apm"]["arm_id"],
+				animal_id=user['animal_id'],
+				arms_id=user['apm']['arm_id'],
 				tg_nickname=user['name']
 			)
 			text, kbd = apm6_show_mpls(user)
+	elif key == 'apm6_done':
+		# todo Использовать arm_id из базы #154
+		arm_id = Storage.get_arm_id(apm6_place_id, user['location_id'])
+		# todo Использовать arm_id из базы #154
+		Storage.insert_place_history(arm_id, user['animal_id'], user['name'])
+		return None, None, None
 	elif key == 'apm6_diarrhea_yes':
-		Storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
 		text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_diarrhea_no':
-		Storage.insert_value_history(animal_id=user["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 		text, kbd = apm6_show_mpls(user)

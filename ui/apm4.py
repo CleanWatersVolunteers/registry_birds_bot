@@ -5,6 +5,8 @@ from database import Database as Db
 from storage import Storage
 from tools import Tools
 
+apm4_place_id = 4
+
 # БД manipulations.id
 body_condition_manipulations_id = 8
 mucous_manipulations_id = 9
@@ -39,7 +41,7 @@ def show_mpls(user, mpls):
 			text += f'✅ {mpl['name']}\n'
 		else:
 			kbd[mpl['name']] = f'apm4_mpl_{mpl["id"]}'
-	kbd['Готово'] = 'entry_cancel'
+	kbd[const.text_done] = 'apm4_done'
 	text += f'{const.text_manipulation_done}'
 	return text, kbd
 
@@ -108,6 +110,12 @@ def apm4_button(user, text, key):
 		Storage.insert_value_history(animal_id=user["animal_id"], type_id=body_condition_history_type_id,
 									 value=body_condition,
 									 tg_nickname=user['name'])
+	elif key == 'apm4_done':
+		# todo Использовать arm_id из базы #154
+		arm_id = Storage.get_arm_id(apm4_place_id, user['location_id'])
+		# todo Использовать arm_id из базы #154
+		Storage.insert_place_history(arm_id, user['animal_id'], user['name'])
+		return None, None, None
 	else:
 		key_id = key.split('_')[-1]
 		user['mpl_list'].append(key_id)
