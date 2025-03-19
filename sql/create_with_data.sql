@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `manipulations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.manipulations: ~16 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.manipulations: ~17 rows (приблизительно)
 INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(0, 'Ел сам', '6'),
 	(1, 'Пил сам', '6'),
@@ -137,7 +137,8 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(13, 'Переливание крови', '5'),
 	(14, 'Раствор электролитов перорально', '4,5,6'),
 	(15, 'Диарея', '5,6'),
-	(16, 'Другое', '5');
+	(16, 'Заметка', '5'),
+	(17, 'Неврологическая симптоматика', '5');
 
 -- Дамп структуры для таблица registry_birds.places
 CREATE TABLE IF NOT EXISTS `places` (
@@ -212,7 +213,8 @@ INSERT INTO `values_history_type` (`id`, `name`, `units`) VALUES
 	(4, 'Степень упитанности', NULL),
 	(5, 'Слизистая', NULL),
 	(6, 'Диарея', NULL),
-	(7, 'Другое', NULL);
+	(7, 'Заметка', NULL),
+	(8, 'Неврологическая симптоматика', NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
