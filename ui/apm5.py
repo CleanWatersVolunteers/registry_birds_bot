@@ -2,8 +2,8 @@
 import re
 
 from const import const
-from database import Database as db
-from storage import storage
+from database import Database as Db
+from storage import Storage
 from timetools import week_db, TimeTools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
@@ -37,7 +37,7 @@ def apm5_show_mpls(user, dead_info=None):
 	if history is not None:
 		text += f'{history}\n'
 	if user['animal']['is_dead'] is False:
-		mpls = storage.get_manipulations(apm5_place_id)
+		mpls = Storage.get_manipulations(apm5_place_id)
 		if len(mpls) > 0:
 			text += f'{const.text_line}\n'
 			for mpl in mpls:  # {'id':'1', "name":"манипуляция 1"}
@@ -64,7 +64,7 @@ def apm5_get_triage(triage):
 
 
 def apm5_get_animal_card(user):
-	animal = storage.get_animal_by_bar_code(user['animal']['bar_code'])
+	animal = Storage.get_animal_by_bar_code(user['animal']['bar_code'])
 	if animal:
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
@@ -100,9 +100,9 @@ def apm5_animal_dead_confirmation(user):
 
 def apm5_animal_dead(user):
 	animal_id = user['animal']['animal_id']
-	arm_id = storage.get_arm_id(user['apm']['place_id'], user['location_id'])
+	arm_id = Storage.get_arm_id(user['apm']['place_id'], user['location_id'])
 	if arm_id is not None:
-		storage.create_dead_animal(animal_id, arm_id, user['name'])
+		Storage.create_dead_animal(animal_id, arm_id, user['name'])
 	return None, None, None
 
 
@@ -111,9 +111,9 @@ def apm5_animal_dead(user):
 ##################################
 
 def apm5_start(user_id, text, key=None):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if key is None:
-		animal = storage.get_animal_by_bar_code(text)
+		animal = Storage.get_animal_by_bar_code(text)
 		if animal == {}:
 			return (
 				const.animal_not_found.format(code=text),
@@ -122,7 +122,7 @@ def apm5_start(user_id, text, key=None):
 			)
 		user['mpl_list'] = []
 		user['animal'] = animal
-		dead_info = storage.get_animal_dead(animal["bar_code"])
+		dead_info = Storage.get_animal_dead(animal["bar_code"])
 		user['animal']['is_dead'] = dead_info is not None
 		if animal['clinical_condition_admission'] is None:
 			return (
@@ -140,19 +140,19 @@ def apm5_start(user_id, text, key=None):
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
 	if key == 'apm5_diarrhea_yes':
-		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
 		return text, kbd, None
 	if key == 'apm5_diarrhea_no':
-		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
 		return text, kbd, None
 	if key == 'apm5_other':
-		storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.other_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.other_history_type_id,
 									 value=text,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
@@ -183,19 +183,19 @@ def apm5_button(user, text, key):
 		else:
 			key_id = key.split('_')[-1]
 			user["mpl_list"].append(key_id)
-			storage.insert_history(manipulation_id=key_id, animal_id=user['animal']['animal_id'],
+			Storage.insert_history(manipulation_id=key_id, animal_id=user['animal']['animal_id'],
 								   arms_id=user['apm']['arm_id'], tg_nickname=user['name'])
 	elif key == 'apm5_diarrhea_yes':
 		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
-		storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
 	elif key == 'apm5_diarrhea_no':
 		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
-		storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
+		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 	elif key == 'apm5_done':
-		storage.update_animal(animal_id=user['animal']['animal_id'], clinical_condition_admission=user['clinic_state'])
+		Storage.update_animal(animal_id=user['animal']['animal_id'], clinical_condition_admission=user['clinic_state'])
 	text, kbd = apm5_show_mpls(user)
 	return text, kbd, None

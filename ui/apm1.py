@@ -1,9 +1,9 @@
 # Поступление
 
 from const import const
-from database import Database as db
+from database import Database as Db
 from logs import my_logger
-from storage import storage
+from storage import Storage
 from timetools import TimeTools
 from timetools import now
 from timetools import today
@@ -18,6 +18,7 @@ apm1_wrong_time_input = "Ошибка, дата отлова не может б�
 apm1_text_pollution = 'Укажите степень загрязнения'
 apm1_text_already_registered = '❌ Животное с номером {code} уже зарегистрировано!'
 apm1_text_species = '⚠️ Введите вид животного'
+apm1_text_catcher = 'Введите информацию о ловце'
 
 apm1_pollution_grade = {
 	"apm1_pollution_0": "менее 25%",
@@ -100,6 +101,14 @@ def apm1_get_species(code):
 	)
 
 
+def apm1_get_catcher(code):
+	return (
+		f'{const.text_animal_number} {code}\n{apm1_text_catcher}',
+		{const.text_cancel: 'entry_cancel'},
+		'apm1_catcher'
+	)
+
+
 def apm1_get_pollution(code):
 	kbd = {}
 	for key in apm1_pollution_grade:
@@ -125,9 +134,9 @@ def show_result(user):
 
 
 def apm1_start(user_id, text, key=None):
-	user = db.get_user(user_id)
+	user = Db.get_user(user_id)
 	if key is None:
-		animal = storage.get_animal_by_bar_code(text)
+		animal = Storage.get_animal_by_bar_code(text)
 		if animal != {}:
 			return (
 				f'{apm1_text_already_registered.format(code=text)}',
@@ -145,6 +154,9 @@ def apm1_start(user_id, text, key=None):
 		return apm1_time_validate(text, user)
 	if key == 'apm1_species':
 		user['species'] = text
+		return apm1_get_catcher(user["code"])
+	if key == 'apm1_catcher':
+		user['catcher'] = text
 		return apm1_get_pollution(user["code"])
 	if key == 'apm1_pollution':
 		# todo Если пользователь ввел буквами, вывести ошибку и заставить нажать кнопки
@@ -170,17 +182,19 @@ def apm1_button(user, msg, key):
 		text += f'❓ {const.text_capture_place}: {user["place"]}\n'
 		text += f'❓ {const.text_capture_time}: {user["capture_datetime"]}\n'
 		text += f'❓ Вид: {user['species']}\n'
+		text += f'❓ Ловец: {user['catcher']}\n'
 		text += f'❓ Степень загрязнения: {user["pollution"]}\n'
 		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
 	if key == 'apm1_done':
-		animal_id = storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"],
+		animal_id = Storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"],
 										  place=user["place"],
 										  species=user['species'],
+										  catcher=user['catcher'],
 										  pollution=user["pollution"])
 		if animal_id is not None:
 			# todo Использовать arm_id из базы #154
-			arm_id = storage.get_arm_id(apm1_place_id, user["location_id"])
+			arm_id = Storage.get_arm_id(apm1_place_id, user["location_id"])
 			# todo Использовать arm_id из базы #154
-			storage.insert_place_history(arm_id, animal_id, user['name'])
+			Storage.insert_place_history(arm_id, animal_id, user['name'])
 	return None, None, None

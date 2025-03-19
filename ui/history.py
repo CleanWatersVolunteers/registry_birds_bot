@@ -2,7 +2,7 @@
 
 from const import const
 from logs import my_logger
-from storage import storage
+from storage import Storage
 from timetools import TimeTools
 
 text_weight_change = 'Изменение веса'
@@ -13,9 +13,9 @@ text_weight_change = 'Изменение веса'
 ##################################
 
 def history_get_info(animal_id, start_date, dead_info=None):
-	numerical_history = storage.get_animal_values_history(animal_id, start_date)
-	history = storage.get_animal_history(animal_id, start_date)
-	place_history = storage.get_place_history(animal_id, start_date)
+	numerical_history = Storage.get_animal_values_history(animal_id, start_date)
+	history = Storage.get_animal_history(animal_id, start_date)
+	place_history = Storage.get_place_history(animal_id, start_date)
 	my_logger.info(f'history_get_info: {start_date}')
 
 	combined_history = (numerical_history + history + place_history)
@@ -52,7 +52,7 @@ def history_get_info(animal_id, start_date, dead_info=None):
 
 
 def get_diff_values_history(animal_id, type_id):
-	diff = storage.get_diff_values_history(animal_id, type_id)
+	diff = Storage.get_diff_values_history(animal_id, type_id)
 	if diff is not None:
 		if diff > 0:
 			return f'{text_weight_change}: + {diff}\n'
