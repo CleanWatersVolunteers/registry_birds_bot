@@ -31,13 +31,15 @@ SLEEP = 5 * 60
 
 db.init()
 
-
 def kbd_to_inline(text_list):
 	keyboard = []
-	for key in text_list:
-		keyboard.append([InlineKeyboardButton(key, callback_data=text_list[key])])
+	for text_line in text_list:
+		line = []
+		for btn in text_line:
+			line.append(InlineKeyboardButton(callback_data=text_line[btn], text=btn))
+		keyboard.append(line)
 	return keyboard
-
+	
 
 async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	text, keyboard = entry_start(update['message']['from']['username'], update['message']['from']['id'],
