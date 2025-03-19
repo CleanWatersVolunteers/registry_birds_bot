@@ -8,7 +8,6 @@ from timetools import week_db, TimeTools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
-apm5_text_species = '⚠️ Введите вид животного'
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
 apm5_text_other = 'Введите описание'
 
@@ -33,7 +32,7 @@ def apm5_add_hdr_item(label, value):
 
 def apm5_show_mpls(user, dead_info=None):
 	kbd = dict()
-	text = f'{apm5_get_animal_card(user['animal'])}\n'
+	text = f'{apm5_get_animal_card(user)}\n'
 	history = history_get_info(user['animal']['animal_id'], week_db(), dead_info)
 	if history is not None:
 		text += f'{history}\n'
@@ -64,7 +63,8 @@ def apm5_get_triage(triage):
 		return const.text_triage_red
 
 
-def apm5_get_animal_card(animal):
+def apm5_get_animal_card(user):
+	animal = storage.get_animal_by_bar_code(user['animal']['bar_code'])
 	if animal:
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
@@ -120,30 +120,23 @@ def apm5_start(user_id, text, key=None):
 				{const.text_ok: 'entry_cancel'},
 				None
 			)
+		user['mpl_list'] = []
 		user['animal'] = animal
 		dead_info = storage.get_animal_dead(animal["bar_code"])
 		user['animal']['is_dead'] = dead_info is not None
-		if animal['species'] is None:
+		if animal['clinical_condition_admission'] is None:
 			return (
-				f'{apm5_get_animal_card(animal)}\n{apm5_text_species}',
+				f'{const.text_animal_number} {user['animal']['bar_code']}\n{apm5_text_clinic_state}',
 				{const.text_cancel: 'entry_cancel'},
-				'apm5_species'
+				'apm5_clinic_state'
 			)
 		user['mpl_list'] = []
 		text, kbd = apm5_show_mpls(user, dead_info)
 		return text, kbd, None
-	if key == 'apm5_species':
-		user['species'] = text
-		return (
-			f'{const.text_animal_number} {user['animal']['bar_code']}\n{apm5_text_clinic_state}',
-			{const.text_cancel: 'entry_cancel'},
-			'apm5_clinic_state'
-		)
 	if key == 'apm5_clinic_state':
 		user['clinic_state'] = text
 		text = f'{const.text_animal_number} {user['animal']['bar_code']}\n'
 		text += f'{const.text_data_check}\n'
-		text += f'❓ Вид: {user['species']}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
 	if key == 'apm5_diarrhea_yes':
@@ -164,20 +157,9 @@ def apm5_start(user_id, text, key=None):
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
 		return text, kbd, None
-	return (
-		apm5_text_species,
-		{const.text_cancel: 'entry_cancel'},
-		'apm5_species'
-	)
 
 
 def apm5_button(user, text, key):
-	if key == 'apm5_done':
-		storage.update_animal(
-			animal_id=user['animal']['animal_id'],
-			species=user['species'],
-			clinical_condition_admission=user['clinic_state']
-		)
 	if key == 'apm5_animal_dead_confirmation':
 		return apm5_animal_dead_confirmation(user)
 	if key == 'apm5_animal_dead':
@@ -213,5 +195,7 @@ def apm5_button(user, text, key):
 		storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
+	elif key == 'apm5_done':
+		storage.update_animal(animal_id=user['animal']['animal_id'], clinical_condition_admission=user['clinic_state'])
 	text, kbd = apm5_show_mpls(user)
 	return text, kbd, None
