@@ -450,22 +450,6 @@ class Storage:
 			return result
 		return None
 
-	# Вставка записей бумажного журнала первичной регистрации
-	@classmethod
-	def import_place_history(cls, code, registration_datetime, tg_nickname, arm_id):
-		my_logger.info(
-			f'import_place_history. code: {code}, arm_id: {arm_id}, registration_datetime: {registration_datetime}, tg_nickname: {tg_nickname}')
-		registration_datetime = datetime.strptime(registration_datetime, cls.capture_datetime_string_format)
-		capture_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
-		query = """
-				INSERT INTO place_history (animal_id, datetime, tg_nickname, arm_id)
-				VALUES (
-					(SELECT id FROM animals WHERE bar_code = %s), %s, %s, %s);
-				"""
-		data = (code, capture_datetime_formatted, tg_nickname, arm_id)
-		result = cls.execute_query(query, data)
-		return result
-
 	@classmethod
 	def get_place_count(cls, location_id, start_datetime=None, end_datetime=None):
 		my_logger.info(

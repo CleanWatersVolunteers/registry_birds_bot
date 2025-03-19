@@ -4,7 +4,7 @@ load_dotenv()
 
 import csv
 import sys
-from storage import Storage
+from exchange_storage import ExchangeStorage
 
 DEFAULT_POLLUTION = 'Не установлено'
 
@@ -38,13 +38,13 @@ def process_csv(nickname, file_name):
 				'place': place,
 				'pollution': DEFAULT_POLLUTION
 			}
-			animal_id = Storage.insert_animal(code=result_dict["code"],
+			animal_id = ExchangeStorage.insert_animal(code=result_dict["code"],
 											  capture_datetime=result_dict["capture_datetime"],
 											  place=result_dict["place"],
 											  pollution=result_dict["pollution"])
 			if animal_id is not None:
 				registration_count += 1
-				result = Storage.import_place_history(code=result_dict["code"],
+				result = ExchangeStorage.import_place_history(code=result_dict["code"],
 													  registration_datetime=result_dict["registration_date"],
 													  tg_nickname=nickname, arm_id=1)
 				print(f'import_place_history: {result}')
