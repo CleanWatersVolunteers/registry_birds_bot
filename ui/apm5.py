@@ -58,7 +58,7 @@ def apm5_show_mpls(user, dead_info=None):
 		else:
 			text += f'{const.manipulation_not_found}\n'
 		kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
-	kbd['Готово'] = 'entry_cancel'
+	kbd[const.text_done] = 'apm5_done'
 	text += const.text_manipulation_done
 	return text, kbd
 
@@ -147,7 +147,7 @@ def apm5_start(user_id, text, key=None):
 		text = f'{const.text_animal_number} {user['animal']['bar_code']}\n'
 		text += f'{const.text_data_check}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
-		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
+		return text, {const.text_done: 'apm5_clinical_condition', const.text_cancel: 'entry_cancel'}, None
 	if key == 'apm5_note':
 		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=apm5_note_history_type_id,
 									 value=text,
@@ -161,6 +161,12 @@ def apm5_button(user, text, key):
 		return apm5_animal_dead_confirmation(user)
 	if key == 'apm5_animal_dead':
 		return apm5_animal_dead(user)
+	if key == 'apm5_done':
+		# todo Использовать arm_id из базы #154
+		arm_id = Storage.get_arm_id(apm5_place_id, user['location_id'])
+		# todo Использовать arm_id из базы #154
+		Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+		return None, None, None
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
 		manipulation_id = match.group()
@@ -209,7 +215,7 @@ def apm5_button(user, text, key):
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=apm5_neurological_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
-	elif key == 'apm5_done':
+	elif key == 'apm5_clinical_condition':
 		Storage.update_animal(animal_id=user['animal']['animal_id'], clinical_condition_admission=user['clinic_state'])
 	text, kbd = apm5_show_mpls(user)
 	return text, kbd, None
