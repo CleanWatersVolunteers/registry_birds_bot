@@ -214,16 +214,16 @@ class storage:
 		return []
 
 	@classmethod
-	def insert_animal(cls, code, capture_datetime, place, pollution):
+	def insert_animal(cls, code, capture_datetime, place, species, pollution):
 		my_logger.info(
-			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, pollution: {pollution}')
+			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, species: {species}, pollution: {pollution}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 		query = """
-			INSERT INTO animals (bar_code, place_capture, capture_datetime, degree_pollution)
-			VALUES (%s, %s, %s, %s)
+			INSERT INTO animals (bar_code, place_capture, capture_datetime, species, degree_pollution)
+			VALUES (%s, %s, %s, %s, %s)
 		"""
-		data = (code, place, capture_datetime_formatted, pollution)
+		data = (code, place, capture_datetime_formatted, species, pollution)
 		return cls.execute_query(query, data)
 
 	@classmethod

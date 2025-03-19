@@ -17,6 +17,7 @@ apm1_text_time = 'Введите время отлова в формате ЧЧ:
 apm1_wrong_time_input = "Ошибка, дата отлова не может быть раньше 24 часов или позже текущего времени"
 apm1_text_pollution = 'Укажите степень загрязнения'
 apm1_text_already_registered = '❌ Животное с номером {code} уже зарегистрировано!'
+apm1_text_species = '⚠️ Введите вид животного'
 
 apm1_pollution_grade = {
 	"apm1_pollution_0": "менее 25%",
@@ -50,7 +51,7 @@ def validate_datetime(user, date_input, time_input):
 		)
 	else:
 		user['capture_datetime'] = user_input_time
-		return apm1_get_pollution(user["code"])
+		return apm1_get_species(user["code"])
 
 
 # Проверка времени
@@ -88,6 +89,14 @@ def apm1_get_date(code):
 		f'{const.text_animal_number} {code}\n{apm1_text_date}',
 		{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
 		None
+	)
+
+
+def apm1_get_species(code):
+	return (
+		f'{const.text_animal_number} {code}\n{apm1_text_species}',
+		{const.text_cancel: 'entry_cancel'},
+		'apm1_species'
 	)
 
 
@@ -132,11 +141,11 @@ def apm1_start(user_id, text, key=None):
 	if key == 'apm1_place':
 		user['place'] = text
 		return apm1_get_date(user["code"])
-	if key == 'apm1_date':
-		user['capture_datetime'] = text  # todo incorrect for today button
-		return apm1_get_pollution(user["code"])
 	if key == 'apm1_time_validate':
 		return apm1_time_validate(text, user)
+	if key == 'apm1_species':
+		user['species'] = text
+		return apm1_get_pollution(user["code"])
 	if key == 'apm1_pollution':
 		# todo Если пользователь ввел буквами, вывести ошибку и заставить нажать кнопки
 		user["pollution"] = text
@@ -157,15 +166,17 @@ def apm1_button(user, msg, key):
 	if keys[1] == 'pollution':
 		user["pollution"] = apm1_pollution_grade[key]
 		text = f'{const.text_data_check}'
-		text += f'✅ {const.text_animal_number} {user["code"]}\n'
-		text += f'✅ {const.text_capture_place}: {user["place"]}\n'
-		text += f'✅ {const.text_capture_time}: {user["capture_datetime"]}\n'
-		text += f'✅ Степень загрязнения: {user["pollution"]}\n'
+		text += f'❓ {const.text_animal_number} {user["code"]}\n'
+		text += f'❓ {const.text_capture_place}: {user["place"]}\n'
+		text += f'❓ {const.text_capture_time}: {user["capture_datetime"]}\n'
+		text += f'❓ Вид: {user['species']}\n'
+		text += f'❓ Степень загрязнения: {user["pollution"]}\n'
 		return text, {const.text_done: "apm1_done", const.text_cancel: "entry_cancel"}, None
 
 	if key == 'apm1_done':
 		animal_id = storage.insert_animal(code=user["code"], capture_datetime=user["capture_datetime"],
 										  place=user["place"],
+										  species=user['species'],
 										  pollution=user["pollution"])
 		if animal_id is not None:
 			# todo Использовать arm_id из базы #154
