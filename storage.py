@@ -104,6 +104,19 @@ class Storage:
 			return {}
 
 	@classmethod
+	def get_max_qr_code(cls):
+		query = """
+		SELECT bar_code
+		FROM (
+			SELECT bar_code, ROW_NUMBER() OVER (ORDER BY id DESC) AS rn
+		FROM animals
+		) AS subquery
+		WHERE rn = 1;
+		"""
+		result = cls.execute_query(query, fetch=True)
+		return result[0]['bar_code']
+
+	@classmethod
 	def insert_value_history(cls, animal_id, type_id, value, tg_nickname):
 		my_logger.info(
 			f'insert_value_history. animal_id: {animal_id}, type_id: {type_id}, value: {value}, tg_nickname: {tg_nickname}')

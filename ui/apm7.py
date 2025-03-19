@@ -4,7 +4,7 @@ import random
 from const import const
 from database import Database as Db
 from logs import my_logger
-from storage import Storage
+from storage import Storage, QRCodeStorage
 from timetools import TimeTools
 from timetools import today
 from timetools import today_db
@@ -214,7 +214,10 @@ def get_stat(user):
 
 def get_first_screen(user):
 	kbd = {}
-	text = f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
+	start_number = QRCodeStorage.get_qr_start_value()
+	max = Storage.get_max_qr_code()
+	text = f'Последний распечатанный QR: {start_number - 1}\nНе использовано: {start_number - max}.\n\n'
+	text += f'/{qr_cmd_gen24} - генерация 24 новых QR-кодов\n'
 	text += f'/{qr_cmd_gen48} - генерация 48 новых QR-кодов\n'
 	text += f'/{qr_cmd_gen72} - генерация 72 новых QR-кодов\n'
 	text += f'/{qr_cmd_old} N1,N2 - получение существующих N1,N2,.. QR-кодов\n'
