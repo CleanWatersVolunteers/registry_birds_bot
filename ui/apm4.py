@@ -15,7 +15,6 @@ mucous_manipulations_id = 9
 body_condition_history_type_id = 4
 mucous_history_type_id = 5
 
-apm4_place_id = 4
 apm4_text_triage = '⚠️ Укажите триаж животного'
 apm4_body_condition = 'Укажите степень упитанности'
 apm4_text_mucous = 'Укажите состояние слизистой'
