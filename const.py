@@ -39,8 +39,6 @@ class const:
 
 	# БД values_history_type.id
 	diarrhea_history_type_id = 6
-	other_history_type_id = 7
 
 	# БД manipulations.id
 	diarrhea_manipulations_id = 15
-	other_manipulations_id = 16

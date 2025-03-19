@@ -9,7 +9,8 @@ from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
-apm5_text_other = 'Введите описание'
+apm5_text_note = 'Введите текст заметки'
+apm5_text_neurological = 'Неврологическая симптоматика'
 
 history_text_pollution_degree = 'Степень загрязнения'
 history_text_weight = 'Вес'
@@ -19,6 +20,14 @@ history_text_clinical_condition = 'Клиническое состояние'
 history_text_triage = 'Триаж'
 
 apm5_place_id = 5
+
+# БД values_history_type.id
+apm5_note_history_type_id = 7
+apm5_neurological_history_type_id = 8
+
+# БД manipulations.id
+apm5_note_manipulations_id = 16
+apm5_neurological_manipulations_id = 17
 
 
 def apm5_add_hdr_item(label, value):
@@ -139,20 +148,8 @@ def apm5_start(user_id, text, key=None):
 		text += f'{const.text_data_check}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_done', const.text_cancel: 'entry_cancel'}, None
-	if key == 'apm5_diarrhea_yes':
-		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
-									 value=const.text_yes,
-									 tg_nickname=user['name'])
-		text, kbd = apm5_show_mpls(user)
-		return text, kbd, None
-	if key == 'apm5_diarrhea_no':
-		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,
-									 value=const.text_no,
-									 tg_nickname=user['name'])
-		text, kbd = apm5_show_mpls(user)
-		return text, kbd, None
-	if key == 'apm5_other':
-		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.other_history_type_id,
+	if key == 'apm5_note':
+		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=apm5_note_history_type_id,
 									 value=text,
 									 tg_nickname=user['name'])
 		text, kbd = apm5_show_mpls(user)
@@ -174,11 +171,18 @@ def apm5_button(user, text, key):
 				 const.text_cancel: "entry_cancel"},
 				None
 			)
-		elif int(manipulation_id) == const.other_manipulations_id:
+		elif int(manipulation_id) == apm5_note_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_other}',
+				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_note}',
 				{const.text_cancel: "entry_cancel"},
-				'apm5_other'
+				'apm5_note'
+			)
+		elif int(manipulation_id) == apm5_neurological_manipulations_id:
+			return (
+				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_neurological}',
+				{const.text_yes: "apm5_neurological_yes", const.text_no: "apm5_neurological_no",
+				 const.text_cancel: "entry_cancel"},
+				None
 			)
 		else:
 			key_id = key.split('_')[-1]
@@ -193,6 +197,16 @@ def apm5_button(user, text, key):
 	elif key == 'apm5_diarrhea_no':
 		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
+									 value=const.text_no,
+									 tg_nickname=user['name'])
+	elif key == 'apm5_neurological_yes':
+		user["mpl_list"].append(str(apm5_neurological_manipulations_id))
+		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=apm5_neurological_history_type_id,
+									 value=const.text_yes,
+									 tg_nickname=user['name'])
+	elif key == 'apm5_neurological_no':
+		user["mpl_list"].append(str(apm5_neurological_manipulations_id))
+		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=apm5_neurological_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
 	elif key == 'apm5_done':

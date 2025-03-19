@@ -63,3 +63,9 @@ INSERT INTO `values_history_type` (`id`, `name`) VALUES (7, 'Другое');
 
 -- В приёмку добавить ввод информации о ловце. #339
 ALTER TABLE `animals` ADD COLUMN `catcher` VARCHAR(45) NOT NULL COLLATE 'utf8mb4_0900_ai_ci';
+
+-- Неврологическая симптоматика: да, нет #278
+INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (17, 'Неврологическая симптоматика', '5');
+INSERT INTO `values_history_type` (`id`, `name`) VALUES (8, 'Неврологическая симптоматика');
+UPDATE `manipulations` SET `name`='Заметка' WHERE  `id`=16;
+UPDATE `values_history_type` SET `name`='Заметка' WHERE  `id`=7;
