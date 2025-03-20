@@ -7,6 +7,7 @@ import sys
 from exchange_storage import ExchangeStorage
 
 DEFAULT_POLLUTION = 'Не установлено'
+DEFAULT_CATCHER = 'Нет'
 
 
 # code,date,capture_time,registration_time,type,place
@@ -23,7 +24,7 @@ def process_csv(nickname, file_name):
 			date = row['date'] + '.2025'  # Добавляем год к дате
 			capture_time = row['capture']
 			registration_time = row['registration']
-			animal_type = row['type']
+			species = row['species']
 			place = row['place']
 
 			# Форматируем даты и времена
@@ -34,19 +35,22 @@ def process_csv(nickname, file_name):
 				'code': code,
 				'capture_datetime': capture_date,
 				'registration_date': registration_date,
-				'type': animal_type,
+				'species': species,
 				'place': place,
-				'pollution': DEFAULT_POLLUTION
+				'pollution': DEFAULT_POLLUTION,
+				'catcher': DEFAULT_CATCHER
 			}
 			animal_id = ExchangeStorage.insert_animal(code=result_dict["code"],
-											  capture_datetime=result_dict["capture_datetime"],
-											  place=result_dict["place"],
-											  pollution=result_dict["pollution"])
+													  capture_datetime=result_dict["capture_datetime"],
+													  place=result_dict["place"],
+													  species=result_dict["species"],
+													  catcher=result_dict["catcher"],
+													  pollution=result_dict["pollution"])
 			if animal_id is not None:
 				registration_count += 1
 				result = ExchangeStorage.import_place_history(code=result_dict["code"],
-													  registration_datetime=result_dict["registration_date"],
-													  tg_nickname=nickname, arm_id=1)
+															  registration_datetime=result_dict["registration_date"],
+															  tg_nickname=nickname, arm_id=1)
 				print(f'import_place_history: {result}')
 			else:
 				print(f'\nОшибка регистрации QR: {code}')
