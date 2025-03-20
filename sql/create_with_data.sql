@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS `history` (
   `arm_id` int NOT NULL,
   `tg_nickname` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_animal_datetime_manipulation_arm` (`animal_id`,`datetime`,`manipulation_id`,`arm_id`),
   KEY `fk_history_animals1_idx` (`animal_id`),
   KEY `fk_history_manipulations1_idx` (`manipulation_id`),
   KEY `fk_history_arms1_idx` (`arm_id`),

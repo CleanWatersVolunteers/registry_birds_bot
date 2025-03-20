@@ -72,3 +72,6 @@ UPDATE `values_history_type` SET `name`='Заметка' WHERE  `id`=7;
 
 -- Добавить составной уникальный ключ animal_id + datetime для place_history #357
 ALTER TABLE `place_history` ADD CONSTRAINT `unique_animal_datetime` UNIQUE (`animal_id`, `datetime`);
+
+-- Добавить составной уникальный ключ animal_id + datetime для place_history #357
+ALTER TABLE history ADD CONSTRAINT unique_animal_datetime_manipulation_arm UNIQUE (animal_id, datetime, manipulation_id, arm_id);
