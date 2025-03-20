@@ -134,8 +134,8 @@ def apm6_button(user, text, key):
 		elif int(manipulation_id) == const.diarrhea_manipulations_id:
 			return (
 				f'{const.text_animal_number} {user['bar_code']}\n{const.text_diarrhea}',
-				{const.text_yes: 'apm6_diarrhea_yes', const.text_no: 'apm6_diarrhea_no',
-				 const.text_cancel: 'entry_cancel'},
+				[{const.text_yes: 'apm6_diarrhea_yes', const.text_no: 'apm6_diarrhea_no'},
+				 {const.text_cancel: 'entry_cancel'}],
 				None
 			)
 		else:

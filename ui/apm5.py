@@ -173,8 +173,8 @@ def apm5_button(user, text, key):
 		if int(manipulation_id) == const.diarrhea_manipulations_id:
 			return (
 				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{const.text_diarrhea}',
-				{const.text_yes: "apm5_diarrhea_yes", const.text_no: "apm5_diarrhea_no",
-				 const.text_cancel: "entry_cancel"},
+				[{const.text_yes: 'apm5_diarrhea_yes', const.text_no: 'apm5_diarrhea_no'},
+				 {const.text_cancel: 'entry_cancel'}],
 				None
 			)
 		elif int(manipulation_id) == apm5_note_manipulations_id:
@@ -186,8 +186,8 @@ def apm5_button(user, text, key):
 		elif int(manipulation_id) == apm5_neurological_manipulations_id:
 			return (
 				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_neurological}',
-				{const.text_yes: "apm5_neurological_yes", const.text_no: "apm5_neurological_no",
-				 const.text_cancel: "entry_cancel"},
+				[{const.text_yes: "apm5_neurological_yes", const.text_no: "apm5_neurological_no"},
+				 {const.text_cancel: "entry_cancel"}],
 				None
 			)
 		else:
