@@ -15,7 +15,8 @@ DEFAULT_CATCHER = 'Нет'
 def process_csv(nickname, file_name):
 	with open(file_name, mode='r', encoding='utf-8') as file:
 		row_count = 0  # Считаем количество строк
-		registration_count = 0
+		animal_count = 0
+		place_count = 0
 		reader = csv.DictReader(file)  # Читаем файл как словарь, используя первую строку как заголовки
 		for row in reader:
 			row_count += 1
@@ -40,19 +41,21 @@ def process_csv(nickname, file_name):
 				'pollution': DEFAULT_POLLUTION,
 				'catcher': DEFAULT_CATCHER
 			}
-			ExchangeStorage.insert_animal(code=result_dict["code"],
-													  capture_datetime=result_dict["capture_datetime"],
-													  place=result_dict["place"],
-													  species=result_dict["species"],
-													  catcher=result_dict["catcher"],
-													  pollution=result_dict["pollution"])
-			registration_count += 1
-			ExchangeStorage.import_place_history(code=result_dict["code"],
-														  registration_datetime=result_dict["registration_date"],
-														  tg_nickname=nickname, arm_id=1)
-			print(result_dict)
+			animal_result = ExchangeStorage.insert_animal(code=result_dict["code"],
+														  capture_datetime=result_dict["capture_datetime"],
+														  place=result_dict["place"],
+														  species=result_dict["species"],
+														  catcher=result_dict["catcher"],
+														  pollution=result_dict["pollution"])
+			if animal_result is not None:
+				animal_count += 1
 
-	print(f'Всего: {row_count}, зарегистрировано: {registration_count}')
+			place_result = ExchangeStorage.import_place_history(code=result_dict["code"],
+																registration_datetime=result_dict["registration_date"],
+																tg_nickname=nickname, arm_id=1)
+			if place_result is not None:
+				place_count += 1
+	print(f'Всего: {row_count}, animal_count: {animal_count}, place_count: {place_count}')
 
 
 # Пример использования
