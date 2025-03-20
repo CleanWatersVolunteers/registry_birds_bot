@@ -69,3 +69,6 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES (17, 'Невро
 INSERT INTO `values_history_type` (`id`, `name`) VALUES (8, 'Неврологическая симптоматика');
 UPDATE `manipulations` SET `name`='Заметка' WHERE  `id`=16;
 UPDATE `values_history_type` SET `name`='Заметка' WHERE  `id`=7;
+
+-- Добавить составной уникальный ключ animal_id + datetime для place_history #357
+ALTER TABLE `place_history` ADD CONSTRAINT `unique_animal_datetime` UNIQUE (`animal_id`, `datetime`);

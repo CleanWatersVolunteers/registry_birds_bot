@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS `place_history` (
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `arm_id` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `unique_animal_datetime` (`animal_id`,`datetime`),
   KEY `fk_place_history_animals_idx` (`animal_id`),
   KEY `fk_place_history_arms1_idx` (`arm_id`),
   CONSTRAINT `fk_place_history_animals` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
