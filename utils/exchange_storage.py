@@ -1,8 +1,11 @@
 import os
 from datetime import datetime
 
-import mysql.connector
-from mysql.connector import pooling
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.exc import IntegrityError  # Основное исключение SQLAlchemy
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+
+# from pymysql.err import IntegrityError as PymysqlIntegrityError  # Исключение драйвера pymysql
 
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
@@ -10,72 +13,141 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
 
+# Создание движка (engine) для подключения к базе данных
+DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=10)
+
+# Создание сессии
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Базовый класс для ORM-моделей
+Base = declarative_base()
+
+
+class Animal(Base):
+	__tablename__ = "animals"
+
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	bar_code = Column(Integer, unique=True, nullable=False)
+	place_capture = Column(String(45), nullable=False)
+	capture_datetime = Column(DateTime, nullable=False)
+	degree_pollution = Column(String(45), nullable=False)
+	weight = Column(Integer, nullable=True)
+	species = Column(String(45), nullable=True)
+	clinical_condition_admission = Column(String(45), nullable=True)
+	triage = Column(Integer, nullable=True)
+	catcher = Column(String(45), nullable=False)
+
+	# Связь с таблицей place_history
+	place_history = relationship("PlaceHistory", back_populates="animal")
+
+
+class PlaceHistory(Base):
+	__tablename__ = "place_history"
+
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	animal_id = Column(Integer, ForeignKey("animals.id"), nullable=False)
+	datetime = Column(DateTime, nullable=False)
+	tg_nickname = Column(String(50), nullable=False)
+	arm_id = Column(Integer, nullable=False)
+
+	# Связь с таблицей animals
+	animal = relationship("Animal", back_populates="place_history")
+
+
+class AnimalDead(Base):
+	__tablename__ = "animals_dead"
+
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	animal_id = Column(Integer, ForeignKey("animals.id"), nullable=False, unique=True)
+	datetime = Column(DateTime, nullable=False)
+	arms_id = Column(Integer, nullable=False)
+	tg_nickname = Column(String(50), nullable=False)
+
 
 class ExchangeStorage:
 	capture_datetime_string_format = "%d.%m.%Y %H:%M"
 	capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
 
-	DB_CONFIG = {
-		"host": DB_HOST,
-		"port": int(DB_PORT),
-		"user": DB_USER,
-		"password": DB_PASSWORD,
-		"database": DB_NAME
-	}
-	connection_pool = pooling.MySQLConnectionPool(
-		pool_name="mypool",
-		pool_size=5,
-		**DB_CONFIG
-	)
+	@staticmethod
+	def get_session():
+		"""Создает и возвращает сессию."""
+		return SessionLocal()
 
 	@classmethod
-	def execute_query(cls, query, data=None, fetch=False):
-		connection = cls.connection_pool.get_connection()
-		cursor = connection.cursor(dictionary=True)
-		try:
-			cursor.execute(query, data)
-			if fetch:
-				results = cursor.fetchall()
-				return results
-			else:
-				connection.commit()  # Подтверждаем изменения
-				return cursor.lastrowid
-		except mysql.connector.Error as err:
-			print(f"Ошибка при выполнении запроса: {err}\n{query}")
-			return None
-		finally:
-			cursor.close()
-			connection.close()  # Закрываем соединение, возвращая его в пул
-
-	@classmethod
-	def insert_animal(cls, code, capture_datetime, place, species, catcher, pollution):
-		# print(
-		# 	f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, species: {species}, catcher: {catcher}, pollution: {pollution}')
+	def insert_animal(cls, code, capture_datetime, place, pollution, weight=None, species=None, clinical_condition=None,
+					  triage=None, catcher=None):
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
-		query = """
-			INSERT INTO animals (bar_code, place_capture, capture_datetime, species, catcher, degree_pollution)
-			VALUES (%s, %s, %s, %s, %s, %s)
-		"""
-		data = (code, place, capture_datetime_formatted, species, catcher, pollution)
-		result = cls.execute_query(query, data)
-		return result
+
+		db = cls.get_session()
+		try:
+			new_animal = Animal(
+				bar_code=code,
+				place_capture=place,
+				capture_datetime=capture_datetime_formatted,
+				degree_pollution=pollution,
+				weight=weight,
+				species=species,
+				clinical_condition_admission=clinical_condition,
+				triage=triage,
+				catcher=catcher
+			)
+			db.add(new_animal)
+			db.commit()
+			db.refresh(new_animal)
+			return new_animal.id
+		except IntegrityError as e:  # Перехватываем IntegrityError
+			db.rollback()
+			if "Duplicate entry" in str(e):
+				print(f"Ошибка: Животное с bar_code '{code}' уже существует.")
+			else:
+				print(f"Ошибка целостности данных: {e}")
+			return None
+		except Exception as e:
+			db.rollback()
+			print(f"Ошибка при добавлении животного: {e}")
+			return None
+		finally:
+			db.close()
 
 	# Вставка записей бумажного журнала первичной регистрации
 	@classmethod
 	def import_place_history(cls, code, registration_datetime, tg_nickname, arm_id):
-		print(
-			f'import_place_history. code: {code}, arm_id: {arm_id}, registration_datetime: {registration_datetime}, tg_nickname: {tg_nickname}')
 		registration_datetime = datetime.strptime(registration_datetime, cls.capture_datetime_string_format)
-		capture_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
-		query = """
-				INSERT INTO place_history (animal_id, datetime, tg_nickname, arm_id)
-				VALUES (
-					(SELECT id FROM animals WHERE bar_code = %s), %s, %s, %s);
-				"""
-		data = (code, capture_datetime_formatted, tg_nickname, arm_id)
-		result = cls.execute_query(query, data)
-		return result
+		registration_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
+
+		db = cls.get_session()
+		try:
+			# Найти animal_id по bar_code
+			animal = db.query(Animal).filter_by(bar_code=code).first()
+			if not animal:
+				print(f"Животное с bar_code {code} не найдено.")
+				return None
+
+			new_place_history = PlaceHistory(
+				animal_id=animal.id,
+				datetime=registration_datetime_formatted,
+				tg_nickname=tg_nickname,
+				arm_id=arm_id
+			)
+			db.add(new_place_history)
+			db.commit()
+			db.refresh(new_place_history)
+			return new_place_history.id
+		except IntegrityError as e:  # Перехватываем IntegrityError
+			db.rollback()
+			if "Duplicate entry" in str(e):
+				print(f"Ошибка: Запись '{code} - {registration_datetime}' уже существует.")
+			else:
+				print(f"Ошибка целостности данных: {e}")
+			return None
+		except Exception as e:
+			db.rollback()
+			print(f"Ошибка при добавлении записи в place_history: {e}")
+			return None
+		finally:
+			db.close()
 
 	@classmethod
 	def get_animals_list(cls):
@@ -83,40 +155,48 @@ class ExchangeStorage:
 		Метод для получения списка животных с указанными полями, включая данные из place_history.
 		:return: Список словарей, где каждый словарь представляет одно животное.
 		"""
-		query = """
-				SELECT 
-					a.bar_code, 
-					a.place_capture, 
-					a.capture_datetime, 
-					a.degree_pollution, 
-					a.species, 
-					a.catcher,
-					ph.datetime AS place_history_datetime
-				FROM animals a
-				LEFT JOIN place_history ph ON a.id = ph.animal_id
-				WHERE ph.arm_id = 1
-				ORDER BY ph.datetime
-			"""
-		# Выполняем запрос и получаем результаты
-		results = cls.execute_query(query, fetch=True)
-		if results is None:
-			# Если произошла ошибка, возвращаем пустой список
+		db = cls.get_session()
+		try:
+			results = (
+				db.query(
+					Animal.bar_code,
+					Animal.place_capture,
+					Animal.capture_datetime,
+					Animal.degree_pollution,
+					Animal.species,
+					Animal.catcher,
+					PlaceHistory.datetime.label("place_history_datetime"),
+				)
+				.outerjoin(PlaceHistory, Animal.id == PlaceHistory.animal_id)
+				.filter(PlaceHistory.arm_id == 1)
+				.order_by(PlaceHistory.datetime)
+				.all()
+			)
+
+			# Преобразование результатов в словари
+			animals_list = []
+			for row in results:
+				animal_data = {
+					"bar_code": row.bar_code,
+					"place_capture": row.place_capture,
+					"capture_datetime": row.capture_datetime.strftime(cls.capture_datetime_string_format),
+					"degree_pollution": row.degree_pollution,
+					"species": row.species,
+					"catcher": row.catcher,
+					"place_history_datetime": row.place_history_datetime.strftime(cls.capture_datetime_string_format)
+					if row.place_history_datetime else None,
+				}
+				animals_list.append(animal_data)
+
+			return animals_list
+		except Exception as e:
+			print(f"Ошибка при получении списка животных: {e}")
 			return []
-
-		# Преобразуем capture_datetime и place_history_datetime в строковый формат для удобства
-		for animal in results:
-			if animal["capture_datetime"]:
-				animal["capture_datetime"] = animal["capture_datetime"].strftime(cls.capture_datetime_string_format)
-			if animal["place_history_datetime"]:
-				animal["place_history_datetime"] = animal["place_history_datetime"].strftime(
-					cls.capture_datetime_string_format)
-
-		return results
+		finally:
+			db.close()
 
 	@classmethod
 	def insert_dead(cls, code, dead_datetime, arms_id, tg_nickname):
-		# print(
-		# 	f'insert_dead. code: {code}, dead_datetime: {dead_datetime}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		"""
 		Метод для внесения записи о погибшем животном в таблицу animals_dead.
 
@@ -126,35 +206,36 @@ class ExchangeStorage:
 		:param tg_nickname: Никнейм пользователя Telegram.
 		:return: ID вставленной записи или None в случае ошибки.
 		"""
-		# 1. Найти animal_id по bar_code
-		find_animal_query = "SELECT id FROM animals WHERE bar_code = %s"
-		animal_data = cls.execute_query(find_animal_query, (code,), fetch=True)
-
-		if not animal_data:
-			print(f"Животное с bar_code {code} не найдено.")
-			return None
-
-		animal_id = animal_data[0]["id"]
-
 		dead_datetime = datetime.strptime(dead_datetime, cls.capture_datetime_string_format)
 		dead_datetime_formatted = dead_datetime.strftime(cls.capture_datetime_db_format)
 
-		# 2. Вставить запись в таблицу animals_dead
-		insert_query = """
-				INSERT INTO animals_dead (animal_id, datetime, arms_id, tg_nickname)
-				VALUES (%s, %s, %s, %s)
-			"""
-		data = (animal_id, dead_datetime_formatted, arms_id, tg_nickname)
-
+		db = cls.get_session()
 		try:
-			# Выполняем запрос на вставку
-			last_row_id = cls.execute_query(insert_query, data)
-			if last_row_id is not None:
-				print(f"Запись успешно добавлена в таблицу animals_dead. QR: {code}")
-				return last_row_id
-			else:
-				print(f"Ошибка при добавлении записи в таблицу animals_dead. QR: {code}")
+			animal = db.query(Animal).filter_by(bar_code=code).first()
+			if not animal:
+				print(f"Животное с bar_code {code} не найдено.")
 				return None
-		except Exception as e:
-			print(f"Ошибка при выполнении запроса: {e}")
+
+			new_dead_record = AnimalDead(
+				animal_id=animal.id,
+				datetime=dead_datetime_formatted,
+				arms_id=arms_id,
+				tg_nickname=tg_nickname
+			)
+			db.add(new_dead_record)
+			db.commit()
+			db.refresh(new_dead_record)
+			return new_dead_record.id
+		except IntegrityError as e:  # Перехватываем IntegrityError
+			db.rollback()
+			if "Duplicate entry" in str(e):
+				print(f"Ошибка: Запись '{code}' уже существует.")
+			else:
+				print(f"Ошибка целостности данных: {e}")
 			return None
+		except Exception as e:
+			db.rollback()
+			print(f"Ошибка при добавлении записи о погибшем животном: {e}")
+			return None
+		finally:
+			db.close()
