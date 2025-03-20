@@ -244,5 +244,20 @@ code,date,capture,registration,type,place
 
 Запуск скрипта (телеграмм_ник имя_файла)
 ```
-/root/venv/bin/python register.py Palmman 03.06.csv
+/root/venv/bin/python3 register.py Palmman 03.06.csv
+```
+
+
+Импорт журнала гибели
+
+Формат файла:
+```
+code,date,time
+766,12.03,8:30
+807,12.03,15:00
+```
+
+Запуск скрипта (телеграмм_ник имя_файла)
+```
+/root/venv/bin/python3 dead_import.py Palmman 03.06_dead.csv
 ```
