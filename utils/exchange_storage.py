@@ -15,12 +15,6 @@ class ExchangeStorage:
 	capture_datetime_string_format = "%d.%m.%Y %H:%M"
 	capture_datetime_db_format = "%Y-%m-%d %H:%M:%S"
 
-	# print(f'host: {DB_HOST}')
-	# print(f'port: {DB_PORT}')
-	# print(f'user: {DB_USER}')
-	# print(f'password: {DB_PASSWORD}')
-	# print(f'host: {DB_NAME}')
-
 	DB_CONFIG = {
 		"host": DB_HOST,
 		"port": int(DB_PORT),
@@ -55,8 +49,8 @@ class ExchangeStorage:
 
 	@classmethod
 	def insert_animal(cls, code, capture_datetime, place, species, catcher, pollution):
-		print(
-			f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, species: {species}, catcher: {catcher}, pollution: {pollution}')
+		# print(
+		# 	f'insert_animal. code: {code}, capture_datetime: {capture_datetime}, place: {place}, species: {species}, catcher: {catcher}, pollution: {pollution}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 		query = """
@@ -64,7 +58,8 @@ class ExchangeStorage:
 			VALUES (%s, %s, %s, %s, %s, %s)
 		"""
 		data = (code, place, capture_datetime_formatted, species, catcher, pollution)
-		return cls.execute_query(query, data)
+		result = cls.execute_query(query, data)
+		return result
 
 	# Вставка записей бумажного журнала первичной регистрации
 	@classmethod
@@ -117,3 +112,49 @@ class ExchangeStorage:
 					cls.capture_datetime_string_format)
 
 		return results
+
+	@classmethod
+	def insert_dead(cls, code, dead_datetime, arms_id, tg_nickname):
+		# print(
+		# 	f'insert_dead. code: {code}, dead_datetime: {dead_datetime}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
+		"""
+		Метод для внесения записи о погибшем животном в таблицу animals_dead.
+
+		:param code: QR-код животного (уникальный идентификатор).
+		:param dead_datetime: Дата и время смерти животного (формат datetime или строка).
+		:param arms_id: Идентификатор рабочего места.
+		:param tg_nickname: Никнейм пользователя Telegram.
+		:return: ID вставленной записи или None в случае ошибки.
+		"""
+		# 1. Найти animal_id по bar_code
+		find_animal_query = "SELECT id FROM animals WHERE bar_code = %s"
+		animal_data = cls.execute_query(find_animal_query, (code,), fetch=True)
+
+		if not animal_data:
+			print(f"Животное с bar_code {code} не найдено.")
+			return None
+
+		animal_id = animal_data[0]["id"]
+
+		dead_datetime = datetime.strptime(dead_datetime, cls.capture_datetime_string_format)
+		dead_datetime_formatted = dead_datetime.strftime(cls.capture_datetime_db_format)
+
+		# 2. Вставить запись в таблицу animals_dead
+		insert_query = """
+				INSERT INTO animals_dead (animal_id, datetime, arms_id, tg_nickname)
+				VALUES (%s, %s, %s, %s)
+			"""
+		data = (animal_id, dead_datetime_formatted, arms_id, tg_nickname)
+
+		try:
+			# Выполняем запрос на вставку
+			last_row_id = cls.execute_query(insert_query, data)
+			if last_row_id is not None:
+				print(f"Запись успешно добавлена в таблицу animals_dead. QR: {code}")
+				return last_row_id
+			else:
+				print(f"Ошибка при добавлении записи в таблицу animals_dead. QR: {code}")
+				return None
+		except Exception as e:
+			print(f"Ошибка при выполнении запроса: {e}")
+			return None
