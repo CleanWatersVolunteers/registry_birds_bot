@@ -75,3 +75,6 @@ ALTER TABLE `place_history` ADD CONSTRAINT `unique_animal_datetime` UNIQUE (`ani
 
 -- Добавить составной уникальный ключ animal_id + datetime для place_history #357
 ALTER TABLE history ADD CONSTRAINT unique_animal_datetime_manipulation_arm UNIQUE (animal_id, datetime, manipulation_id, arm_id);
+
+-- Добавить составной уникальный ключ animal_id, type_id, datetime для values_history #362
+ALTER TABLE values_history ADD CONSTRAINT unique_animal_type_datetime UNIQUE (animal_id, type_id, datetime);

@@ -193,6 +193,7 @@ CREATE TABLE IF NOT EXISTS `values_history` (
   `datetime` datetime NOT NULL,
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_animal_type_datetime` (`animal_id`,`type_id`,`datetime`),
   KEY `fk_values_history_values_history_type1_idx` (`type_id`),
   KEY `fk_values_history_animals1_idx` (`animal_id`),
   CONSTRAINT `fk_values_history_animals1` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
