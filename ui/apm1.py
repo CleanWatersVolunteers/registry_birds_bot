@@ -47,7 +47,8 @@ def validate_datetime(user, date_input, time_input):
 	if time1 < time2 or time_diff.days > 0:
 		return (
 			f'{const.text_incorrect} {user_input_time} \n{apm1_wrong_time_input} \n{apm1_text_date}',
-			{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
+			[{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today'}],
+			[{const.text_cancel: 'entry_cancel'}],
 			None
 		)
 	else:
@@ -88,7 +89,8 @@ def apm1_get_time(code):
 def apm1_get_date(code):
 	return (
 		f'{const.text_animal_number} {code}\n{apm1_text_date}',
-		{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today', const.text_cancel: 'entry_cancel'},
+		[{const.text_yesterday: 'apm1_yesterday', const.text_today: 'apm1_today'},
+		 {const.text_cancel: 'entry_cancel'}],
 		None
 	)
 

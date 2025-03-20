@@ -35,7 +35,7 @@ def nanny_weighing(msg, user, username) -> (str,):
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_weight
 		return (
 			f'{const.text_animal_number} {user['bar_code']}\n{error_text}\n{nanny_text_weighing_action}',
-			[{const.text_cancel: 'entry_cancel'}],
+			{const.text_cancel: 'entry_cancel'},
 			'apm6_weighing'
 		)
 	else:
@@ -50,7 +50,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_fish_number
 		return (
 			f'{const.text_animal_number} {user['bar_code']}\n{error_text}\n{nanny_text_entry_fish}',
-			[{const.text_cancel: 'entry_cancel'}],
+			{const.text_cancel: 'entry_cancel'},
 			'apm6_feeding'
 		)
 	else:
@@ -82,7 +82,7 @@ def apm6_show_mpls(user):
 		text += f'{const.manipulation_not_found}\n'
 	kbd[const.text_done] = 'apm6_done'
 	text += f'{const.text_line}\n{const.text_manipulation_done}'
-	return text, [kbd]
+	return text, kbd
 
 
 ##################################
@@ -104,7 +104,7 @@ def apm6_start(user_id, text, key=None):
 		if animal == {}:
 			return (
 				const.animal_not_found.format(code=text),
-				[{const.text_ok: "entry_cancel"}],
+				{const.text_ok: "entry_cancel"},
 				None
 			)
 		user['animal_id'] = animal['animal_id']
@@ -122,13 +122,13 @@ def apm6_button(user, text, key):
 		if int(manipulation_id) == feeding_manipulations_id:
 			return (
 				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_entry_fish}',
-				[{const.text_cancel: "entry_cancel"}],
+				{const.text_cancel: "entry_cancel"},
 				'apm6_feeding'
 			)
 		elif int(manipulation_id) == weighting_manipulations_id:
 			return (
 				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_weighing_action}',
-				[{const.text_cancel: 'entry_cancel'}],
+				{const.text_cancel: 'entry_cancel'},
 				'apm6_weighing'
 			)
 		elif int(manipulation_id) == const.diarrhea_manipulations_id:

@@ -10,7 +10,7 @@ from logs import my_logger
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 
-from database import Database as db
+from database import Database as Db
 from storage import QRCodeStorage
 from ui.entry import entry_start, entry_button, entry_photo, SUPERVISOR_ARM
 from ui.gen import (
@@ -29,17 +29,22 @@ TEXT_QR_NOT_PREVIOUSLY_PRINTED = "❌ Этот код не был распеча
 
 SLEEP = 5 * 60
 
-db.init()
+Db.init()
+
 
 def kbd_to_inline(text_list):
 	keyboard = []
-	for text_line in text_list:
-		line = []
-		for btn in text_line:
-			line.append(InlineKeyboardButton(callback_data=text_line[btn], text=btn))
-		keyboard.append(line)
+	if isinstance(text_list, dict):
+		for key in text_list:
+			keyboard.append([InlineKeyboardButton(key, callback_data=text_list[key])])
+	else:
+		for text_line in text_list:
+			line = []
+			for btn in text_line:
+				line.append(InlineKeyboardButton(callback_data=text_line[btn], text=btn))
+			keyboard.append(line)
 	return keyboard
-	
+
 
 async def cb_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	text, keyboard = entry_start(update['message']['from']['username'], update['message']['from']['id'],
@@ -97,7 +102,7 @@ async def cb_cmd_gen(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 	try:
 		user_id = update['message']['from']['id']
-		user = db.get_user(user_id)
+		user = Db.get_user(user_id)
 		if user["apm"]["place_id"] != SUPERVISOR_ARM:
 			await update.message.reply_text("❌ Команда запрещена")
 			return None
