@@ -24,9 +24,6 @@ def process_csv(nickname, file_name):
 
 			# Форматируем даты и времена
 			dead_datetime = f"{date} {time}"
-			# Пример вызова метода
-			# bar_code = 12345
-			# dead_datetime = "2023-10-25 14:30:00"  # Можно также использовать datetime.datetime.now()
 			arms_id = 1
 			result = ExchangeStorage.insert_dead(code, dead_datetime, arms_id, nickname)
 			if result is not None:
