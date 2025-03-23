@@ -6,11 +6,11 @@ import csv
 import sys
 from exchange_storage import ExchangeStorage
 
-DEFAULT_POLLUTION = 'Не установлено'
-DEFAULT_CATCHER = 'Нет'
+DEFAULT_POLLUTION = 'Нет'
+YEAR = '.2025'
 
 
-# code,date,capture_time,registration_time,type,place
+# code,date,capture_time,registration_time,species,place,catcher
 # 234,07.03,12:50,16:45,Чомга,Пляж
 def process_csv(nickname, file_name):
 	with open(file_name, mode='r', encoding='utf-8') as file:
@@ -22,11 +22,15 @@ def process_csv(nickname, file_name):
 			row_count += 1
 			# Извлекаем значения из строки и подготавливаем даты
 			code = row['code']
-			date = row['date'] + '.2025'  # Добавляем год к дате
-			capture_time = row['capture']
-			registration_time = row['registration']
+			date = row['date'] + YEAR  # Добавляем год к дате
+			capture_time = row['capture_time']
+			registration_time = row['registration_time']
 			species = row['species']
 			place = row['place']
+			if 'catcher' in row:
+				catcher = row['catcher']
+			else:
+				catcher = 'нет'
 
 			# Форматируем даты и времена
 			capture_date = f"{date} {capture_time}"
@@ -39,7 +43,7 @@ def process_csv(nickname, file_name):
 				'species': species,
 				'place': place,
 				'pollution': DEFAULT_POLLUTION,
-				'catcher': DEFAULT_CATCHER
+				'catcher': catcher
 			}
 			animal_result = ExchangeStorage.insert_animal(code=result_dict["code"],
 														  capture_datetime=result_dict["capture_datetime"],
