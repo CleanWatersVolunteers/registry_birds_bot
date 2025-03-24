@@ -65,8 +65,12 @@ class TimeTools:
 		return datetime.strptime(value, const.datetime_format)
 
 	@classmethod
-	def formatTimeInterval(cls, capture_datetime):
-		delta = datetime.now() - capture_datetime
+	def formatTimeInterval(cls, start_datetime, end_datetime=None):
+		if end_datetime is None:
+			end_datetime = datetime.now()
+			delta = end_datetime - start_datetime
+		else:
+			delta = start_datetime - end_datetime
 		total_seconds = int(delta.total_seconds())
 
 		if total_seconds < SECONDS_IN_DAY:  # Менее 24 часов

@@ -14,7 +14,7 @@ apm2_place_id = 2
 
 def apm2_start(user_id, text, key=None):
 	user = Db.get_user(user_id)
-	checkDead = Tools.checkDead(text)
+	checkDead = Tools.checkLeave(text)
 	if checkDead is not False:
 		return checkDead
 	animal = Storage.get_animal_by_bar_code(text)

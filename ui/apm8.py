@@ -14,7 +14,7 @@ apm8_text_confirm = 'Подтвердите поступление'
 
 def apm8_start(user_id, text, key=None):
 	user = Db.get_user(user_id)
-	check_dead = Tools.checkDead(text)
+	check_dead = Tools.checkLeave(text)
 	if check_dead is not False:
 		return check_dead
 	animal = Storage.get_animal_by_bar_code(text)

@@ -195,6 +195,9 @@ def get_state_item(user, location_id, start_datetime=None, end_datetime=None):
 	if place_counts is not None:
 		for item in place_counts:
 			text += f'{item['name']}: {item['count']}\n'
+	outside_count = Storage.count_animals_outside(location_id, start_datetime, end_datetime)
+	if outside_count > 0:
+		text += f'Выбыло: {outside_count}\n'
 	dead_count = Storage.count_animals_dead(location_id, start_datetime, end_datetime)
 	text += f'Погибло: {dead_count}'
 	return text

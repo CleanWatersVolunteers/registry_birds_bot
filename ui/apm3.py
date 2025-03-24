@@ -16,7 +16,7 @@ apm3_place_id = 3
 def apm3_start(user_id, text, key=None):
 	user = Db.get_user(user_id)
 	if key is None:
-		checkDead = Tools.checkDead(text)
+		checkDead = Tools.checkLeave(text)
 		if checkDead is not False:
 			return checkDead
 		animal = Storage.get_animal_by_bar_code(text)
