@@ -41,6 +41,7 @@ def nanny_weighing(msg, user, username) -> (str,):
 	else:
 		Storage.insert_value_history(animal_id=user['animal_id'], type_id=weighting_history_type_id, value=int(msg),
 									 tg_nickname=username)
+		user['there_are_changes'] = True
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
@@ -56,6 +57,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 	else:
 		Storage.insert_value_history(animal_id=user['animal_id'], type_id=feeding_history_type_id, value=int(msg),
 									 tg_nickname=username)
+		user['there_are_changes'] = True
 		text, kbd = apm6_show_mpls(user)
 		return text, kbd, None
 
@@ -107,6 +109,7 @@ def apm6_start(user_id, text, key=None):
 				{const.text_ok: "entry_cancel"},
 				None
 			)
+		user['there_are_changes'] = False
 		user['animal_id'] = animal['animal_id']
 		user['capture_datetime'] = animal['capture_datetime']
 		user['bar_code'] = text
@@ -146,22 +149,26 @@ def apm6_button(user, text, key):
 				arms_id=user['apm']['arm_id'],
 				tg_nickname=user['name']
 			)
+			user['there_are_changes'] = True
 			text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_done':
-		# todo Использовать arm_id из базы #154
-		arm_id = Storage.get_arm_id(apm6_place_id, user['location_id'])
-		# todo Использовать arm_id из базы #154
-		Storage.insert_place_history(arm_id, user['animal_id'], user['name'])
+		if user['there_are_changes']:
+			# todo Использовать arm_id из базы #154
+			arm_id = Storage.get_arm_id(apm6_place_id, user['location_id'])
+			# todo Использовать arm_id из базы #154
+			Storage.insert_place_history(arm_id, user['animal_id'], user['name'])
 		return None, None, None
 	elif key == 'apm6_diarrhea_yes':
 		Storage.insert_value_history(animal_id=user['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
+		user['there_are_changes'] = True
 		text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_diarrhea_no':
 		Storage.insert_value_history(animal_id=user['animal_id'], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
+		user['there_are_changes'] = True
 		text, kbd = apm6_show_mpls(user)
 	# todo Local variable 'kbd' might be referenced before assignment
 	return text, kbd, None
