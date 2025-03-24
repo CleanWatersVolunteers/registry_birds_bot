@@ -8,7 +8,7 @@ class const:
 	text_incorrect = 'Неверный ввод:'
 	text_animal_number = 'Животное №:'
 	text_exit = 'Выход'
-	animal_not_found = '❌ Животное с номером {code} не найдено!'
+	animal_not_found = '❌ Животное с номером {code} не найдено! Возможно оно не прошло регистрацию на мойке.'
 	animal_is_dead = '❌ Животное {code} погибло.'
 	animal_is_out = '❌ Животное {code} выбыло.'
 	manipulation_not_found = '❌ Манипуляции не найдены!'
