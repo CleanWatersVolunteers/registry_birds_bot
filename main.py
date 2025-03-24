@@ -164,7 +164,7 @@ async def main() -> None:
 	await application.start()
 	await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
-	my_logger.info("Bot 'Registry Birds v1.0.0' enabled")
+	my_logger.info("Bot 'Registry Birds v1.1.0' enabled")
 
 	while True:
 		await asyncio.sleep(SLEEP)
