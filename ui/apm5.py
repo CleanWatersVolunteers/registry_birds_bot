@@ -133,6 +133,7 @@ def apm5_start(user_id, text, key=None):
 			)
 		user['mpl_list'] = []
 		user['animal'] = animal
+		user['there_are_changes'] = False
 		dead_info = Storage.get_animal_dead(animal["bar_code"])
 		user['animal']['is_dead'] = dead_info is not None
 		out_info = Storage.get_animal_outside(animal["bar_code"])
@@ -153,6 +154,7 @@ def apm5_start(user_id, text, key=None):
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_clinical_condition', const.text_cancel: 'entry_cancel'}, None
 	if key == 'apm5_note':
+		user['there_are_changes'] = True
 		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=apm5_note_history_type_id,
 									 value=text,
 									 tg_nickname=user['name'])
@@ -166,10 +168,11 @@ def apm5_button(user, text, key):
 	if key == 'apm5_animal_dead':
 		return apm5_animal_dead(user)
 	if key == 'apm5_done':
-		# todo Использовать arm_id из базы #154
-		arm_id = Storage.get_arm_id(apm5_place_id, user['location_id'])
-		# todo Использовать arm_id из базы #154
-		Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+		if user['there_are_changes']:
+			# todo Использовать arm_id из базы #154
+			arm_id = Storage.get_arm_id(apm5_place_id, user['location_id'])
+			# todo Использовать arm_id из базы #154
+			Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
 		return None, None, None
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
@@ -199,21 +202,25 @@ def apm5_button(user, text, key):
 			user["mpl_list"].append(key_id)
 			Storage.insert_history(manipulation_id=key_id, animal_id=user['animal']['animal_id'],
 								   arms_id=user['apm']['arm_id'], tg_nickname=user['name'])
+			user['there_are_changes'] = True
 	elif key == 'apm5_diarrhea_yes':
 		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
+		user['there_are_changes'] = True
 	elif key == 'apm5_diarrhea_no':
 		user["mpl_list"].append(str(const.diarrhea_manipulations_id))
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=const.diarrhea_history_type_id,
 									 value=const.text_no,
 									 tg_nickname=user['name'])
+		user['there_are_changes'] = True
 	elif key == 'apm5_neurological_yes':
 		user["mpl_list"].append(str(apm5_neurological_manipulations_id))
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=apm5_neurological_history_type_id,
 									 value=const.text_yes,
 									 tg_nickname=user['name'])
+		user['there_are_changes'] = True
 	elif key == 'apm5_neurological_no':
 		user["mpl_list"].append(str(apm5_neurological_manipulations_id))
 		Storage.insert_value_history(animal_id=user['animal']["animal_id"], type_id=apm5_neurological_history_type_id,
@@ -221,5 +228,6 @@ def apm5_button(user, text, key):
 									 tg_nickname=user['name'])
 	elif key == 'apm5_clinical_condition':
 		Storage.update_animal(animal_id=user['animal']['animal_id'], clinical_condition_admission=user['clinic_state'])
+		user['there_are_changes'] = True
 	text, kbd = apm5_show_mpls(user)
 	return text, kbd, None
