@@ -63,7 +63,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 def apm6_show_mpls(user):
 	kbd = dict()
 	text = f'{const.text_animal_number} {user['bar_code']}\n{const.text_line}\n'
-	history = history_get_info(user['animal_id'], week_db())
+	history = history_get_info(user['animal_id'], user['capture_datetime'], week_db())
 	if history is not None:
 		text += f'{history}\n'
 	weight_change = get_diff_values_history(user['animal_id'], const.history_type_weight)
@@ -97,7 +97,7 @@ def apm6_start(user_id, text, key=None):
 		return nanny_weighing(text, user, user['name'])
 
 	if key is None:
-		checkDead = Tools.checkDead(text)
+		checkDead = Tools.checkLeave(text)
 		if checkDead is not False:
 			return checkDead
 		animal = Storage.get_animal_by_bar_code(text)
@@ -108,6 +108,7 @@ def apm6_start(user_id, text, key=None):
 				None
 			)
 		user['animal_id'] = animal['animal_id']
+		user['capture_datetime'] = animal['capture_datetime']
 		user['bar_code'] = text
 		user['mpl_list'] = []
 	text, kbd = apm6_show_mpls(user)

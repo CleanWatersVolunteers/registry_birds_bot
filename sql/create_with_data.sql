@@ -45,6 +45,19 @@ CREATE TABLE IF NOT EXISTS `animals_dead` (
   CONSTRAINT `fk_arms_id` FOREIGN KEY (`arms_id`) REFERENCES `arms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Дамп структуры для таблица registry_birds.animals_outside
+CREATE TABLE IF NOT EXISTS `animals_outside` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `animal_id` int NOT NULL,
+  `datetime` datetime NOT NULL,
+  `tg_nickname` varchar(50) NOT NULL,
+  `description` varchar(50) NOT NULL,
+  `arms_id` int NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `id_UNIQUE` (`id`) USING BTREE,
+  UNIQUE KEY `unique_animal_id` (`animal_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Дамп структуры для таблица registry_birds.arms
 CREATE TABLE IF NOT EXISTS `arms` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -128,7 +141,7 @@ INSERT INTO `manipulations` (`id`, `name`, `place_list`) VALUES
 	(2, 'Отказ от еды', '6'),
 	(3, 'Отказ от питья', '6'),
 	(4, 'Энтерофурил', '4,5,6'),
-	(5, 'Рингер 50/50 + Глюкоза 10мл', '4,5'),
+	(5, 'Рингер 10ми + Глюкоза 10мл', '4,5'),
 	(6, 'Бриллиантовые глаза', '4'),
 	(7, 'Взвешивание', '6'),
 	(8, 'Степень упитанности', '4'),
@@ -193,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `values_history` (
   `datetime` datetime NOT NULL,
   `tg_nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_animal_type_datetime` (`animal_id`,`type_id`,`datetime`),
   KEY `fk_values_history_values_history_type1_idx` (`type_id`),
   KEY `fk_values_history_animals1_idx` (`animal_id`),
   CONSTRAINT `fk_values_history_animals1` FOREIGN KEY (`animal_id`) REFERENCES `animals` (`id`),
@@ -207,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `values_history_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Дамп данных таблицы registry_birds.values_history_type: ~7 rows (приблизительно)
+-- Дамп данных таблицы registry_birds.values_history_type: ~8 rows (приблизительно)
 INSERT INTO `values_history_type` (`id`, `name`, `units`) VALUES
 	(1, 'Съедено рыбы', 'шт.'),
 	(2, 'Вес', 'гр.'),

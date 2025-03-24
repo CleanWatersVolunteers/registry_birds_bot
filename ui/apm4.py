@@ -63,7 +63,7 @@ def apm4_start(user_id, text, key=None):
 		Storage.insert_value_history(animal_id=user["animal_id"], type_id=mucous_history_type_id, value=text,
 									 tg_nickname=user['name'])
 	if key is None:
-		checkDead = Tools.checkDead(text)
+		checkDead = Tools.checkLeave(text)
 		if checkDead is not False:
 			return checkDead
 		animal = Storage.get_animal_by_bar_code(text)

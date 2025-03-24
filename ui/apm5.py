@@ -39,13 +39,14 @@ def apm5_add_hdr_item(label, value):
 	return text
 
 
-def apm5_show_mpls(user, dead_info=None):
+def apm5_show_mpls(user, dead_info=None, out_info=None):
 	kbd = dict()
 	text = f'{apm5_get_animal_card(user)}\n'
-	history = history_get_info(user['animal']['animal_id'], week_db(), dead_info)
+	history = history_get_info(user['animal']['animal_id'], user['animal']['capture_datetime'], week_db(), dead_info,
+							   out_info)
 	if history is not None:
 		text += f'{history}\n'
-	if user['animal']['is_dead'] is False:
+	if user['animal']['is_dead'] is False and user['animal']['is_out'] is False:
 		mpls = Storage.get_manipulations(apm5_place_id)
 		if len(mpls) > 0:
 			text += f'{const.text_line}\n'
@@ -78,7 +79,8 @@ def apm5_get_animal_card(user):
 		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
 		text += apm5_add_hdr_item(const.text_capture_time, animal['capture_datetime'].strftime(const.datetime_format))
-		text += f'({TimeTools.formatTimeInterval(animal['capture_datetime'])})\n'
+		if user['animal']['is_dead'] is False and user['animal']['is_out'] is False:
+			text += f'({TimeTools.formatTimeInterval(start_datetime=animal['capture_datetime'])})\n'
 		text += apm5_add_hdr_item(history_text_pollution_degree, animal['degree_pollution'])
 		text += apm5_add_hdr_item(history_text_weight,
 								  f"{animal['weight']} гр." if animal['weight'] else history_text_not_specified)
@@ -133,6 +135,8 @@ def apm5_start(user_id, text, key=None):
 		user['animal'] = animal
 		dead_info = Storage.get_animal_dead(animal["bar_code"])
 		user['animal']['is_dead'] = dead_info is not None
+		out_info = Storage.get_animal_outside(animal["bar_code"])
+		user['animal']['is_out'] = out_info is not None
 		if animal['clinical_condition_admission'] is None:
 			return (
 				f'{const.text_animal_number} {user['animal']['bar_code']}\n{apm5_text_clinic_state}',
@@ -140,7 +144,7 @@ def apm5_start(user_id, text, key=None):
 				'apm5_clinic_state'
 			)
 		user['mpl_list'] = []
-		text, kbd = apm5_show_mpls(user, dead_info)
+		text, kbd = apm5_show_mpls(user, dead_info, out_info)
 		return text, kbd, None
 	if key == 'apm5_clinic_state':
 		user['clinic_state'] = text

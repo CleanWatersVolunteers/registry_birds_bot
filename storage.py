@@ -440,11 +440,55 @@ class Storage:
 	@classmethod
 	def get_animal_dead(cls, bar_code):
 		query = """
-			SELECT ad.*
+			SELECT "dead", datetime, tg_nickname
 			FROM animals_dead ad
 			JOIN animals a ON ad.animal_id = a.id
 			WHERE a.bar_code = %s
 			"""
+		result = cls.execute_query(query, (bar_code,), fetch=True)
+		if result and len(result) > 0:
+			return result
+		return None
+
+	@classmethod
+	def count_animals_outside(cls, location_id, start_datetime=None, end_datetime=None):
+		my_logger.info(
+			f'count_animals_outside location_id: {location_id}, start_datetime: {start_datetime}, end_datetime: {end_datetime}')
+		"""
+		Возвращает количество записей в таблице animals_outside для указанного location_id
+		и временного диапазона [start_datetime, end_datetime]."""
+		query = """
+		SELECT COUNT(*) AS count
+		FROM animals_outside ao 
+		JOIN arms a ON ao.arms_id = a.id
+		"""
+		where = " WHERE a.location_id = %s"
+		params = [location_id]
+		if start_datetime is not None:
+			where += " AND ao.datetime >= %s"
+			params.append(start_datetime)
+		if end_datetime is not None:
+			where += " AND ao.datetime <= %s"
+			params.append(end_datetime)
+		results = cls.execute_query(query + where, tuple(params), fetch=True)
+		if results and len(results) > 0:
+			return results[0]["count"]
+		return 0
+
+	@classmethod
+	def get_animal_outside(cls, bar_code):
+		"""
+		Получает запись из таблицы animals_outside по bar_code.
+
+		:param bar_code: QR-код животного для поиска.
+		:return: Словарь с данными записи или None, если запись не найдена.
+		"""
+		query = """
+					SELECT "outside", datetime, tg_nickname, description
+					FROM animals_outside ao
+					JOIN animals a ON ao.animal_id = a.id
+					WHERE a.bar_code = %s
+					"""
 		result = cls.execute_query(query, (bar_code,), fetch=True)
 		if result and len(result) > 0:
 			return result
