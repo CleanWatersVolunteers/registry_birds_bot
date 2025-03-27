@@ -8,6 +8,7 @@ from timetools import TimeTools
 from timetools import now
 from timetools import today
 from timetools import yesterday
+from utils.spreadsheets import exportNewAnimal
 
 apm1_place_id = 1
 
@@ -198,5 +199,12 @@ def apm1_button(user, msg, key):
 			# todo Использовать arm_id из базы #154
 			arm_id = Storage.get_arm_id(apm1_place_id, user["location_id"])
 			# todo Использовать arm_id из базы #154
-			Storage.insert_place_history(arm_id, animal_id, user['name'])
+			if Storage.insert_place_history(arm_id, animal_id, user['name']) is not None:
+				# todo По хорошему нужно брать register_datetime из таблицы place_history
+				exportNewAnimal(code=user["code"], capture_datetime=user["capture_datetime"],
+								place=user["place"],
+								species=user['species'],
+								catcher=user['catcher'],
+								pollution=user["pollution"],
+								register_datetime=now())
 	return None, None, None
