@@ -1,0 +1,14 @@
+python-telegram-bot==21.11.1
+opencv-contrib-python==4.11.0.86
+opencv-python==4.11.0.86
+pytz==2025.1
+pyzbar==0.1.9
+mysql-connector-python==9.2.0
+numpy==2.2.3
+PyPDF2==3.0.1
+reportlab==4.3.1
+python-dotenv==1.0.1
+gspread==6.2.0
+oauth2client==3.2.2
+sqlalchemy==2.0.39
+PyMySQL==1.1.1

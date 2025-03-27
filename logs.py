@@ -1,24 +1,29 @@
+import logging as log
+from logging.handlers import TimedRotatingFileHandler
 
-from datetime import datetime
-import pytz
-curr_time = lambda: datetime.now().isoformat()
+log.basicConfig(
+	level=log.WARNING,
+	format="%(asctime)s - %(levelname)s - %(message)s",
+	datefmt="%Y-%m-%d %H:%M:%S",
+	handlers=[
+		log.StreamHandler(),  # Вывод в консоль
+		TimedRotatingFileHandler(
+			filename="app.log",  # Базовое имя файла
+			when="midnight",  # Интервал: каждый день в полночь
+			interval=1,  # Каждый 1 день
+			# backupCount=7,  # Сохранять последние 7 файлов
+			encoding="utf-8"  # Кодировка файла
+		)
+	]
+)
 
+# Создание нашего логгера
+my_logger = log.getLogger('my_script_logger')
+my_logger.setLevel(log.INFO)
 
-class log:
-    @classmethod
-    def init(cls, name):
-        cls.__name = name
-
-    @classmethod
-    def logi(cls, log):
-        text = f'[..] {log}'
-        # with open(cls.__name, 'a') as f:
-        #     f.write(text)
-        print(text)
-
-    @classmethod
-    def loge(cls, log):
-        text = f'[!!] {log}'
-        # with open(cls.__name, 'a') as f:
-        #     f.write(text)
-        print(text)
+# Запись сообщений в лог
+# my_logger.debug("Отладочная информация")
+# my_logger.info("Информационное сообщение")
+# my_logger.warning("Предупреждение")
+# my_logger.error("Ошибка")
+# my_logger.critical("Критическая ошибка")

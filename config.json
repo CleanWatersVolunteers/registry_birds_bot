@@ -1,0 +1,6 @@
+{
+    "database": "registry_birds",
+    "user": "user",
+    "password": "pass",
+    "host": "localhost"
+}
