@@ -261,3 +261,21 @@ code,date,time
 ```
 /root/venv/bin/python3 dead_import.py Palmman 03.06_dead.csv
 ```
+
+## Экспорт в googe-таблицы
+Для заполнения Google-таблиц с помощью Python можно использовать библиотеку gspread , которая предоставляет удобный интерфейс для работы с Google Sheets через API. Вот пошаговое руководство:
+
+1. Установить библиотеки gspread и oauth2client:
+2. Создание учетных данных (credentials)
+3. Перейдите в [Google Cloud Console](https://console.cloud.google.com/welcome) . 
+4. Создайте новый проект или выберите существующий.
+5. Включите Google Sheets API и Google Drive API для проекта.
+6. Создайте учетные данные (Service Account):
+   Перейдите в раздел "APIs & Services > Credentials" .
+   Нажмите "Create Credentials" → "Service account" .
+   Заполните данные и создайте аккаунт.
+7. Скачайте JSON-файл с ключами (например, credentials.json).
+8. Добавление доступа к таблице
+   Откройте Google-таблицу, которую хотите редактировать.
+   Перейдите в настройки доступа (значок "Поделиться").
+   Добавьте email из созданного Service Account (находится в поле "client_email" в JSON-файле) и предоставьте доступ на редактирование.
