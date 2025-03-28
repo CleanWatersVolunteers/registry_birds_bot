@@ -1,8 +1,9 @@
 from const import const
+from logs import my_logger
 from storage import Storage
 from timetools import now
-from utils.spreadsheets import addVetOutgone
-from utils.spreadsheets import exportDeadAnimal
+from utils.spreadsheets import asyncAddVetOutgone
+from utils.spreadsheets import asyncExportDeadAnimal
 
 
 class Tools:
@@ -28,9 +29,11 @@ class Tools:
 	@classmethod
 	def dead(cls, animal_id, bar_code, arm_id, user_name):
 		Storage.create_dead_animal(animal_id, arm_id, user_name)
-		exportDeadAnimal(bar_code, now())
+		my_logger.debug('Start asyncExportDeadAnimal')
+		asyncExportDeadAnimal(bar_code, now())
 		# todo Убрать хардкод конда появится вторая локация
 		reg_arm_id = 1
 		reg_datetime = Storage.get_reg_time(animal_id, reg_arm_id)
 		if reg_datetime is not None:
-			addVetOutgone(bar_code, reg_datetime.strftime(const.datetime_format), now(), 'гибель')
+			my_logger.debug('Start asyncAddVetOutgone')
+			asyncAddVetOutgone(bar_code, reg_datetime.strftime(const.datetime_format), now(), 'гибель')
