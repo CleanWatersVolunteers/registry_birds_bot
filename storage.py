@@ -86,6 +86,33 @@ class Storage:
 		return cls.execute_query(select_query, data, fetch=True)
 
 	@classmethod
+	def get_reg_time(cls, animal_id, arm_id):
+		"""
+		Метод для получения значения datetime из таблицы place_history
+		по заданным animal_id и arm_id.
+
+		:param animal_id: ID животного.
+		:param arm_id: ID руки.
+		:return: datetime (если запись найдена) или None (если запись не найдена).
+		"""
+		query = """
+				SELECT datetime
+				FROM place_history
+				WHERE animal_id = %s AND arm_id = %s
+			"""
+		data = (animal_id, arm_id)
+
+		# Выполняем запрос
+		results = cls.execute_query(query, data, fetch=True)
+
+		if results:
+			return results[0]["datetime"]
+		else:
+			# Если запись не найдена, возвращаем None
+			my_logger.warning(f"Запись с animal_id={animal_id} и arm_id={arm_id} не найдена.")
+			return None
+
+	@classmethod
 	def get_animal_id(cls, bar_code):
 		select_query = "SELECT id FROM animals WHERE bar_code = %s"
 		result = cls.execute_query(select_query, (bar_code,), fetch=True)
