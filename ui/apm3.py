@@ -7,6 +7,7 @@ from tools import Tools
 
 apm3_text = f"Введите массу животного в граммах"
 apm3_place_id = 3
+apm3_text_skip = 'Пропустить'
 
 
 ##################################
@@ -30,17 +31,13 @@ def apm3_start(user_id, text, key=None):
 		if animal['weight'] is None:
 			return (
 				f'{const.text_animal_number} {text}\n{apm3_text}',
-				{const.text_cancel: "entry_cancel"},
+				[{const.text_cancel: "entry_cancel", apm3_text_skip: "apm3_show_dead"}],
 				'apm3_weight'
 			)
 		else:
 			dead_info = Storage.get_animal_dead(animal['bar_code'])
 			if dead_info is None:
-				return (
-					f'{const.text_animal_number} {animal['bar_code']}',
-					{const.text_animal_dead: 'apm3_animal_dead_confirmation', const.text_cancel: 'entry_cancel'},
-					None
-				)
+				return apm3_show_dead(animal['bar_code'])
 
 	if key == 'apm3_weight':
 		if not text.isdigit():
@@ -56,6 +53,14 @@ def apm3_start(user_id, text, key=None):
 			None
 		)
 	return None, None
+
+
+def apm3_show_dead(bar_code):
+	return (
+		f'{const.text_animal_number} {bar_code}',
+		{const.text_animal_dead: 'apm3_animal_dead_confirmation', const.text_cancel: 'entry_cancel'},
+		None
+	)
 
 
 def apm3_animal_dead_confirmation(user):
@@ -79,11 +84,15 @@ def apm3_button(user, msg, key):
 		# todo Использовать arm_id из базы #154
 		arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
 		# todo Использовать arm_id из базы #154
-		Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
-		Storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
-		user['weight'] = None  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
+		if Storage.get_reg_time(user['animal']['animal_id'], arm_id) is None:
+			Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+		if 'weight' in user:
+			Storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
+			del user['weight']  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
 	elif key == 'apm3_animal_dead_confirmation':
 		return apm3_animal_dead_confirmation(user)
 	elif key == 'apm3_animal_dead':
 		return apm3_animal_dead(user)
+	elif key == 'apm3_show_dead':
+		return apm3_show_dead(user['animal']['bar_code'])
 	return None, None, None
