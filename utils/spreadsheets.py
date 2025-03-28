@@ -14,6 +14,7 @@ scope = [
 ]
 
 DEAD_COLUMN = 8
+OUTGONE_COLUMN = 9
 
 MAIN_GOOGLE_SHEET = os.getenv('MAIN_GOOGLE_SHEET')
 MAIN_WORKSHEET_TITLE = 'Общий журнал'
@@ -66,6 +67,27 @@ def exportDeadAnimal(code, date_time):
 			if cell:
 				my_logger.debug(f"Найдено в строке {cell.row}, столбце {cell.col}")
 				result = worksheet.update_cell(cell.row, DEAD_COLUMN, date_time)
+				my_logger.debug(f'exportDeadAnimal, изменен: {result['updatedRange']}')
+			else:
+				my_logger.debug(f'exportDeadAnimal, не найдено животное: {code}')
+
+
+def asyncExportOutgoneAnimal(code, date_time, reason):
+	asyncio.create_task(asyncio.to_thread(
+		exportOutgoneAnimal, code, date_time, reason)
+	)
+
+
+def exportOutgoneAnimal(code, date_time, reason):
+	spreadsheet = openSheet(MAIN_GOOGLE_SHEET)
+	if spreadsheet is not None:
+		worksheet = ensure_worksheet_exists(spreadsheet, MAIN_WORKSHEET_TITLE)
+		if worksheet is not None:
+			cell = worksheet.find(str(code), in_column=1)
+			if cell:
+				my_logger.debug(f"Найдено в строке {cell.row}, столбце {cell.col}")
+				worksheet.update_cell(cell.row, OUTGONE_COLUMN, date_time)
+				result = worksheet.update_cell(cell.row, OUTGONE_COLUMN + 1, reason)
 				my_logger.debug(f'exportDeadAnimal, изменен: {result['updatedRange']}')
 			else:
 				my_logger.debug(f'exportDeadAnimal, не найдено животное: {code}')
