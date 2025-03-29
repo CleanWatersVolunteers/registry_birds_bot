@@ -5,6 +5,7 @@ from const import const
 from database import Database as Db
 from storage import Storage
 from timetools import week_db, TimeTools
+from tools import Tools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
 
@@ -110,10 +111,10 @@ def apm5_animal_dead_confirmation(user):
 
 
 def apm5_animal_dead(user):
-	animal_id = user['animal']['animal_id']
 	arm_id = Storage.get_arm_id(user['apm']['place_id'], user['location_id'])
 	if arm_id is not None:
-		Storage.create_dead_animal(animal_id, arm_id, user['name'])
+		animal_id = user['animal']['animal_id']
+		Tools.dead(animal_id, user['animal']['bar_code'], arm_id, user['name'])
 	return None, None, None
 
 

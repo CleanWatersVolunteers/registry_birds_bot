@@ -86,6 +86,33 @@ class Storage:
 		return cls.execute_query(select_query, data, fetch=True)
 
 	@classmethod
+	def get_reg_time(cls, animal_id, arm_id):
+		"""
+		Метод для получения значения datetime из таблицы place_history
+		по заданным animal_id и arm_id.
+
+		:param animal_id: ID животного.
+		:param arm_id: ID руки.
+		:return: datetime (если запись найдена) или None (если запись не найдена).
+		"""
+		query = """
+				SELECT datetime
+				FROM place_history
+				WHERE animal_id = %s AND arm_id = %s
+			"""
+		data = (animal_id, arm_id)
+
+		# Выполняем запрос
+		results = cls.execute_query(query, data, fetch=True)
+
+		if results:
+			return results[0]["datetime"]
+		else:
+			# Если запись не найдена, возвращаем None
+			my_logger.warning(f"Запись с animal_id={animal_id} и arm_id={arm_id} не найдена.")
+			return None
+
+	@classmethod
 	def get_animal_id(cls, bar_code):
 		select_query = "SELECT id FROM animals WHERE bar_code = %s"
 		result = cls.execute_query(select_query, (bar_code,), fetch=True)
@@ -449,6 +476,38 @@ class Storage:
 		if result and len(result) > 0:
 			return result
 		return None
+
+	@classmethod
+	def insert_animals_outside(cls, animal_id, tg_nickname, description, arms_id):
+		my_logger.info(
+			f'insert_animals_outside animal_id: {animal_id}, tg_nickname: {tg_nickname}, description: {description}, arms_id: {arms_id}')
+		"""
+		Метод для вставки записи в таблицу animals_outside.
+	
+		:param animal_id: ID животного.
+		:param tg_nickname: Никнейм пользователя Telegram.
+		:param description: Описание.
+		:param arms_id: ID рабочего места.
+		:return: ID вставленной записи или None в случае ошибки.
+		"""
+		query = """
+				INSERT INTO animals_outside (animal_id, datetime, tg_nickname, description, arms_id)
+				VALUES (%s, NOW(), %s, %s, %s)
+			"""
+		data = (animal_id, tg_nickname, description, arms_id)
+
+		try:
+			# Выполняем запрос на вставку
+			last_row_id = cls.execute_query(query, data)
+			if last_row_id is not None:
+				my_logger.debug(f"Запись успешно добавлена в таблицу animals_outside. ID: {last_row_id}")
+				return last_row_id
+			else:
+				my_logger.error("Ошибка при добавлении записи в таблицу animals_outside.")
+				return None
+		except Exception as e:
+			my_logger.error(f"Ошибка при выполнении запроса: {e}")
+			return None
 
 	@classmethod
 	def count_animals_outside(cls, location_id, start_datetime=None, end_datetime=None):
