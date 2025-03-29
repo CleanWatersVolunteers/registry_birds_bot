@@ -18,12 +18,14 @@ nanny_minimal_fish = 1
 # БД manipulations.id
 feeding_manipulations_id = 0
 weighting_manipulations_id = 7
+feeding_manual_manipulations_id = 19
 
 # БД values_history_type.id
 feeding_history_type_id = 1
 weighting_history_type_id = 2
+feeding_manual_history_type_id = 9
 
-nanny_text_entry_fish = 'Введите количество съеденных рыб'
+nanny_text_entry_fish = 'Введите вес съеденной еды в граммах'
 nanny_text_weighing_action = 'Введите массу животного в граммах'
 nanny_text_incorrect_digit = '❌ Вводите только цифры'
 nanny_text_incorrect_fish_number = '❌ Количество должно быть больше 0'
@@ -56,6 +58,23 @@ def nanny_feeding(msg, user, username) -> (str,):
 		)
 	else:
 		Storage.insert_value_history(animal_id=user['animal_id'], type_id=feeding_history_type_id, value=int(msg),
+									 tg_nickname=username)
+		user['there_are_changes'] = True
+		text, kbd = apm6_show_mpls(user)
+		return text, kbd, None
+
+
+def nanny_manual_feeding(msg, user, username) -> (str,):
+	if not msg.isdigit() or int(msg) < nanny_minimal_fish:
+		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_fish_number
+		return (
+			f'{const.text_animal_number} {user['bar_code']}\n{error_text}\n{nanny_text_entry_fish}',
+			{const.text_cancel: 'entry_cancel'},
+			'apm6_feeding'
+		)
+	else:
+		Storage.insert_value_history(animal_id=user['animal_id'], type_id=feeding_manual_history_type_id,
+									 value=int(msg),
 									 tg_nickname=username)
 		user['there_are_changes'] = True
 		text, kbd = apm6_show_mpls(user)
@@ -95,6 +114,8 @@ def apm6_start(user_id, text, key=None):
 	user = Db.get_user(user_id)
 	if key == 'apm6_feeding':
 		return nanny_feeding(text, user, user['name'])
+	elif key == 'apm6_feeding_manual':
+		return nanny_manual_feeding(text, user, user['name'])
 	elif key == 'apm6_weighing':
 		return nanny_weighing(text, user, user['name'])
 
@@ -128,6 +149,12 @@ def apm6_button(user, text, key):
 				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_entry_fish}',
 				{const.text_cancel: "entry_cancel"},
 				'apm6_feeding'
+			)
+		elif int(manipulation_id) == feeding_manual_manipulations_id:
+			return (
+				f'{const.text_animal_number} {user['bar_code']}\n{nanny_text_entry_fish}',
+				{const.text_cancel: 'entry_cancel'},
+				'apm6_feeding_manual'
 			)
 		elif int(manipulation_id) == weighting_manipulations_id:
 			return (
