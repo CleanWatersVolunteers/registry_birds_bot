@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.exc import IntegrityError  # Основное исключение SQLAlchemy
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError  # Основное исключение SQLAlchemy
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 # from pymysql.err import IntegrityError as PymysqlIntegrityError  # Исключение драйвера pymysql
@@ -63,6 +63,18 @@ class AnimalDead(Base):
 	datetime = Column(DateTime, nullable=False)
 	arms_id = Column(Integer, nullable=False)
 	tg_nickname = Column(String(50), nullable=False)
+
+
+# Определение ORM-модели для таблицы animals_outside
+class AnimalOutside(Base):
+	__tablename__ = "animals_outside"
+
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	animal_id = Column(Integer, nullable=False)
+	datetime = Column(DateTime, nullable=False)
+	tg_nickname = Column(String(50), nullable=False)
+	description = Column(String(50), nullable=False)
+	arms_id = Column(Integer, nullable=False)
 
 
 class ExchangeStorage:
@@ -237,5 +249,78 @@ class ExchangeStorage:
 			db.rollback()
 			print(f"Ошибка при добавлении записи о погибшем животном: {e}")
 			return None
+		finally:
+			db.close()
+
+	@classmethod
+	def get_animals_dead_list(cls):
+		"""
+		Метод для получения списка записей из таблицы animals_dead с JOIN таблицы animals.
+		Дополнительно извлекается поле bar_code из таблицы animals.
+
+		:return: Список словарей с данными из таблиц animals_dead и animals.
+				 Возвращает пустой список в случае ошибки.
+		"""
+		db = cls.get_session()
+		try:
+			# Выполняем запрос с JOIN между AnimalDead и Animal
+			query = (
+				db.query(
+					Animal.bar_code,
+					AnimalDead.datetime,
+				)
+				.join(Animal, AnimalDead.animal_id == Animal.id)
+				.all()
+			)
+
+			# Преобразуем результаты в список словарей
+			result = [
+				{
+					"bar_code": row.bar_code,
+					"datetime": row.datetime.strftime(cls.capture_datetime_string_format),
+				}
+				for row in query
+			]
+			return result
+		except SQLAlchemyError as e:
+			print(f"Ошибка при выполнении запроса: {e}")
+			return []
+		finally:
+			db.close()
+
+	@classmethod
+	def get_animals_outside(cls):
+		"""
+		Метод для получения списка записей из таблицы animals_outside.
+
+		:return: Список словарей с данными из таблицы animals_outside.
+				 Возвращает пустой список в случае ошибки.
+		"""
+		db = cls.get_session()
+		try:
+			# Выполняем запрос к таблице animals_outside
+			query = (
+				db.query(
+					Animal.bar_code,
+					AnimalOutside.datetime,
+					AnimalOutside.description
+				)
+				.join(Animal, AnimalOutside.animal_id == Animal.id)
+				.all())
+
+			# Преобразуем результаты в список словарей
+			result = [
+				{
+					"bar_code": row.bar_code,
+					"datetime": row.datetime.strftime(cls.capture_datetime_string_format),
+					"description": row.description,
+				}
+				for row in query
+			]
+			return result
+
+		except SQLAlchemyError as e:
+			print(f"Ошибка при выполнении запроса: {e}")
+			return []
 		finally:
 			db.close()

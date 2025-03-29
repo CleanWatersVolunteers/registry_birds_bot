@@ -7,7 +7,7 @@ load_dotenv()
 import csv
 
 from exchange_storage import ExchangeStorage
-from utils.spreadsheets import exportAnimalList
+from utils.spreadsheets import exportAnimalList, exportDeadAnimalList, exportOutsideAnimalList
 
 
 def save_animals_to_csv():
@@ -53,8 +53,33 @@ def save_to_google_sheet():
 	if not animals:
 		print("Список животных пуст.")
 		return
+	print(f'В работе {len(animals)} животных')
 	exportAnimalList(animals)
+
+def save_dead_google_sheet():
+	"""
+	Метод для сохранения списка животных в google-таблицу.
+	"""
+	animals = ExchangeStorage.get_animals_dead_list()
+	if not animals:
+		print("Список животных пуст.")
+		return
+	print(f'В работе {len(animals)} мертвых животных')
+	exportDeadAnimalList(animals)
+
+def save_outside_google_sheet():
+	"""
+	Метод для сохранения списка животных в google-таблицу.
+	"""
+	animals = ExchangeStorage.get_animals_outside()
+	if not animals:
+		print("Список животных пуст.")
+		return
+	print(f'В работе {len(animals)} выпущенных животных')
+	exportOutsideAnimalList(animals)
 
 
 if __name__ == "__main__":
-	result = save_to_google_sheet()
+	save_to_google_sheet()
+	save_dead_google_sheet()
+	save_outside_google_sheet()
