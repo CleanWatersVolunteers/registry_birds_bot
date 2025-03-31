@@ -14,6 +14,7 @@ apm3_text_skip = 'Пропустить'
 apm3_text_outgone = 'Отбытие'
 apm3_text_outgone_confirmation = '⚠️ Подтвердите отбытие'
 apm3_text_outgone_description = 'Введите место отбытия'
+apm3_text_registration = 'Регистрация'
 
 
 ##################################
@@ -43,7 +44,7 @@ def apm3_start(user_id, text, key=None):
 		else:
 			dead_info = Storage.get_animal_dead(animal['bar_code'])
 			if dead_info is None:
-				return apm3_show_dead(animal['bar_code'])
+				return apm3_show_dead(user, animal['bar_code'])
 	if key == 'apm3_outgone_description':
 		user['animal_outgone'] = text
 		return apm3_animal_outgone_confirmation(user)
@@ -64,11 +65,20 @@ def apm3_start(user_id, text, key=None):
 	return None, None
 
 
-def apm3_show_dead(bar_code):
+def apm3_show_dead(user, bar_code):
+	# todo Использовать arm_id из базы #154
+	arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
+	# todo Использовать arm_id из базы #154
+
+	buttons = [
+		{const.text_animal_dead: 'apm3_animal_dead_confirmation', apm3_text_outgone: 'apm3_get_animal_outgone'}
+	]
+	if Storage.get_reg_time(user['animal']['animal_id'], arm_id) is None:
+		buttons.append({apm3_text_registration: 'apm3_done'})
+	buttons.append({const.text_cancel: 'entry_cancel'})
 	return (
 		f'{const.text_animal_number} {bar_code}',
-		{const.text_animal_dead: 'apm3_animal_dead_confirmation', apm3_text_outgone: 'apm3_get_animal_outgone',
-		 const.text_cancel: 'entry_cancel'},
+		buttons,
 		None
 	)
 
@@ -120,11 +130,9 @@ def apm3_button(user, msg, key):
 	elif key == 'apm3_animal_dead':
 		return apm3_animal_dead(user)
 	elif key == 'apm3_show_dead':
-		return apm3_show_dead(user['animal']['bar_code'])
+		return apm3_show_dead(user, user['animal']['bar_code'])
 	elif key == 'apm3_get_animal_outgone':
 		return apm3_get_animal_outgone(user)
-	elif key == 'apm3_animal_outgone':
-		return apm3_animal_outgone_confirmation(user)
 	elif key == 'apm3_animal_outgone_ready':
 		arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
 		Storage.insert_animals_outside(user['animal']['animal_id'], user['name'], user['animal_outgone'], arm_id)
