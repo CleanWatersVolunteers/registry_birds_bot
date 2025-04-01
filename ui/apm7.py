@@ -32,6 +32,11 @@ apm7_text_no_duty = 'Нет смен'
 apm7_text_create_duty_title = 'Создание смены:'
 apm7_text_delete_duty_confirmation = '❓ Действительно удалить смену:'
 
+# Для получения статистики по стационару
+# todo Когда появятся другие локации придумать алгоритм вычисления нужного ID
+REGISTRATION_ARM_ID = 1
+HOSPITAL_ARM_ID = 3
+
 
 def get_duty_info(item, duty_number):
 	return f'\n{apm7_text_duty_title.format(number=duty_number)}\nПароль: {item["password"]}\nНачало: {item["start_date"].strftime(const.datetime_short_format)}\nОкончание: {item["end_date"].strftime(const.datetime_short_format)}'
@@ -203,13 +208,25 @@ def get_state_item(user, location_id, start_datetime=None, end_datetime=None):
 	return text
 
 
+def get_total_stat(user):
+	registration_count = Storage.get_history_count(REGISTRATION_ARM_ID, user["location_id"])
+	text = f'\nЗарегистрированно: {registration_count}'
+	outside_count = Storage.count_animals_outside(user["location_id"])
+	text += f'\nВыбыло: {outside_count}\n'
+	dead_count = Storage.count_animals_dead(user["location_id"])
+	text += f'Погибло: {dead_count}'
+	text += f'\nОстаток: {registration_count - outside_count - dead_count}'
+	text += f'\nСейчас в стационаре: {Storage.getHospitalCountNow(HOSPITAL_ARM_ID)}'
+	return text
+
+
 def get_stat(user):
 	text = f'\n{const.text_line}\nВсего'
-	text += get_state_item(user, user["location_id"])
-	# --------------------
+	text += get_total_stat(user)
+
 	text += f'\n{const.text_line}\nВчера'
 	text += get_state_item(user, user["location_id"], yesterday_db(), today_db())
-	# --------------------
+
 	text += f'\n{const.text_line}\nСегодня'
 	text += get_state_item(user, user["location_id"], today_db())
 	return text

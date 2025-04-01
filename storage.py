@@ -108,8 +108,6 @@ class Storage:
 		if results:
 			return results[0]["datetime"]
 		else:
-			# Если запись не найдена, возвращаем None
-			my_logger.warning(f"Запись с animal_id={animal_id} и arm_id={arm_id} не найдена.")
 			return None
 
 	@classmethod
@@ -598,6 +596,76 @@ class Storage:
 			difference = first_value - second_value
 			return difference
 		else:
+			return None
+
+	@classmethod
+	def getHospitalCountNow(cls, arm_id):
+		"""
+		Метод для получения количества записей из таблицы animals,
+		которых нет в animals_dead и animals_outside, но которые есть в place_history с arm_id.
+
+		:return: Количество записей (int) или None в случае ошибки.
+		"""
+		query = """
+				SELECT COUNT(DISTINCT a.id) AS count
+				FROM animals a
+				JOIN place_history ph ON a.id = ph.animal_id
+				LEFT JOIN animals_dead ad ON a.id = ad.animal_id
+				LEFT JOIN animals_outside ao ON a.id = ao.animal_id
+				WHERE ad.animal_id IS NULL
+				  AND ao.animal_id IS NULL
+				  AND ph.arm_id = %s;
+			"""
+		try:
+			# Выполняем запрос
+			result = cls.execute_query(query, (arm_id,), fetch=True)
+
+			# Проверяем результат
+			if result and len(result) > 0:
+				return result[0]["count"]  # Возвращаем значение count
+			else:
+				my_logger.warning("Нет данных для статистики.")
+				return 0
+
+		except Exception as e:
+			my_logger.error(f"Ошибка при получении статистики: {e}")
+			return None
+
+	@classmethod
+	def get_history_count(cls, place_id, location_id):
+		"""
+		Метод для получения количества записей в таблице place_history
+		по заданным place_id и location_id.
+
+		:param place_id: ID места.
+		:param location_id: ID локации.
+		:return: Количество записей (int) или None в случае ошибки.
+		"""
+		query = """
+				SELECT COUNT(*) AS count
+				FROM place_history ph
+				JOIN arms a ON ph.arm_id = a.id
+				WHERE a.place_id = %(place_id)s
+				  AND a.location_id = %(location_id)s;
+			"""
+		data = {
+			"place_id": place_id,
+			"location_id": location_id
+		}
+
+		try:
+			# Выполняем запрос
+			result = cls.execute_query(query, data=data, fetch=True)
+
+			# Проверяем результат
+			if result and len(result) > 0:
+				return result[0]["count"]  # Возвращаем значение count
+			else:
+				my_logger.warning("Нет данных для статистики.")
+				return 0
+
+		except Exception as e:
+			my_logger.error(f"Ошибка при получении статистики: {e}")
 			return None
 
 	@classmethod
