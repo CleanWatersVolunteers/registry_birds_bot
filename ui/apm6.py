@@ -32,18 +32,14 @@ nanny_text_incorrect_fish_number = '❌ Количество должно быт
 nanny_text_incorrect_weight = f'Вес должен быть от {nanny_minimal_weight} гр.'
 
 
-def getTitle(animal):
-	if animal['species'] is None:
-		return f'{const.text_animal_number} {animal['bar_code']}'
-	else:
-		return f'{const.text_animal_number} {animal['bar_code']} - {animal['species']}'
+
 
 
 def nanny_weighing(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_weight:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_weight
 		return (
-			f'{getTitle(user['animal'])}\n{error_text}\n{nanny_text_weighing_action}',
+			f'{Tools.getAnimalTitle(user['animal'])}\n{error_text}\n{nanny_text_weighing_action}',
 			{const.text_cancel: 'entry_cancel'},
 			'apm6_weighing'
 		)
@@ -60,7 +56,7 @@ def nanny_feeding(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_fish:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_fish_number
 		return (
-			f'{getTitle(user['animal'])}\n{error_text}\n{nanny_text_entry_fish}',
+			f'{Tools.getAnimalTitle(user['animal'])}\n{error_text}\n{nanny_text_entry_fish}',
 			{const.text_cancel: 'entry_cancel'},
 			'apm6_feeding'
 		)
@@ -77,7 +73,7 @@ def nanny_manual_feeding(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_fish:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_fish_number
 		return (
-			f'{getTitle(user['animal'])}\n{error_text}\n{nanny_text_entry_fish}',
+			f'{Tools.getAnimalTitle(user['animal'])}\n{error_text}\n{nanny_text_entry_fish}',
 			{const.text_cancel: 'entry_cancel'},
 			'apm6_feeding'
 		)
@@ -92,7 +88,7 @@ def nanny_manual_feeding(msg, user, username) -> (str,):
 
 def apm6_show_mpls(user):
 	kbd = dict()
-	text = f'{getTitle(user['animal'])}\n{const.text_line}\n'
+	text = f'{Tools.getAnimalTitle(user['animal'])}\n{const.text_line}\n'
 	history = history_get_info(user['animal']['animal_id'], user['animal']['capture_datetime'], week_db())
 	if history is not None:
 		text += f'{history}\n'
@@ -154,25 +150,25 @@ def apm6_button(user, text, key):
 		user['mpl_list'].append(manipulation_id)
 		if int(manipulation_id) == feeding_manipulations_id:
 			return (
-				f'{getTitle(user['animal'])}\n{nanny_text_entry_fish}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{nanny_text_entry_fish}',
 				{const.text_cancel: "entry_cancel"},
 				'apm6_feeding'
 			)
 		elif int(manipulation_id) == feeding_manual_manipulations_id:
 			return (
-				f'{getTitle(user['animal'])}\n{nanny_text_entry_fish}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{nanny_text_entry_fish}',
 				{const.text_cancel: 'entry_cancel'},
 				'apm6_feeding_manual'
 			)
 		elif int(manipulation_id) == weighting_manipulations_id:
 			return (
-				f'{getTitle(user['animal'])}\n{nanny_text_weighing_action}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{nanny_text_weighing_action}',
 				{const.text_cancel: 'entry_cancel'},
 				'apm6_weighing'
 			)
 		elif int(manipulation_id) == const.diarrhea_manipulations_id:
 			return (
-				f'{getTitle(user['animal'])}\n{const.text_diarrhea}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{const.text_diarrhea}',
 				[{const.text_yes: 'apm6_diarrhea_yes', const.text_no: 'apm6_diarrhea_no'},
 				 {const.text_cancel: 'entry_cancel'}],
 				None
