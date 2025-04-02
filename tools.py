@@ -37,3 +37,10 @@ class Tools:
 		if reg_datetime is not None:
 			my_logger.debug('Start asyncAddVetOutgone')
 			asyncAddVetOutgone(bar_code, reg_datetime.strftime(const.datetime_format), now(), 'гибель')
+
+	@classmethod
+	def getAnimalTitle(cls, animal):
+		if animal['species'] is None:
+			return f'{const.text_animal_number} {animal['bar_code']}'
+		else:
+			return f'{const.text_animal_number} {animal['bar_code']} - {animal['species']}'
