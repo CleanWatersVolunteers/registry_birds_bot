@@ -32,9 +32,6 @@ nanny_text_incorrect_fish_number = '❌ Количество должно быт
 nanny_text_incorrect_weight = f'Вес должен быть от {nanny_minimal_weight} гр.'
 
 
-
-
-
 def nanny_weighing(msg, user, username) -> (str,):
 	if not msg.isdigit() or int(msg) < nanny_minimal_weight:
 		error_text = nanny_text_incorrect_digit if not msg.isdigit() else nanny_text_incorrect_weight
@@ -75,7 +72,7 @@ def nanny_manual_feeding(msg, user, username) -> (str,):
 		return (
 			f'{Tools.getAnimalTitle(user['animal'])}\n{error_text}\n{nanny_text_entry_fish}',
 			{const.text_cancel: 'entry_cancel'},
-			'apm6_feeding'
+			'apm6_feeding_manual'
 		)
 	else:
 		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=feeding_manual_history_type_id,
