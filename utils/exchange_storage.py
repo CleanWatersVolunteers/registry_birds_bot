@@ -89,6 +89,8 @@ class ExchangeStorage:
 	@classmethod
 	def insert_animal(cls, code, capture_datetime, place, pollution, weight=None, species=None, clinical_condition=None,
 					  triage=None, catcher=None):
+		print(
+			f'insert_animal: code: {code}, capture_datetime: {capture_datetime}, place: {place}, pollution: {pollution}, weight: {weight}, species: {species}, clinical_condition: {clinical_condition}, triage: {triage}, catcher: {catcher}')
 		capture_datetime = datetime.strptime(capture_datetime, cls.capture_datetime_string_format)
 		capture_datetime_formatted = capture_datetime.strftime(cls.capture_datetime_db_format)
 
@@ -126,6 +128,8 @@ class ExchangeStorage:
 	# Вставка записей бумажного журнала первичной регистрации
 	@classmethod
 	def import_place_history(cls, code, registration_datetime, tg_nickname, arm_id):
+		print(
+			f'import_place_history code: {code}, registration_datetime: {registration_datetime}, tg_nickname: {tg_nickname}, arm_id: {arm_id}')
 		registration_datetime = datetime.strptime(registration_datetime, cls.capture_datetime_string_format)
 		registration_datetime_formatted = registration_datetime.strftime(cls.capture_datetime_db_format)
 
@@ -218,6 +222,8 @@ class ExchangeStorage:
 		:param tg_nickname: Никнейм пользователя Telegram.
 		:return: ID вставленной записи или None в случае ошибки.
 		"""
+		print(
+			f'insert_dead: code: {code}, dead_datetime: {dead_datetime}, arms_id: {arms_id}, tg_nickname: {tg_nickname}')
 		dead_datetime = datetime.strptime(dead_datetime, cls.capture_datetime_string_format)
 		dead_datetime_formatted = dead_datetime.strftime(cls.capture_datetime_db_format)
 
