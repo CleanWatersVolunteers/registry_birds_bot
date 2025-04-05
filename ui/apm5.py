@@ -61,7 +61,8 @@ def apm5_show_mpls(user, dead_info=None, out_info=None):
 			text += f'{const.manipulation_not_found}\n'
 		kbd[const.text_animal_dead] = 'apm5_animal_dead_confirmation'
 	kbd[const.text_done] = 'apm5_done'
-	text += const.text_manipulation_done
+	if len(kbd) > 1:
+		text += f'{const.text_line}\n{const.text_manipulation_done}'
 	return text, kbd
 
 
@@ -77,7 +78,7 @@ def apm5_get_triage(triage):
 def apm5_get_animal_card(user):
 	animal = Storage.get_animal_by_bar_code(user['animal']['bar_code'])
 	if animal:
-		text = apm5_add_hdr_item(const.text_animal_number, animal['bar_code'])
+		text = f'{Tools.getAnimalTitle(user['animal'])}\n'
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
 		text += apm5_add_hdr_item(const.text_capture_time, animal['capture_datetime'].strftime(const.datetime_format))
 		if user['animal']['is_dead'] is False and user['animal']['is_out'] is False:
@@ -85,8 +86,6 @@ def apm5_get_animal_card(user):
 		text += apm5_add_hdr_item(history_text_pollution_degree, animal['degree_pollution'])
 		text += apm5_add_hdr_item(history_text_weight,
 								  f"{animal['weight']} гр." if animal['weight'] else history_text_not_specified)
-		text += apm5_add_hdr_item(history_text_species,
-								  animal['species'] if animal['species'] else history_text_not_specified)
 		text += apm5_add_hdr_item(history_text_clinical_condition, animal["clinical_condition_admission"] if animal[
 			'clinical_condition_admission'] else history_text_not_specified)
 		if animal["triage"]:
@@ -104,7 +103,7 @@ def apm5_get_animal_card(user):
 
 def apm5_animal_dead_confirmation(user):
 	return (
-		f'{const.text_animal_dead_confirmation} {const.text_animal_number} {user['animal']['bar_code']}',
+		f'{const.text_animal_dead_confirmation} {Tools.getAnimalTitle(user['animal'])}',
 		{f'{const.text_ok}': f'apm5_animal_dead', f'{const.text_cancel}': "entry_apm5"},
 		None
 	)
@@ -141,7 +140,7 @@ def apm5_start(user_id, text, key=None):
 		user['animal']['is_out'] = out_info is not None
 		if animal['clinical_condition_admission'] is None:
 			return (
-				f'{const.text_animal_number} {user['animal']['bar_code']}\n{apm5_text_clinic_state}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{apm5_text_clinic_state}',
 				{const.text_cancel: 'entry_cancel'},
 				'apm5_clinic_state'
 			)
@@ -150,7 +149,7 @@ def apm5_start(user_id, text, key=None):
 		return text, kbd, None
 	if key == 'apm5_clinic_state':
 		user['clinic_state'] = text
-		text = f'{const.text_animal_number} {user['animal']['bar_code']}\n'
+		text = f'{Tools.getAnimalTitle(user['animal'])}\n'
 		text += f'{const.text_data_check}\n'
 		text += f'❓ Клиническое состояние: {user['clinic_state']}\n'
 		return text, {const.text_done: 'apm5_clinical_condition', const.text_cancel: 'entry_cancel'}, None
@@ -180,20 +179,20 @@ def apm5_button(user, text, key):
 		manipulation_id = match.group()
 		if int(manipulation_id) == const.diarrhea_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{const.text_diarrhea}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{const.text_diarrhea}',
 				[{const.text_yes: 'apm5_diarrhea_yes', const.text_no: 'apm5_diarrhea_no'},
 				 {const.text_cancel: 'entry_cancel'}],
 				None
 			)
 		elif int(manipulation_id) == apm5_note_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_note}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{apm5_text_note}',
 				{const.text_cancel: "entry_cancel"},
 				'apm5_note'
 			)
 		elif int(manipulation_id) == apm5_neurological_manipulations_id:
 			return (
-				f'{const.text_animal_number} {user['animal']["bar_code"]}\n{apm5_text_neurological}',
+				f'{Tools.getAnimalTitle(user['animal'])}\n{apm5_text_neurological}',
 				[{const.text_yes: "apm5_neurological_yes", const.text_no: "apm5_neurological_no"},
 				 {const.text_cancel: "entry_cancel"}],
 				None
