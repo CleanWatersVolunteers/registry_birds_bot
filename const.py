@@ -19,6 +19,7 @@ class const:
 	text_today = 'Сегодня'
 	text_yesterday = 'Вчера'
 	text_line = '------------------------'
+	text_not_registered_in_hospital = f'⚠️ Не зарегистрировано в стационаре'
 	text_manipulations_not_found = "Манипуляции не найдены"
 	text_animal_dead = 'Гибель'
 	text_animal_dead_confirmation = '⚠️ Подтвердите гибель'
@@ -43,3 +44,5 @@ class const:
 
 	# БД manipulations.id
 	diarrhea_manipulations_id = 15
+
+	HOSPITAL_ARM_ID = 3

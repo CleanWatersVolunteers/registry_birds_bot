@@ -10,15 +10,13 @@ class Tools:
 
 	@classmethod
 	def checkLeave(cls, bar_code):
-		deadAnimal = Storage.get_animal_dead(bar_code)
-		if deadAnimal:
+		if Storage.get_animal_dead(bar_code):
 			return (
 				const.animal_is_dead.format(code=bar_code),
 				{const.text_ok: "entry_cancel"},
 				None
 			)
-		outAnimal = Storage.get_animal_outside(bar_code)
-		if outAnimal:
+		if Storage.get_animal_outside(bar_code):
 			return (
 				const.animal_is_out.format(code=bar_code),
 				{const.text_ok: "entry_cancel"},
@@ -44,3 +42,9 @@ class Tools:
 			return f'{const.text_animal_number} {animal['bar_code']}'
 		else:
 			return f'{const.text_animal_number} {animal['bar_code']} - {animal['species']}'
+
+	# Возвращает время регистрации в стационаре
+	@classmethod
+	def getHospitalTime(cls, location_id, animal_id):
+		hospital_arm_id = Storage.get_arm_id(const.HOSPITAL_ARM_ID, location_id)
+		return Storage.get_reg_time(animal_id, hospital_arm_id)
