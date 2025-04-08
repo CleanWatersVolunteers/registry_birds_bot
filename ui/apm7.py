@@ -35,7 +35,6 @@ apm7_text_delete_duty_confirmation = '❓ Действительно удали�
 # Для получения статистики по стационару
 # todo Когда появятся другие локации придумать алгоритм вычисления нужного ID
 REGISTRATION_ARM_ID = 1
-HOSPITAL_ARM_ID = 3
 
 
 def get_duty_info(item, duty_number):
@@ -216,7 +215,7 @@ def get_total_stat(user):
 	dead_count = Storage.count_animals_dead(user["location_id"])
 	text += f'Погибло: {dead_count}'
 	text += f'\nОстаток: {registration_count - outside_count - dead_count}'
-	text += f'\nСейчас в стационаре: {Storage.getHospitalCountNow(HOSPITAL_ARM_ID)}'
+	text += f'\nСейчас в стационаре: {Storage.getHospitalCountNow(const.HOSPITAL_ARM_ID)}'
 	return text
 
 

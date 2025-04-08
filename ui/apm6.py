@@ -86,6 +86,9 @@ def nanny_manual_feeding(msg, user, username) -> (str,):
 def apm6_show_mpls(user):
 	kbd = dict()
 	text = f'{Tools.getAnimalTitle(user['animal'])}\n{const.text_line}\n'
+	hospital_time = Tools.getHospitalTime(user["location_id"], user['animal']['animal_id'])
+	if hospital_time is None:
+		text += f'{const.text_not_registered_in_hospital}\n'
 	history = history_get_info(user['animal']['animal_id'], user['animal']['capture_datetime'], week_db())
 	if history is not None:
 		text += f'{history}\n'

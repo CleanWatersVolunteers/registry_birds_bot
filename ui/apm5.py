@@ -12,6 +12,7 @@ from ui.history import history_get_info
 apm5_text_clinic_state = '⚠️ Введите клиническое состояние'
 apm5_text_note = 'Введите текст заметки'
 apm5_text_neurological = 'Неврологическая симптоматика'
+apm5_text_registered_to_hospital = f'Поступило в стационар: '
 
 history_text_pollution_degree = 'Степень загрязнения'
 history_text_weight = 'Вес'
@@ -80,9 +81,15 @@ def apm5_get_animal_card(user):
 	if animal:
 		text = f'{Tools.getAnimalTitle(user['animal'])}\n'
 		text += apm5_add_hdr_item(const.text_capture_place, animal['place_capture'])
-		text += apm5_add_hdr_item(const.text_capture_time, animal['capture_datetime'].strftime(const.datetime_format))
+		text += apm5_add_hdr_item(const.text_capture_time,
+								  animal['capture_datetime'].strftime(const.datetime_short_format))
 		if user['animal']['is_dead'] is False and user['animal']['is_out'] is False:
 			text += f'({TimeTools.formatTimeInterval(start_datetime=animal['capture_datetime'])})\n'
+		hospital_time = Tools.getHospitalTime(user["location_id"], user['animal']['animal_id'])
+		if hospital_time is None:
+			text += f'{const.text_not_registered_in_hospital}\n'
+		else:
+			text += f'{apm5_text_registered_to_hospital} {hospital_time.strftime(const.datetime_short_format)}\n'
 		text += apm5_add_hdr_item(history_text_pollution_degree, animal['degree_pollution'])
 		text += apm5_add_hdr_item(history_text_weight,
 								  f"{animal['weight']} гр." if animal['weight'] else history_text_not_specified)
