@@ -5,8 +5,6 @@ from database import Database as Db
 from storage import Storage
 from tools import Tools
 
-apm2_place_id = 2
-
 
 ##################################
 # Global API
@@ -33,8 +31,5 @@ def apm2_start(user_id, text, key=None):
 
 
 def apm2_button(user, text, key):
-	# todo Использовать arm_id из базы #154
-	arm_id = Storage.get_arm_id(apm2_place_id, user["location_id"])
-	# todo Использовать arm_id из базы #154
-	Storage.insert_place_history(arm_id, user["animal_id"], user['name'])
+	Storage.insert_place_history(user['apm']['arm_id'], user["animal_id"], user['name'])
 	return None, None, None

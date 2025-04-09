@@ -184,10 +184,7 @@ def apm6_button(user, text, key):
 			text, kbd = apm6_show_mpls(user)
 	elif key == 'apm6_done':
 		if user['there_are_changes']:
-			# todo Использовать arm_id из базы #154
-			arm_id = Storage.get_arm_id(apm6_place_id, user['location_id'])
-			# todo Использовать arm_id из базы #154
-			Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+			Storage.insert_place_history(user['apm']['arm_id'], user['animal']['animal_id'], user['name'])
 		return None, None, None
 	elif key == 'apm6_diarrhea_yes':
 		Storage.insert_value_history(animal_id=user['animal']['animal_id'], type_id=const.diarrhea_history_type_id,

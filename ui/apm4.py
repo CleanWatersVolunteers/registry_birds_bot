@@ -110,10 +110,7 @@ def apm4_button(user, text, key):
 									 value=body_condition,
 									 tg_nickname=user['name'])
 	elif key == 'apm4_done':
-		# todo Использовать arm_id из базы #154
-		arm_id = Storage.get_arm_id(apm4_place_id, user['location_id'])
-		# todo Использовать arm_id из базы #154
-		Storage.insert_place_history(arm_id, user['animal_id'], user['name'])
+		Storage.insert_place_history(user['apm']['arm_id'], user['animal_id'], user['name'])
 		return None, None, None
 	else:
 		key_id = key.split('_')[-1]
