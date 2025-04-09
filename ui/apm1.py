@@ -11,8 +11,6 @@ from timetools import yesterday
 from utils.spreadsheets import asyncAddVetIncome
 from utils.spreadsheets import asyncExportNewAnimal
 
-apm1_place_id = 1
-
 apm1_text_place = 'Введите место отлова'
 apm1_text_date = 'Выберите дату отлова'
 apm1_text_time = 'Введите время отлова в формате ЧЧ:ММ'
@@ -197,10 +195,7 @@ def apm1_button(user, msg, key):
 										  catcher=user['catcher'],
 										  pollution=user["pollution"])
 		if animal_id is not None:
-			# todo Использовать arm_id из базы #154
-			arm_id = Storage.get_arm_id(apm1_place_id, user["location_id"])
-			# todo Использовать arm_id из базы #154
-			if Storage.insert_place_history(arm_id, animal_id, user['name']) is not None:
+			if Storage.insert_place_history(user['apm']['arm_id'], animal_id, user['name']) is not None:
 				# todo По хорошему нужно брать register_datetime из таблицы place_history
 				register_datetime = now()
 				my_logger.debug(f'Start asyncExportNewAnimal')

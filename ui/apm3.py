@@ -9,7 +9,6 @@ from utils.spreadsheets import asyncAddVetOutgone
 from utils.spreadsheets import asyncExportOutgoneAnimal
 
 apm3_text = 'Введите массу животного в граммах'
-apm3_place_id = 3
 apm3_text_skip = 'Пропустить'
 apm3_text_outgone = 'Отбытие'
 apm3_text_outgone_confirmation = '⚠️ Подтвердите отбытие'
@@ -66,14 +65,10 @@ def apm3_start(user_id, text, key=None):
 
 
 def apm3_show_dead(user, bar_code):
-	# todo Использовать arm_id из базы #154
-	arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
-	# todo Использовать arm_id из базы #154
-
 	buttons = [
 		{const.text_animal_dead: 'apm3_animal_dead_confirmation', apm3_text_outgone: 'apm3_get_animal_outgone'}
 	]
-	if Storage.get_reg_time(user['animal']['animal_id'], arm_id) is None:
+	if Storage.get_reg_time(user['animal']['animal_id'], user['apm']['arm_id']) is None:
 		buttons.append({apm3_text_registration: 'apm3_done'})
 	buttons.append({const.text_cancel: 'entry_cancel'})
 	return (
@@ -108,20 +103,14 @@ def apm3_animal_outgone_confirmation(user):
 
 
 def apm3_animal_dead(user):
-	arm_id = Storage.get_arm_id(user['apm']['place_id'], user['location_id'])
-	if arm_id is not None:
-		animal_id = user['animal']['animal_id']
-		Tools.dead(animal_id, user['animal']['bar_code'], arm_id, user['name'])
+	Tools.dead(user['animal']['animal_id'], user['animal']['bar_code'], user['apm']['arm_id'], user['name'])
 	return None, None, None
 
 
 def apm3_button(user, msg, key):
 	if key == "apm3_done":
-		# todo Использовать arm_id из базы #154
-		arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
-		# todo Использовать arm_id из базы #154
-		if Storage.get_reg_time(user['animal']['animal_id'], arm_id) is None:
-			Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+		if Storage.get_reg_time(user['animal']['animal_id'], user['apm']['arm_id']) is None:
+			Storage.insert_place_history(user['apm']['arm_id'], user['animal']['animal_id'], user['name'])
 		if 'weight' in user:
 			Storage.update_animal(user['animal']['animal_id'], weight=user['weight'])
 			del user['weight']  # todo Мало того что оно к user не относится, так еще и сохраняется при смене животного.
@@ -134,8 +123,8 @@ def apm3_button(user, msg, key):
 	elif key == 'apm3_get_animal_outgone':
 		return apm3_get_animal_outgone(user)
 	elif key == 'apm3_animal_outgone_ready':
-		arm_id = Storage.get_arm_id(apm3_place_id, user["location_id"])
-		Storage.insert_animals_outside(user['animal']['animal_id'], user['name'], user['animal_outgone'], arm_id)
+		Storage.insert_animals_outside(user['animal']['animal_id'], user['name'], user['animal_outgone'],
+									   user['apm']['arm_id'])
 		asyncExportOutgoneAnimal(user['animal']['bar_code'], now(), user['animal_outgone'])
 		# todo Убрать хардкод конда появится вторая локация
 		reg_arm_id = 1

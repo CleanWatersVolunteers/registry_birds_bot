@@ -117,10 +117,7 @@ def apm5_animal_dead_confirmation(user):
 
 
 def apm5_animal_dead(user):
-	arm_id = Storage.get_arm_id(user['apm']['place_id'], user['location_id'])
-	if arm_id is not None:
-		animal_id = user['animal']['animal_id']
-		Tools.dead(animal_id, user['animal']['bar_code'], arm_id, user['name'])
+	Tools.dead(user['animal']['animal_id'], user['animal']['bar_code'], user['apm']['arm_id'], user['name'])
 	return None, None, None
 
 
@@ -176,10 +173,7 @@ def apm5_button(user, text, key):
 		return apm5_animal_dead(user)
 	if key == 'apm5_done':
 		if user['there_are_changes']:
-			# todo Использовать arm_id из базы #154
-			arm_id = Storage.get_arm_id(apm5_place_id, user['location_id'])
-			# todo Использовать arm_id из базы #154
-			Storage.insert_place_history(arm_id, user['animal']['animal_id'], user['name'])
+			Storage.insert_place_history(user['apm']['arm_id'], user['animal']['animal_id'], user['name'])
 		return None, None, None
 	if "mpl" in key:
 		match = re.search(r'\d+$', key)
