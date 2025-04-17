@@ -77,6 +77,11 @@ ALTER TABLE `place_history` ADD CONSTRAINT `unique_animal_datetime` UNIQUE (`ani
 ALTER TABLE history ADD CONSTRAINT unique_animal_datetime_manipulation_arm UNIQUE (animal_id, datetime, manipulation_id, arm_id);
 
 INSERT INTO `manipulations` (`name`, `place_list`) VALUES ('Принудительное кормление', '6');
-UPDATE `values_history_type` SET `units`='гр.' WHERE  `id`=1;
+UPDATE `values_history_type` SET `units`='гр.' where  `id`=1;
 INSERT INTO `values_history_type` (`name`, `units`) VALUES ('Принудительно съедено', 'гр.');
-UPDATE `values_history_type` SET `name`='Съедено' WHERE  `id`=1;
+UPDATE `values_history_type` SET `name`='Съедено' where  `id`=1;
+
+-- Адаптировать скрипт загрузки данных для номеров < 700 #413
+ALTER TABLE `values_history` CHANGE COLUMN `value` `value` VARCHAR(100) NOT NULL
+ALTER TABLE `animals` ADD COLUMN `name` VARCHAR(50) NULL DEFAULT NULL;
+ALTER TABLE `animals` ADD CONSTRAINT `unique_name` UNIQUE (`name`);
