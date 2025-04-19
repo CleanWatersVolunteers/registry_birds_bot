@@ -106,7 +106,7 @@ def exportNewAnimal(code, place, capture_datetime, register_datetime, pollution,
 	spreadsheet = openSheet(MAIN_GOOGLE_SHEET)
 	if spreadsheet is not None:
 		titles = ['Номер птицы', 'Место отлова', 'Время отлова', 'Время поступления', 'Степень загрязнения', 'Вид',
-				  'Время гибели', 'Время отбытия', 'Отбытие']
+				  'Ловец', 'Время гибели', 'Время отбытия', 'Отбытие']
 		worksheet = ensure_worksheet_exists(spreadsheet, MAIN_WORKSHEET_TITLE, titles)
 		if worksheet is not None:
 			addNewAnimal(worksheet, code, place, capture_datetime, register_datetime, pollution, species, catcher)
