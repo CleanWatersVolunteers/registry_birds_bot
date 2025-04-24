@@ -26,8 +26,8 @@ def yesterday():
 	return (datetime.now().date() - timedelta(days=1)).strftime(const.date_format)
 
 
-def week_db():
-	return (datetime.now().date() - timedelta(days=7)).strftime("%Y.%m.%d")
+def two_weeks_db():
+	return (datetime.now().date() - timedelta(days=14)).strftime("%Y.%m.%d")
 
 
 def yesterday_db():

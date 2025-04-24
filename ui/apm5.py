@@ -4,7 +4,7 @@ import re
 from const import const
 from database import Database as Db
 from storage import Storage
-from timetools import week_db, TimeTools
+from timetools import two_weeks_db, TimeTools
 from tools import Tools
 from ui.history import get_diff_values_history
 from ui.history import history_get_info
@@ -44,7 +44,7 @@ def apm5_add_hdr_item(label, value):
 def apm5_show_mpls(user, dead_info=None, out_info=None):
 	kbd = dict()
 	text = f'{apm5_get_animal_card(user)}\n'
-	history = history_get_info(user['animal']['animal_id'], user['animal']['capture_datetime'], week_db(), dead_info,
+	history = history_get_info(user['animal']['animal_id'], user['animal']['capture_datetime'], two_weeks_db(), dead_info,
 							   out_info)
 	if history is not None:
 		text += f'{history}\n'
