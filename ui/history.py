@@ -12,13 +12,14 @@ text_weight_change = 'Изменение веса'
 # Global API
 ##################################
 
-def history_get_info(animal_id, capture_datetime, start_date, dead_info=None, out_info=None):
+def history_get_info(animal_id, capture_datetime, start_date=None, dead_info=None, out_info=None):
 	numerical_history = Storage.get_animal_values_history(animal_id, start_date)
 	history = Storage.get_animal_history(animal_id, start_date)
-	place_history = Storage.get_place_history(animal_id, start_date)
+	# place_history = Storage.get_place_history(animal_id, start_date)
 	my_logger.info(f'history_get_info: {start_date}')
 
-	combined_history = (numerical_history + history + place_history)
+	combined_history = (numerical_history + history)
+	# + place_history
 	if dead_info is not None:
 		combined_history += dead_info
 	if out_info is not None:
